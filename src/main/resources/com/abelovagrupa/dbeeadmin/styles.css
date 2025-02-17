@@ -1,0 +1,16 @@
+.keyword {
+    -fx-fill: blue;
+    -fx-font-weight: bold;
+}
+
+.string {
+    -fx-fill: green;
+}
+
+.number {
+    -fx-fill: orangered;
+}
+
+.comment {
+    -fx-fill: dimgray;
+}
