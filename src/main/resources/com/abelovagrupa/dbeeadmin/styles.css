@@ -8,9 +8,9 @@
 }
 
 .number {
-    -fx-fill: red;
+    -fx-fill: orangered;
 }
 
 .comment {
-    -fx-fill: gray;
+    -fx-fill: dimgray;
 }
