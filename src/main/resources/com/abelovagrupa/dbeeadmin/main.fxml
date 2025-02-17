@@ -38,7 +38,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ToolBar?>
@@ -48,8 +47,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
+<?import org.fxmisc.richtext.CodeArea?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.MainController" prefHeight="600.0"
+      prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -98,7 +99,13 @@
     <SplitPane dividerPositions="0.24, 0.83" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
             <VBox prefHeight="509.0" prefWidth="166.0" />
-        <ScrollPane prefHeight="509.0" prefWidth="549.0" />
+            <SplitPane dividerPositions="0.7" orientation="VERTICAL">
+               <items>
+                  <CodeArea fx:id="codeArea">
+                  </CodeArea>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+               </items>
+            </SplitPane>
         <AnchorPane prefHeight="509.0" prefWidth="181.0">
           <children>
             <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" style="&#10;" text="Details" textAlignment="CENTER" wrapText="false">
