@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.abelovagrupa.dbeeadmin.view.PanelResults">
+    <items>
+        <TableView prefHeight="200.0" prefWidth="200.0" />
+        <ScrollPane prefHeight="200.0" prefWidth="200.0" />
+    </items>
+</SplitPane>

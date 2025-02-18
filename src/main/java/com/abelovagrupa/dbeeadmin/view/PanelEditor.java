@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainController implements Initializable {
+public class PanelEditor implements Initializable {
 
     @FXML
     CodeArea codeArea;

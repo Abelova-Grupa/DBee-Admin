@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<SplitPane dividerPositions="0.7"
+           orientation="VERTICAL"
+           xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.abelovagrupa.dbeeadmin.view.PanelCenter">
+        <items>
+            <fx:include source="panelEditor.fxml" />
+            <fx:include source="panelResults.fxml" />
+        </items>
+    </SplitPane>

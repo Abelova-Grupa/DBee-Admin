@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.fxmisc.richtext.CodeArea?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.abelovagrupa.dbeeadmin.view.PanelEditor">
+    <children>
+        <ToolBar prefHeight="40.0" prefWidth="200.0">
+            <items>
+                <Button mnemonicParsing="false" text="Execute script" />
+                <Button mnemonicParsing="false" text="Execute line" />
+                <Button mnemonicParsing="false" text="Save..." />
+                <Button mnemonicParsing="false" text="Load script..." />
+            </items>
+        </ToolBar>
+        <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS">
+        </CodeArea>
+    </children>
+</VBox>
