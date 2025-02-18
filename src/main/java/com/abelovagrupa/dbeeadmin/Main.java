@@ -15,7 +15,7 @@ public class Main extends Application {
 
         scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
-        stage.setTitle("DBee Admin 1.0-SNAPSHOT");
+        stage.setTitle("DBee Admin");
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.show();
