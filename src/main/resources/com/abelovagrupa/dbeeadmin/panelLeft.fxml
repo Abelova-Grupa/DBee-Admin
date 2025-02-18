@@ -10,33 +10,43 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<SplitPane dividerPositions="0.6823530947883893" orientation="VERTICAL" prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelLeft">
-        <items>
-      <HBox prefHeight="100.0" prefWidth="200.0">
-         <children>
-            <BorderPane prefHeight="133.0" prefWidth="248.0">
-               <top>
-                  <BorderPane prefHeight="54.0" prefWidth="198.0" BorderPane.alignment="CENTER">
-                     <left>
-                        <Label text="Schema" BorderPane.alignment="CENTER">
-                           <BorderPane.margin>
-                              <Insets left="10.0" />
-                           </BorderPane.margin></Label>
-                     </left>
-                     <right>
-                        <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="74.0" text="Refresh" BorderPane.alignment="CENTER" />
-                     </right>
-                     <bottom>
-                        <TextField promptText="Find " text="Search Objects" BorderPane.alignment="CENTER" />
-                     </bottom>
+<HBox xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelLeft">
+   <children>
+      <SplitPane dividerPositions="0.6823530947883893" orientation="VERTICAL" prefHeight="200.0" prefWidth="225.0" HBox.hgrow="ALWAYS">
+              <items>
+            <HBox prefHeight="100.0" prefWidth="200.0" >
+               <children >
+                  <BorderPane prefHeight="133.0" prefWidth="248.0" HBox.hgrow="ALWAYS">
+                     <top>
+                        <BorderPane prefHeight="54.0" prefWidth="198.0" BorderPane.alignment="CENTER">
+                           <left>
+                              <Label text="Schema" BorderPane.alignment="CENTER">
+                                 <BorderPane.margin>
+                                    <Insets left="10.0" />
+                                 </BorderPane.margin>
+                              </Label>
+                           </left>
+                           <right>
+                              <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="74.0" text="Refresh" BorderPane.alignment="CENTER" />
+                           </right>
+                           <bottom>
+                              <TextField promptText="Find " text="Search Objects" BorderPane.alignment="CENTER" />
+                           </bottom>
+                        </BorderPane>
+                     </top>
+                     <center>
+                        <VBox prefHeight="250.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <TreeView fx:id="treeView1" prefHeight="130.0" prefWidth="225.0" />
+                              <TreeView fx:id="treeView2" prefHeight="130.0" prefWidth="225.0" />
+                           </children>
+                        </VBox>
+                     </center>
                   </BorderPane>
-               </top>
-               <center>
-                  <TreeView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-               </center>
-            </BorderPane>
-         </children>
-      </HBox>
-            <VBox prefHeight="200.0" prefWidth="100.0" />
-        </items>
-    </SplitPane>
+               </children>
+            </HBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS"/>
+              </items>
+          </SplitPane>
+   </children>
+</HBox>
