@@ -1,6 +1,9 @@
 package com.abelovagrupa.dbeeadmin.controller;
 
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
+import com.abelovagrupa.dbeeadmin.model.DBEngine;
+import com.abelovagrupa.dbeeadmin.model.Schema;
+import com.abelovagrupa.dbeeadmin.model.Table;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -35,13 +38,13 @@ public class DatabaseInspector {
         return databaseNames;
     }
 
-    public List<String> getTableNames(String database) {
+    public List<String> getTableNames(Schema schema) {
 
         List<String> tableNames = new LinkedList<>();
 
         String query = "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, database);
+            ps.setString(1, schema.getName());
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -54,6 +57,30 @@ public class DatabaseInspector {
         }
         return tableNames;
     }
+
+    public List<Table> getTables(Schema schema){
+
+        List<Table> tables = new LinkedList<>();
+        String query = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?;";
+
+        try(PreparedStatement ps = connection.prepareStatement(query);){
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                Table table = new Table();
+                table.setName(rs.getString("TABLE_NAME"));
+                table.setDbEngine(DBEngine.valueOf(rs.getString("ENGINE").toUpperCase()));
+
+                // A lot more table attributes, implementation depends on scope
+
+                tables.add(table);
+            }
+
+        }catch(SQLException ex){
+            System.err.println("Error retrieving tables: "+ ex.getMessage());
+        }
+        return tables;
+    }
+
 
     
 
