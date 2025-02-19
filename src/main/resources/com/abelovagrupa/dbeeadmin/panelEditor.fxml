@@ -4,16 +4,33 @@
 <?import javafx.scene.layout.*?>
 <?import org.fxmisc.richtext.CodeArea?>
 
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.abelovagrupa.dbeeadmin.view.PanelEditor">
     <children>
         <ToolBar prefHeight="40.0" prefWidth="200.0">
             <items>
-                <Button mnemonicParsing="false" text="Execute script" />
-                <Button mnemonicParsing="false" text="Execute line" />
-                <Button mnemonicParsing="false" text="Save..." />
-                <Button mnemonicParsing="false" text="Load script..." />
+                <Button mnemonicParsing="false" text="Execute script" >
+                    <graphic>
+                        <FontIcon iconLiteral="fas-angle-double-right:16"/>
+                    </graphic>
+                </Button>
+                <Button mnemonicParsing="false" text="Execute line" >
+                    <graphic>
+                        <FontIcon iconLiteral="fas-angle-right:16"/>
+                    </graphic>
+                </Button>
+                <Button mnemonicParsing="false" text="Save..." >
+                    <graphic>
+                        <FontIcon iconLiteral="fas-file-export:16"/>
+                    </graphic>
+                </Button>
+                <Button mnemonicParsing="false" text="Load script..." >
+                    <graphic>
+                        <FontIcon iconLiteral="fas-file-import:16"/>
+                    </graphic>
+                </Button>
             </items>
         </ToolBar>
         <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS">

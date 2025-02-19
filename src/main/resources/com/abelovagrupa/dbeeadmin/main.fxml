@@ -47,6 +47,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelMain">
   <children>
     <MenuBar VBox.vgrow="NEVER">
@@ -90,10 +91,26 @@
     </MenuBar>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
-          <Button mnemonicParsing="false" text="Connection" />
-            <Button layoutX="10.0" layoutY="12.0" mnemonicParsing="false" text="New..." />
-            <Button layoutX="74.0" layoutY="12.0" mnemonicParsing="false" text="Import" />
-            <Button layoutX="162.0" layoutY="12.0" mnemonicParsing="false" text="Export" />
+          <Button mnemonicParsing="false" text="Connection" >
+            <graphic>
+              <FontIcon iconLiteral="fas-plug" iconSize="16"/>
+            </graphic>
+          </Button>
+          <Button layoutX="10.0" layoutY="12.0" mnemonicParsing="false" text="New..." >
+            <graphic>
+              <FontIcon iconLiteral="fas-server" iconSize="16"/>
+            </graphic>
+          </Button>
+            <Button layoutX="74.0" layoutY="12.0" mnemonicParsing="false" text="Import" >
+              <graphic>
+                <FontIcon iconLiteral="fas-file-import" iconSize="16"/>
+              </graphic>
+            </Button>
+            <Button layoutX="162.0" layoutY="12.0" mnemonicParsing="false" text="Export" >
+              <graphic>
+                <FontIcon iconLiteral="fas-file-export" iconSize="16"/>
+              </graphic>
+            </Button>
         </items>
       </ToolBar>
     <SplitPane dividerPositions="0.16072871667421143, 0.8999069981425871" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
