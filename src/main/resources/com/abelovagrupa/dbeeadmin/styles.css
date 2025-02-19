@@ -14,3 +14,11 @@
 .comment {
     -fx-fill: dimgray;
 }
+
+.tree-view {
+     -fx-background-color: transparent;
+     -fx-border-color: transparent;
+     -fx-border-width: 0;
+
+}
+
