@@ -13,22 +13,18 @@ public class Table {
     private List<ForeignKey> foreignKeys;
     private List<Trigger> triggers;
     private  DBEngine dbEngine;
-    private Charset charset;
-    private Collation collation;
     private Schema schema;
 
     public Table() {
     }
 
-    public Table(String name, List<Column> columns, List<Index> indexes, List<ForeignKey> foreignKeys, List<Trigger> triggers, DBEngine dbEngine, Charset charset, Collation collation, Schema schema) {
+    public Table(String name, List<Column> columns, List<Index> indexes, List<ForeignKey> foreignKeys, List<Trigger> triggers, DBEngine dbEngine, Schema schema) {
         this.name = name;
         this.columns = columns;
         this.indexes = indexes;
         this.foreignKeys = foreignKeys;
         this.triggers = triggers;
         this.dbEngine = dbEngine;
-        this.charset = charset;
-        this.collation = collation;
         this.schema = schema;
     }
 
@@ -80,22 +76,6 @@ public class Table {
         this.dbEngine = dbEngine;
     }
 
-    public Charset getCharset() {
-        return charset;
-    }
-
-    public void setCharset(Charset charset) {
-        this.charset = charset;
-    }
-
-    public Collation getCollation() {
-        return collation;
-    }
-
-    public void setCollation(Collation collation) {
-        this.collation = collation;
-    }
-
     public Schema getSchema() {
         return schema;
     }
@@ -113,8 +93,6 @@ public class Table {
                 ", foreignKeys=" + foreignKeys +
                 ", triggers=" + triggers +
                 ", dbEngine=" + dbEngine +
-                ", charset=" + charset +
-                ", collation=" + collation +
                 ", schema=" + schema +
                 '}';
     }
@@ -124,7 +102,7 @@ public class Table {
         if (this == o) return true;
         if (!(o instanceof Table table)) return false;
 
-        return getName().equals(table.getName()) && getColumns().equals(table.getColumns()) && getIndexes().equals(table.getIndexes()) && Objects.equals(getForeignKeys(), table.getForeignKeys()) && Objects.equals(getTriggers(), table.getTriggers()) && getDbEngine() == table.getDbEngine() && getCharset() == table.getCharset() && getCollation() == table.getCollation() && getSchema().equals(table.getSchema());
+        return getName().equals(table.getName()) && getColumns().equals(table.getColumns()) && getIndexes().equals(table.getIndexes()) && Objects.equals(getForeignKeys(), table.getForeignKeys()) && Objects.equals(getTriggers(), table.getTriggers()) && getDbEngine() == table.getDbEngine()  && getSchema().equals(table.getSchema());
     }
 
     @Override
@@ -135,8 +113,6 @@ public class Table {
         result = 31 * result + Objects.hashCode(getForeignKeys());
         result = 31 * result + Objects.hashCode(getTriggers());
         result = 31 * result + getDbEngine().hashCode();
-        result = 31 * result + getCharset().hashCode();
-        result = 31 * result + getCollation().hashCode();
         result = 31 * result + getSchema().hashCode();
         return result;
     }
