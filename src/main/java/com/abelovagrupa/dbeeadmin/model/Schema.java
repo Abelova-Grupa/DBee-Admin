@@ -40,6 +40,54 @@ public class Schema {
                 '}';
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Charset getCharset() {
+        return charset;
+    }
+
+    public void setCharset(Charset charset) {
+        this.charset = charset;
+    }
+
+    public Collation getCollation() {
+        return collation;
+    }
+
+    public void setCollation(Collation collation) {
+        this.collation = collation;
+    }
+
+    public List<Table> getTables() {
+        return tables;
+    }
+
+    public void setTables(List<Table> tables) {
+        this.tables = tables;
+    }
+
+    public int getTableCount() {
+        return tableCount;
+    }
+
+    public void setTableCount(int tableCount) {
+        this.tableCount = tableCount;
+    }
+
+    public double getDatabaseSize() {
+        return databaseSize;
+    }
+
+    public void setDatabaseSize(double databaseSize) {
+        this.databaseSize = databaseSize;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
