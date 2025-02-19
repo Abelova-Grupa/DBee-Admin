@@ -2,7 +2,9 @@ module com.abelovagrupa.dbeeadmin {
     requires javafx.controls;
     requires javafx.fxml;
     requires org.fxmisc.richtext;
-
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.fontawesome5;
 
     opens com.abelovagrupa.dbeeadmin to javafx.fxml;
     exports com.abelovagrupa.dbeeadmin;
