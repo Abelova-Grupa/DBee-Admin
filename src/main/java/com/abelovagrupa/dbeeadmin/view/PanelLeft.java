@@ -1,11 +1,13 @@
 package com.abelovagrupa.dbeeadmin.view;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.List;
@@ -21,6 +23,9 @@ public class PanelLeft implements Initializable {
 
     @FXML
     TreeView<String> treeView2;
+
+    @FXML
+    VBox vboxBrowser;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -42,8 +47,16 @@ public class PanelLeft implements Initializable {
             TreeItem<String> table2 = new TreeItem<>("Table 2");
 
             tableBranch.getChildren().addAll(table1,table2);
-
             schema.getChildren().addAll(tableBranch,viewBranch,procedureBranch,functionBranch);
+
+            schemaView.setPrefHeight(24);
+            schemaView.getRoot().addEventHandler(TreeItem.branchExpandedEvent(), event -> {
+                Platform.runLater(() -> schemaView.setPrefHeight(schemaView.getExpandedItemCount() * 24));
+            });
+
+            schemaView.getRoot().addEventHandler(TreeItem.branchCollapsedEvent(), event -> {
+                Platform.runLater(() -> schemaView.setPrefHeight(schemaView.getExpandedItemCount() * 24));
+            });
 
 
         }
@@ -54,8 +67,10 @@ public class PanelLeft implements Initializable {
     @FXML
     public void selectTreeItem(){
 
-        TreeItem<String> selectedTreeItem = schemaViews.get(0).getSelectionModel().getSelectedItem();
+        TreeItem<String> selectedTreeItem = schemaViews.getFirst().getSelectionModel().getSelectedItem();
         System.out.println(selectedTreeItem.getValue());
     }
+
+
 
 }

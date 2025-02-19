@@ -50,10 +50,10 @@
                         </BorderPane>
                      </top>
                      <center>
-                        <VBox prefHeight="250.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                        <VBox fx:id="vboxBrowser" prefHeight="250.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                            <children>
-                              <TreeView fx:id="treeView1" prefHeight="130.0" prefWidth="250.0" />
-                              <TreeView fx:id="treeView2" prefHeight="130.0" prefWidth="250.0" />
+                              <TreeView fx:id="treeView1"  styleClass="tree-view" prefHeight="130.0" prefWidth="250.0" />
+                              <TreeView fx:id="treeView2" styleClass="tree-view" prefHeight="130.0" prefWidth="250.0" />
                            </children>
                         </VBox>
                      </center>
