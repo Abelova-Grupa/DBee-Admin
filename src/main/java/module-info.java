@@ -5,6 +5,9 @@ module com.abelovagrupa.dbeeadmin {
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome5;
+    requires java.sql;
+    requires java.dotenv;
+
 
     opens com.abelovagrupa.dbeeadmin to javafx.fxml;
     exports com.abelovagrupa.dbeeadmin;
