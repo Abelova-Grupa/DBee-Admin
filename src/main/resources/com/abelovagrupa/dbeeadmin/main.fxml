@@ -93,7 +93,7 @@
     </MenuBar>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
-          <Button fx:id="btnConnection" mnemonicParsing="false">
+          <Button fx:id="btnConnection" mnemonicParsing="false" onAction="#openConnectionSettings">
             <graphic>
               <FontIcon iconLiteral="fas-plug" iconSize="16" />
             </graphic>
