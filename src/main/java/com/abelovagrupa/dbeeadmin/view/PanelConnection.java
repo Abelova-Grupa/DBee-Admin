@@ -1,5 +1,6 @@
 package com.abelovagrupa.dbeeadmin.view;
 
+import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import io.github.cdimascio.dotenv.Dotenv;
 import javafx.event.ActionEvent;
@@ -10,7 +11,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
 import java.util.ResourceBundle;
 
 public class PanelConnection implements Initializable {
@@ -35,20 +38,44 @@ public class PanelConnection implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Dotenv dotenv = Dotenv.load();
-        String dbUrl = dotenv.get("DB_URL");
-        String dbUsername = dotenv.get("DB_USERNAME");
-        String dbPassword = dotenv.get("DB_PASSWORD");
 
-        if(dbUrl == null || dbUsername == null) return;
+        String dbUrl;
+        String dbUsername;
+        String dbPassword;
 
-        String urlWithoutPrefix = dbUrl.replace("jdbc:mysql://", "");
-        String[] parts = urlWithoutPrefix.split(":");
+        try{
+            // Catches initial exception when there is no .env file in project
+            Dotenv dotenv = Dotenv.configure().directory("src/main/resources/com/abelovagrupa/dbeeadmin/.env").load();
+            dbUrl = dotenv.get("DB_URL");
+            dbUsername = dotenv.get("DB_USERNAME");
+            dbPassword = dotenv.get("DB_PASSWORD");
 
-        if(parts.length == 2) {
-            txtHost.setText(parts[0]);
-            txtPort.setText(parts[1].replace("/", ""));
-        } else return;
+            if(dbUrl == null || dbUsername == null) return;
+
+            String urlWithoutPrefix = dbUrl.replace("jdbc:mysql://", "");
+            String[] parts = urlWithoutPrefix.split(":");
+
+            if(parts.length == 2) {
+                txtHost.setText(parts[0]);
+                txtPort.setText(parts[1].replace("/", ""));
+            } else return;
+
+
+        }catch (Exception ex){
+            // Initializing parameters to empty strings
+            dbUrl = "";
+            dbUsername = "";
+            dbPassword = "";
+
+        }
+        // Creating .env file
+        try {
+            DatabaseConnection.getInstance().setConnectionParameters(dbUrl,dbUsername,dbPassword);
+
+        } catch (IOException e) {
+            AlertManager.showInformationDialog(null,null,"Failed to create/alter .env file");
+        }
+
 
         txtUsername.setText(dbUsername);
         pwdPassword.setText(dbPassword);
