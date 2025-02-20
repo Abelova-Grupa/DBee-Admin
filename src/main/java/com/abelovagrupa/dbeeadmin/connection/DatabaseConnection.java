@@ -1,6 +1,5 @@
 package com.abelovagrupa.dbeeadmin.connection;
 
-import io.github.cdimascio.dotenv.DotEnvException;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.BufferedWriter;
@@ -28,7 +27,7 @@ public class DatabaseConnection {
 
             assert dbUrl != null;
             assert dbUsername != null;
-            connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+            setConnection(dbUrl,dbUsername,dbPassword);
             System.out.println("Database connection established.");
 //        } catch (SQLException  | AssertionError e ) {
 //            throw new RuntimeException(e);
@@ -49,6 +48,15 @@ public class DatabaseConnection {
         return connection;
     }
 
+    public void setConnection(String dbUrl, String dbUsername, String dbPassword){
+        try {
+            connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+            setConnectionParameters(dbUrl,dbUsername,dbPassword);
+        } catch (SQLException  | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -67,16 +75,6 @@ public class DatabaseConnection {
      * @param dbPassword password
      * @throws IOException on .env writing failure
      */
-
-    public void setConnection(String dbUrl, String dbUsername, String dbPassword){
-        try {
-            connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-            setConnectionParameters(dbUrl,dbUsername,dbPassword);
-        } catch (SQLException  | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void setConnectionParameters(String dbUrl, String dbUsername, String dbPassword) throws IOException {
         String filePath = "src/main/resources/com/abelovagrupa/dbeeadmin/.env";
         System.out.println("Database connection established");

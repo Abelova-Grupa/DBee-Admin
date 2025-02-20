@@ -68,14 +68,6 @@ public class PanelConnection implements Initializable {
             dbPassword = "";
 
         }
-        // Creating .env file
-        try {
-            DatabaseConnection.getInstance().setConnectionParameters(dbUrl,dbUsername,dbPassword);
-
-        } catch (IOException e) {
-            AlertManager.showInformationDialog(null,null,"Failed to create/alter .env file");
-        }
-
 
         txtUsername.setText(dbUsername);
         pwdPassword.setText(dbPassword);
