@@ -63,13 +63,15 @@ public class DatabaseInspector {
         List<Table> tables = new LinkedList<>();
         String query = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?;";
 
-        try(PreparedStatement ps = connection.prepareStatement(query);){
+        try(PreparedStatement ps = connection.prepareStatement(query)){
+            ps.setString(1,schema.getName());
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 Table table = new Table();
+                table.setSchema(schema);
                 table.setName(rs.getString("TABLE_NAME"));
                 table.setDbEngine(DBEngine.valueOf(rs.getString("ENGINE").toUpperCase()));
-
+                table.setColumns(getColumns(table));
                 // A lot more table attributes, implementation depends on scope
 
                 tables.add(table);
@@ -203,6 +205,38 @@ public class DatabaseInspector {
         return column;
     }
 
+    /**
+     * Retrieves a list of current users databases.
+     * @return List of databases from current connection.
+     */
+    public List<Schema> getDatabases(){
+        List<Schema> databases = new LinkedList<>();
+
+        try {
+            String query = "SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.schemata;";
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+
+            while(rs.next()){
+                // DO NOT CHANGE ORDER, FRAGILE TO ORDER CHANGE
+                Schema newDatabase = new Schema();
+                newDatabase.setName(rs.getString("SCHEMA_NAME"));
+                newDatabase.setCharset(Charset.valueOf(rs.getString("DEFAULT_CHARACTER_SET_NAME").toUpperCase()));
+                newDatabase.setCollation(Collation.valueOf(rs.getString("DEFAULT_COLLATION_NAME").toUpperCase()));
+                newDatabase.setTables(getTables(newDatabase));
+                newDatabase.setTableCount(newDatabase.getTableCount());
+                newDatabase.setDatabaseSize(getDatabaseSize(newDatabase.getName()));
+
+                databases.add(newDatabase);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return databases;
+    }
+
     public List<ForeignKey> getForeignKeys(Table table) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -217,6 +251,29 @@ public class DatabaseInspector {
 
     public List<Trigger> getTriggers(Table table) {
         throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    public float getDatabaseSize(String databaseName){
+
+        float databaseSize = -1;
+
+        String query = "SELECT table_schema \"DB Name\",\n" +
+                "        ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) \"DB Size in MB\"\n" +
+                "FROM information_schema.tables\n" +
+                "WHERE table_schema=?;";
+
+        try(PreparedStatement ps = connection.prepareStatement(query)){
+            ps.setString(1,databaseName);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                databaseSize =  rs.getFloat("DB Size in MB");
+            }
+
+        }catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+
+        return databaseSize;
     }
 
 }
