@@ -1,5 +1,6 @@
 package com.abelovagrupa.dbeeadmin.connection;
 
+import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.BufferedWriter;
@@ -33,6 +34,7 @@ public class DatabaseConnection {
 //            throw new RuntimeException(e);
         }catch(Exception e){
             //Catches exception that is caused by no .env file
+            System.err.println(e.getMessage());
             connection = null;
         }
     }
@@ -77,8 +79,8 @@ public class DatabaseConnection {
      */
     public void setConnectionParameters(String dbUrl, String dbUsername, String dbPassword) throws IOException {
         String filePath = "src/main/resources/com/abelovagrupa/dbeeadmin/.env";
-        System.out.println("Database connection established");
-        System.out.println("Writing to file: " + filePath);
+        System.out.println("Connection parameters set.");
+        // System.out.println("Writing to file: " + filePath);
         BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filePath, false));
         fileWriter.write("DB_URL=" + dbUrl + "\n");
         fileWriter.write("DB_USERNAME=" + dbUsername + "\n");
