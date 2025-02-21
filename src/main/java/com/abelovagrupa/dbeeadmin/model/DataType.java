@@ -20,6 +20,8 @@ public enum DataType {
     VARCHAR(255),
     YEAR(4);
 
+    // FIXME: No enum constant com.abelovagrupa.dbeeadmin.model.DataType.DATE
+
     private final int typeSize;
 
     DataType(int typeSize) {
