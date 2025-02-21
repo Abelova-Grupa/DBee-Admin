@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-
 <SplitPane dividerPositions="0.7"
            orientation="VERTICAL"
            xmlns="http://javafx.com/javafx"

@@ -15,6 +15,8 @@ import java.util.ResourceBundle;
 
 public class PanelLeft implements Initializable {
 
+    private PanelMain mainPanelController;
+
     @FXML
     List<TreeView<String>> schemaViews;
 
@@ -24,8 +26,7 @@ public class PanelLeft implements Initializable {
     @FXML
     TreeView<String> treeView2;
 
-    @FXML
-    VBox vboxBrowser;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -62,6 +63,14 @@ public class PanelLeft implements Initializable {
         }
 
 //
+    }
+
+    public void setMainPanelController(PanelMain mainPanelController) {
+        this.mainPanelController = mainPanelController;
+    }
+
+    public PanelMain getMainPanelController() {
+        return mainPanelController;
     }
 
     @FXML

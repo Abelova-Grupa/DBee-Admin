@@ -4,18 +4,71 @@ import com.abelovagrupa.dbeeadmin.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class PanelMain {
+public class PanelMain implements Initializable {
     @FXML
     Button btnConnection;
 
+    @FXML
+    private HBox leftPanel;
+
+    private PanelLeft leftPanelController;
+
+    @FXML
+    private SplitPane centralPanel;
+
+    private PanelCenter centerPanelController;
+
+    @FXML
+    private VBox rightPanel;
+
+    private PanelRight rightPanelController;
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Linking controllers...
+        try {
+            // Only solution to get the controllers..., might change in the future
+            // Loading leftPanel and injecting leftController
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/abelovagrupa/dbeeadmin/panelLeft.fxml"));
+            leftPanel = loader.load();
+            leftPanelController = loader.getController();
+            // Creating a reference to the main controller from left controller
+            leftPanelController.setMainPanelController(this);
+
+            // Loading centerPanel and injecting centerController
+            loader = new FXMLLoader(getClass().getResource("/com/abelovagrupa/dbeeadmin/panelCenter.fxml"));
+            centralPanel = loader.load();
+            centerPanelController = loader.getController();
+            // Creating a reference to the main controller from center controller
+            centerPanelController.setMainPanelController(this);
+
+            // Loading rightPanel and injecting rightController
+            loader = new FXMLLoader(getClass().getResource("/com/abelovagrupa/dbeeadmin/panelRight.fxml"));
+            rightPanel = loader.load();
+            rightPanelController = loader.getController();
+            // Creating a reference to the main controller from right controller
+            rightPanelController.setMainPanelController(this);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     public void openConnectionSettings(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelConnection.fxml"));
@@ -42,4 +95,6 @@ public class PanelMain {
         ;
         stage.show();
     }
+
+
 }
