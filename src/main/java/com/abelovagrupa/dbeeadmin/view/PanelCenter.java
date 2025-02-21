@@ -22,6 +22,8 @@ public class PanelCenter implements Initializable {
 
     private PanelResults resultsPanelController;
 
+    private PanelMain mainPanelController;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
@@ -38,20 +40,12 @@ public class PanelCenter implements Initializable {
         }
 
     }
-//
-//    public void setLeftPanelController(PanelLeft leftPanelController) {
-//        this.leftPanelController = leftPanelController;
-//    }
-//
-//    public void setRightPanelController(PanelRight rightPanelController) {
-//        this.rightPanelController = rightPanelController;
-//    }
-//
-//    public void setEditorPanelController(PanelEditor editorPanelController) {
-//        this.editorPanelController = editorPanelController;
-//    }
-//
-//    public void setResultsPanelController(PanelResults resultsPanelController) {
-//        this.resultsPanelController = resultsPanelController;
-//    }
+
+    public PanelMain getMainPanelController() {
+        return mainPanelController;
+    }
+
+    public void setMainPanelController(PanelMain mainPanelController) {
+        this.mainPanelController = mainPanelController;
+    }
 }

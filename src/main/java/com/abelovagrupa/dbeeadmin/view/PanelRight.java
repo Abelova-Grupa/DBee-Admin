@@ -4,17 +4,13 @@ import javafx.fxml.FXML;
 
 public class PanelRight {
 
-//    @FXML
-//    private PanelLeft leftPanelController;
-//
-//    @FXML
-//    private PanelCenter centerPanelController;
-//
-//    public void setLeftPanelController(PanelLeft leftPanelController) {
-//        this.leftPanelController = leftPanelController;
-//    }
-//
-//    public void setCenterPanelController(PanelCenter centerPanelController) {
-//        this.centerPanelController = centerPanelController;
-//    }
+    private PanelMain mainPanelController;
+
+    public PanelMain getMainPanelController() {
+        return mainPanelController;
+    }
+
+    public void setMainPanelController(PanelMain mainPanelController) {
+        this.mainPanelController = mainPanelController;
+    }
 }

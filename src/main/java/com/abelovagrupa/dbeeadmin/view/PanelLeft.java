@@ -15,11 +15,7 @@ import java.util.ResourceBundle;
 
 public class PanelLeft implements Initializable {
 
-//    @FXML
-//    private PanelCenter centerPanelController;
-//
-//    @FXML
-//    private PanelRight rightPanelController;
+    private PanelMain mainPanelController;
 
     @FXML
     List<TreeView<String>> schemaViews;
@@ -30,13 +26,7 @@ public class PanelLeft implements Initializable {
     @FXML
     TreeView<String> treeView2;
 
-//    public void setRightPanelController(PanelRight rightPanelControllerPanel) {
-//        this.rightPanelController = rightPanelControllerPanel;
-//    }
-//
-//    public void setCenterPanelController(PanelCenter centerPanelController) {
-//        this.centerPanelController = centerPanelController;
-//    }
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -73,6 +63,14 @@ public class PanelLeft implements Initializable {
         }
 
 //
+    }
+
+    public void setMainPanelController(PanelMain mainPanelController) {
+        this.mainPanelController = mainPanelController;
+    }
+
+    public PanelMain getMainPanelController() {
+        return mainPanelController;
     }
 
     @FXML
