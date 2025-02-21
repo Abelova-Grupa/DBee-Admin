@@ -1,6 +1,6 @@
 package com.abelovagrupa.dbeeadmin.services;
 
-import com.abelovagrupa.dbeeadmin.model.Schema;
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 
 public class ProgramState {
 

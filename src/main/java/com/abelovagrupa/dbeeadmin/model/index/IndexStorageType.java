@@ -1,4 +1,4 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.index;
 
 public enum IndexStorageType {
     DEFAULT,

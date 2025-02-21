@@ -1,4 +1,8 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.foreignkey;
+
+import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
+import com.abelovagrupa.dbeeadmin.model.table.Table;
 
 import java.util.List;
 import java.util.Objects;

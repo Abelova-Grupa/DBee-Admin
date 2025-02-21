@@ -1,6 +1,10 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.table;
 
-import javafx.print.Collation;
+import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 
 import java.util.List;
 import java.util.Objects;
@@ -12,7 +16,7 @@ public class Table {
     private List<Index> indexes;
     private List<ForeignKey> foreignKeys;
     private List<Trigger> triggers;
-    private  DBEngine dbEngine;
+    private DBEngine dbEngine;
     private Schema schema;
 
     public Table() {

@@ -1,17 +1,14 @@
 package com.abelovagrupa.dbeeadmin.controller;
 
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
-import com.abelovagrupa.dbeeadmin.model.Column;
-import com.abelovagrupa.dbeeadmin.model.Schema;
-import com.abelovagrupa.dbeeadmin.model.Table;
+import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
+import com.abelovagrupa.dbeeadmin.model.table.Table;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DatabaseInspectorTest {
 

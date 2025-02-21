@@ -1,13 +1,21 @@
 package com.abelovagrupa.dbeeadmin.controller;
 
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
-import com.abelovagrupa.dbeeadmin.model.*;
+import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.column.DataType;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
+import com.abelovagrupa.dbeeadmin.model.schema.Charset;
+import com.abelovagrupa.dbeeadmin.model.schema.Collation;
+import com.abelovagrupa.dbeeadmin.model.table.DBEngine;
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
+import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 
 import java.sql.*;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class DatabaseInspector {
 
