@@ -1,4 +1,4 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.index;
 
 import java.util.List;
 import java.util.Objects;

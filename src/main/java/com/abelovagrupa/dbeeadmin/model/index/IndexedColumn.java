@@ -1,4 +1,6 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.index;
+
+import com.abelovagrupa.dbeeadmin.model.column.Column;
 
 import java.util.Objects;
 

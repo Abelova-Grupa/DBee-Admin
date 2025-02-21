@@ -1,4 +1,4 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.column;
 
 public enum DataType {
 
@@ -20,7 +20,7 @@ public enum DataType {
     VARCHAR(255),
     YEAR(4);
 
-    // FIXME: No enum constant com.abelovagrupa.dbeeadmin.model.DataType.DATE
+    // FIXME: No enum constant com.abelovagrupa.dbeeadmin.model.column.DataType.DATE
 
     private final int typeSize;
 

@@ -1,4 +1,6 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.trigger;
+
+import com.abelovagrupa.dbeeadmin.model.table.Table;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

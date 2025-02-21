@@ -1,4 +1,4 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.table;
 
 public enum DBEngine {
     INNODB,

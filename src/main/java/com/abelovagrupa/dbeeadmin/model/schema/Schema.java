@@ -1,6 +1,8 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.schema;
 
 
+
+import com.abelovagrupa.dbeeadmin.model.table.Table;
 
 import java.util.List;
 import java.util.Objects;

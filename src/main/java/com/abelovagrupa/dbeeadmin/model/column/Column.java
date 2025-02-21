@@ -1,6 +1,6 @@
-package com.abelovagrupa.dbeeadmin.model;
+package com.abelovagrupa.dbeeadmin.model.column;
 
-import javafx.print.Collation;
+import com.abelovagrupa.dbeeadmin.model.table.Table;
 
 public class Column {
 
