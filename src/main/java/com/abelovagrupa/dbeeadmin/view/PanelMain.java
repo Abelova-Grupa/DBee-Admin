@@ -42,6 +42,7 @@ public class PanelMain implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Linking controllers...
         try {
+            // Only solution to get the controllers..., might change in the future
             // Loading leftPanel and injecting leftController
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/abelovagrupa/dbeeadmin/panelLeft.fxml"));
             leftPanel = loader.load();
