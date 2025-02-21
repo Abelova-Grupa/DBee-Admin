@@ -88,4 +88,13 @@ public class DatabaseConnection {
         fileWriter.close();
     }
 
+    public boolean isConnectionValid(String dbUrl, String dbUsername, String dbPassword) {
+        try {
+            setConnection(dbUrl, dbUsername, dbPassword);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
 }
