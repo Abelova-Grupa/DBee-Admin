@@ -91,8 +91,29 @@ public class DatabaseInspector {
         return tables;
     }
 
-    public Table getTableByName(Schema schema, String name) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public Table getTableByName(Schema schema, String tableName) {
+
+        Table table = null;
+        String query = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA =? AND TABLE_NAME=?;";
+
+        try(PreparedStatement ps = connection.prepareStatement(query)){
+            ps.setString(1, schema.getName());
+            ps.setString(2, tableName);
+
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                table = new Table();
+                table.setSchema(schema);
+                table.setName(rs.getString("TABLE_NAME"));
+                table.setDbEngine(DBEngine.valueOf(rs.getString("ENGINE").toUpperCase()));
+                table.setColumns(getColumns(table));
+            }
+
+
+        }catch(SQLException e){
+            System.err.println(e.getMessage());
+        }
+        return table;
     }
 
     /**
