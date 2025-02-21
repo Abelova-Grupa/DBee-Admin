@@ -1,7 +1,6 @@
 package com.abelovagrupa.dbeeadmin.model;
 
 
-import javafx.print.Collation;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +14,7 @@ public class Schema {
     private int tableCount;
     private double databaseSize;
 
-    public Schema(String name) {
+    public Schema() {
 
     }
 
@@ -106,4 +105,6 @@ public class Schema {
         result = 31 * result + Double.hashCode(databaseSize);
         return result;
     }
+
+
 }
