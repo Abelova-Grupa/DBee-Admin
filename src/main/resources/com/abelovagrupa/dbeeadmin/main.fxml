@@ -139,9 +139,9 @@
       </ToolBar>
     <SplitPane dividerPositions="0.16072871667421143, 0.8999069981425871" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
-            <fx:include source="panelLeft.fxml" />
-            <fx:include source="panelCenter.fxml" />
-            <fx:include source="panelRight.fxml" />
+            <fx:include  source="panelLeft.fxml" />
+            <fx:include  source="panelCenter.fxml" />
+            <fx:include  source="panelRight.fxml" />
       </items>
     </SplitPane>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">

@@ -15,6 +15,12 @@ import java.util.ResourceBundle;
 
 public class PanelLeft implements Initializable {
 
+//    @FXML
+//    private PanelCenter centerPanelController;
+//
+//    @FXML
+//    private PanelRight rightPanelController;
+
     @FXML
     List<TreeView<String>> schemaViews;
 
@@ -24,8 +30,13 @@ public class PanelLeft implements Initializable {
     @FXML
     TreeView<String> treeView2;
 
-    @FXML
-    VBox vboxBrowser;
+//    public void setRightPanelController(PanelRight rightPanelControllerPanel) {
+//        this.rightPanelController = rightPanelControllerPanel;
+//    }
+//
+//    public void setCenterPanelController(PanelCenter centerPanelController) {
+//        this.centerPanelController = centerPanelController;
+//    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
