@@ -25,6 +25,8 @@ import static com.abelovagrupa.dbeeadmin.view.PanelResults.*;
 
 public class PanelEditor implements Initializable {
 
+    private PanelCenter centerPanelController;
+
     @FXML
     CodeArea codeArea;
 
@@ -34,6 +36,14 @@ public class PanelEditor implements Initializable {
         codeArea.textProperty().addListener((_, _, newText) -> {
             codeArea.setStyleSpans(0, computeHighlighting(newText));
         });
+    }
+
+    public PanelCenter getCenterPanelController() {
+        return centerPanelController;
+    }
+
+    public void setCenterPanelController(PanelCenter centerPanelController) {
+        this.centerPanelController = centerPanelController;
     }
 
     private static final String[] SQL_KEYWORDS = {
