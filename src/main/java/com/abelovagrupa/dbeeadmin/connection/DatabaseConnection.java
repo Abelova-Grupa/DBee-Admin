@@ -97,4 +97,7 @@ public class DatabaseConnection {
         return true;
     }
 
+    public String generateDbUrl(String host,String port){
+        return "jdbc:mysql://"+host+":" + port;
+    }
 }
