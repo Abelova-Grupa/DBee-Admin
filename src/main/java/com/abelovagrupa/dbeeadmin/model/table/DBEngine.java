@@ -15,6 +15,7 @@ public enum DBEngine {
     PERFORMANCE_SCHEMA,
     TokuDB,
     CONNECT,
-    SPHINX
+    SPHINX,
+    ARIA
 
 }

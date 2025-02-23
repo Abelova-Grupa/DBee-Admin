@@ -78,6 +78,7 @@ public class DatabaseInspector {
                 Table table = new Table();
                 table.setSchema(schema);
                 table.setName(rs.getString("TABLE_NAME"));
+                // FIXME: Cannot invoke "String.toUpperCase()" if the return value of rs.getString("ENGINE") is null
                 table.setDbEngine(DBEngine.valueOf(rs.getString("ENGINE").toUpperCase()));
                 table.setColumns(getColumns(table));
                 // A lot more table attributes, implementation depends on scope
