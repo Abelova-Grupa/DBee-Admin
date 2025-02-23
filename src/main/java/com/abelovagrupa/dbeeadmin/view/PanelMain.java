@@ -25,48 +25,15 @@ public class PanelMain implements Initializable {
     @FXML
     private HBox leftPanel;
 
-    private PanelLeft leftPanelController;
-
     @FXML
     private SplitPane centralPanel;
-
-    private PanelCenter centerPanelController;
 
     @FXML
     private VBox rightPanel;
 
-    private PanelRight rightPanelController;
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Linking controllers...
-        try {
-            // Only solution to get the controllers..., might change in the future
-            // Loading leftPanel and injecting leftController
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/abelovagrupa/dbeeadmin/panelLeft.fxml"));
-            leftPanel = loader.load();
-            leftPanelController = loader.getController();
-            // Creating a reference to the main controller from left controller
-            leftPanelController.setMainPanelController(this);
-
-            // Loading centerPanel and injecting centerController
-            loader = new FXMLLoader(getClass().getResource("/com/abelovagrupa/dbeeadmin/panelCenter.fxml"));
-            centralPanel = loader.load();
-            centerPanelController = loader.getController();
-            // Creating a reference to the main controller from center controller
-            centerPanelController.setMainPanelController(this);
-
-            // Loading rightPanel and injecting rightController
-            loader = new FXMLLoader(getClass().getResource("/com/abelovagrupa/dbeeadmin/panelRight.fxml"));
-            rightPanel = loader.load();
-            rightPanelController = loader.getController();
-            // Creating a reference to the main controller from right controller
-            rightPanelController.setMainPanelController(this);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
     }
 

@@ -7,7 +7,61 @@
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.abelovagrupa.dbeeadmin.view.PanelCenter">
         <items>
-            <fx:include source="panelEditor.fxml" />
-            <fx:include source="panelResults.fxml" />
+            <TabPane>
+                <tabs>
+                    <Tab text="SQL Script">
+                        <content>
+                            <VBox>
+                                <children>
+                                    <ToolBar prefHeight="40.0" prefWidth="200.0">
+                                        <items>
+                                            <Button mnemonicParsing="false" onAction="#runScript">
+                                                <graphic>
+                                                    <FontIcon iconLiteral="fas-angle-double-right:16" />
+                                                </graphic>
+                                                <tooltip>
+                                                    <Tooltip text="Execute Script" />
+                                                </tooltip>
+                                            </Button>
+                                            <Button mnemonicParsing="false">
+                                                <graphic>
+                                                    <FontIcon iconLiteral="fas-angle-right:16" />
+                                                </graphic>
+                                                <tooltip>
+                                                    <Tooltip text="Execute Line" />
+                                                </tooltip>
+                                            </Button>
+                                            <Button mnemonicParsing="false">
+                                                <graphic>
+                                                    <FontIcon iconLiteral="fas-file-import:16" />
+                                                </graphic>
+                                                <tooltip>
+                                                    <Tooltip text="Import" />
+                                                </tooltip>
+                                            </Button>
+                                            <Button mnemonicParsing="false">
+                                                <graphic>
+                                                    <FontIcon iconLiteral="fas-file-export:16" />
+                                                </graphic>
+                                                <tooltip>
+                                                    <Tooltip text="Export" />
+                                                </tooltip>
+                                            </Button>
+                                        </items>
+                                    </ToolBar>
+                                    <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS">
+                                    </CodeArea>
+                                </children>
+                            </VBox>
+                        </content>
+                    </Tab>
+                </tabs>
+            </TabPane>
+            <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                <items>
+                    <TableView prefHeight="200.0" prefWidth="200.0" />
+                    <ScrollPane prefHeight="200.0" prefWidth="200.0" />
+                </items>
+            </SplitPane>
         </items>
     </SplitPane>
