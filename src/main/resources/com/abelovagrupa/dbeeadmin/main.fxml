@@ -213,7 +213,7 @@
                       <children>
                         <ToolBar prefHeight="40.0" prefWidth="200.0">
                           <items>
-                            <Button mnemonicParsing="false">
+                            <Button mnemonicParsing="false" onAction="#runScript">
                               <graphic>
                                 <FontIcon iconLiteral="fas-angle-double-right:16" />
                               </graphic>
