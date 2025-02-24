@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+           dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+    <items>
+        <TableView fx:id="resultsTable" prefHeight="200.0" prefWidth="200.0" />
+        <ScrollPane fx:id="historyPane" prefHeight="200.0" prefWidth="200.0">
+            <content>
+                <VBox fx:id="resultContainer" prefHeight="200.0" />
+            </content></ScrollPane>
+    </items>
+
+</SplitPane>

@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -41,11 +42,10 @@ public class PanelMain implements Initializable {
 
     // Main panel components
 
-    @FXML
-    Button btnConnection;
+    Parent leftPanel;
 
     @FXML
-    private HBox leftPanel;
+    Button btnConnection;
 
     @FXML
     private SplitPane centralPanel;
@@ -119,7 +119,6 @@ public class PanelMain implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         // Left panel initialization
-
         schemaViews = List.of(treeView1,treeView2);
 
         for (TreeView<String> schemaView : schemaViews){
