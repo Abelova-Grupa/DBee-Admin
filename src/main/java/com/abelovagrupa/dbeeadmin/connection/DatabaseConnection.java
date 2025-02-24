@@ -98,6 +98,9 @@ public class DatabaseConnection {
     }
 
     public String generateDbUrl(String host,String port){
-        return "jdbc:mysql://"+host+":" + port;
+        // If connection parameters are null and user changes them, test for prefix
+        if(host.contains("jdbc:mysql://")){
+            return host+":"+port;
+        }else return "jdbc:mysql://"+host+":" + port;
     }
 }

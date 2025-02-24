@@ -75,7 +75,10 @@ public class PanelConnection implements Initializable {
     }
 
     public void connect(ActionEvent actionEvent) {
-        AlertManager.showInformationDialog(null, null, "Not implemented yet.");
+//        AlertManager.showInformationDialog(null, null, "Not implemented yet.");
+        String dbUrl = DatabaseConnection.getInstance().generateDbUrl(txtHost.getText(),txtPort.getText());
+        DatabaseConnection.getInstance().setConnection(dbUrl,txtUsername.getText(),pwdPassword.getText());
+        AlertManager.showInformationDialog("DB-Admin",null,"Successfully connection");
     }
 
     public void testConnection(ActionEvent actionEvent) {
