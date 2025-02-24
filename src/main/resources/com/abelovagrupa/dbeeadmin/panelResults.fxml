@@ -6,8 +6,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
+<SplitPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            prefHeight="400.0" prefWidth="600.0" >
+           fx:controller="com.abelovagrupa.dbeeadmin.view.PanelResults"
+               dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+    <items>
+        <TableView fx:id="resultsTable" prefHeight="200.0" prefWidth="200.0" />
+        <ScrollPane fx:id="historyPane" prefHeight="200.0" prefWidth="200.0">
+            <content>
+                <VBox fx:id="resultContainer" prefHeight="200.0" />
+            </content></ScrollPane>
+    </items>
 
-</AnchorPane>
+</SplitPane>

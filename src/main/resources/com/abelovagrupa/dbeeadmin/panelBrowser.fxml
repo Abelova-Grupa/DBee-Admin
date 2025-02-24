@@ -8,9 +8,10 @@
 <?import javafx.geometry.Insets?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!--      fx:controller="com.abelovagrupa.dbeeadmin.view.PanelBrowser"-->
+<!--      -->
 <HBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.abelovagrupa.dbeeadmin.view.PanelBrowser"
       prefHeight="100.0" prefWidth="250.0">
         <children>
             <BorderPane prefHeight="133.0" prefWidth="248.0" HBox.hgrow="ALWAYS">

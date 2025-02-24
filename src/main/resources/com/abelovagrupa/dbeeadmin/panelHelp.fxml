@@ -6,15 +6,25 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<SplitPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-           dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
-    <items>
-        <TableView fx:id="resultsTable" prefHeight="200.0" prefWidth="200.0" />
-        <ScrollPane fx:id="historyPane" prefHeight="200.0" prefWidth="200.0">
-            <content>
-                <VBox fx:id="resultContainer" prefHeight="200.0" />
-            </content></ScrollPane>
-    </items>
-
-</SplitPane>
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.abelovagrupa.dbeeadmin.view.PanelHelp"
+      alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+    <children>
+        <Label text="Get Help">
+            <font>
+                <Font name="System Bold" size="21.0" />
+            </font>
+        </Label>
+        <Label prefHeight="132.0" prefWidth="177.0" text="Sic Mundus creatus est. Hinc erunt Adaptationes Mirabiles, quarum Modus est hic. Itaque vocatus sum Hermes Trismegistus, habens tres partes Philosophiae totius Mundi." wrapText="true">
+            <padding>
+                <Insets left="6.0" right="6.0" />
+            </padding>
+        </Label>
+    </children>
+    <opaqueInsets>
+        <Insets />
+    </opaqueInsets>
+</VBox>
