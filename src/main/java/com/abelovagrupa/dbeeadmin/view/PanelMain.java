@@ -14,6 +14,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -26,6 +28,7 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -42,11 +45,23 @@ public class PanelMain implements Initializable {
 
     // Main panel components
     @FXML
-    SplitPane leftPanel;
+    SplitPane leftPane;
+
+    @FXML
+    SplitPane centerPane;
+
+    @FXML
+    SplitPane rightPane;
 
     PanelBrowser browserController;
 
     PanelInfo infoController;
+
+    PanelEditor editorController;
+
+    PanelResults resultsController;
+
+    PanelHelp helpController;
 
     @FXML
     Button btnConnection;
@@ -124,6 +139,9 @@ public class PanelMain implements Initializable {
 
             loadBrowser();
             loadInfo();
+            loadEditor();
+            loadResults();
+            loadHelp();
 
         // Left panel initialization
 //        schemaViews = List.of(treeView1,treeView2);
@@ -179,13 +197,37 @@ public class PanelMain implements Initializable {
         this.infoController = infoController;
     }
 
+    public PanelEditor getEditorController() {
+        return editorController;
+    }
+
+    public void setEditorController(PanelEditor editorController) {
+        this.editorController = editorController;
+    }
+
+    public PanelResults getResultsController() {
+        return resultsController;
+    }
+
+    public void setResultsController(PanelResults resultsController) {
+        this.resultsController = resultsController;
+    }
+
+    public PanelHelp getHelpController() {
+        return helpController;
+    }
+
+    public void setHelpController(PanelHelp helpController) {
+        this.helpController = helpController;
+    }
+
     public void loadBrowser(){
 
         try{
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelBrowser.fxml"));
             setBrowserController(fxmlLoader.getController());
             Parent root = fxmlLoader.load();
-            leftPanel.getItems().add(root);
+            leftPane.getItems().add(root);
 
 
         }catch(IOException e){
@@ -199,7 +241,43 @@ public class PanelMain implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelInfo.fxml"));
             setInfoController(fxmlLoader.getController());
             Parent root = fxmlLoader.load();
-            leftPanel.getItems().add(root);
+            leftPane.getItems().add(root);
+
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadEditor(){
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelEditor.fxml"));
+            setEditorController(fxmlLoader.getController());
+            Parent root = fxmlLoader.load();
+            centerPane.getItems().add(root);
+
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadResults(){
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelResults.fxml"));
+            setResultsController(fxmlLoader.getController());
+            Parent root = fxmlLoader.load();
+            centerPane.getItems().add(root);
+
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadHelp(){
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelHelp.fxml"));
+            setHelpController(fxmlLoader.getController());
+            Parent root = fxmlLoader.load();
+            rightPane.getItems().add(root);
 
         }catch(IOException e){
             throw new RuntimeException(e);

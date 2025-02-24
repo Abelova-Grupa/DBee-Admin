@@ -145,12 +145,12 @@
           </Button>
         </items>
       </ToolBar>
-    <SplitPane dividerPositions="0.16072871667421143, 0.8999069981425871" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.16072871667421143, 0.8999069981425871" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" fx:id="rightPane">
       <items>
 
         <HBox prefWidth="250.0">
           <children>
-            <SplitPane dividerPositions="0.6823530947883893" orientation="VERTICAL" prefHeight="200.0" prefWidth="225.0" HBox.hgrow="ALWAYS" fx:id="leftPanel">
+            <SplitPane dividerPositions="0.6823530947883893" orientation="VERTICAL" prefHeight="200.0" prefWidth="225.0" HBox.hgrow="ALWAYS" fx:id="leftPane">
               <items>
 <!--                PLACE FOR BROWSER-->
 <!--                PLACE FOR INFO-->
@@ -159,13 +159,13 @@
           </children>
         </HBox>
 
-        <SplitPane dividerPositions="0.7" orientation="VERTICAL">
+        <SplitPane dividerPositions="0.7" orientation="VERTICAL" fx:id="centerPane">
           <items>
-            <fx:include source="panelEditor.fxml"/>
-            <fx:include source="panelResults.fxml"/>
+<!--              PLACE FOR EDITOR-->
+<!--              PLACE FOR RESULTS-->
           </items>
         </SplitPane>
-        <fx:include source="panelHelp.fxml"/>
+<!--          PLACE FOR HELP SECTION-->
       </items>
     </SplitPane>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
