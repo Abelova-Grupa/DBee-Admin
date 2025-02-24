@@ -77,7 +77,9 @@ public class DatabaseConnection {
      * @param dbPassword password
      * @throws IOException on .env writing failure
      */
+    // TODO: Create a Session Manager that will clear env parameters after the user has logged off
     public void setConnectionParameters(String dbUrl, String dbUsername, String dbPassword) throws IOException {
+        // TODO: Create a session
         String filePath = "src/main/resources/com/abelovagrupa/dbeeadmin/.env";
         System.out.println("Connection parameters set.");
         // System.out.println("Writing to file: " + filePath);
@@ -98,6 +100,9 @@ public class DatabaseConnection {
     }
 
     public String generateDbUrl(String host,String port){
-        return "jdbc:mysql://"+host+":" + port;
+        // If connection parameters are null and user changes them, test for prefix
+        if(host.contains("jdbc:mysql://")){
+            return host+":"+port;
+        }else return "jdbc:mysql://"+host+":" + port;
     }
 }

@@ -75,10 +75,18 @@ public class PanelConnection implements Initializable {
     }
 
     public void connect(ActionEvent actionEvent) {
-        AlertManager.showInformationDialog(null, null, "Not implemented yet.");
+//        AlertManager.showInformationDialog(null, null, "Not implemented yet.");
+        // TODO: Better exception handling and displaying
+        String dbUrl = DatabaseConnection.getInstance().generateDbUrl(txtHost.getText(),txtPort.getText());
+        DatabaseConnection.getInstance().setConnection(dbUrl,txtUsername.getText(),pwdPassword.getText());
+        AlertManager.showInformationDialog("DB-Admin",null,"Connection established");
     }
 
     public void testConnection(ActionEvent actionEvent) {
-        AlertManager.showInformationDialog(null, null, "Not implemented yet.");
+//        AlertManager.showInformationDialog(null, null, "Not implemented yet.");
+        // TODO: Better exception handling and displaying
+        String dbUrl = DatabaseConnection.getInstance().generateDbUrl(txtHost.getText(),txtPort.getText());
+        DatabaseConnection.getInstance().isConnectionValid(dbUrl,txtUsername.getText(),pwdPassword.getText());
+        AlertManager.showInformationDialog("DB-Admin",null,"Successfully made the MYSQL Connection");
     }
 }

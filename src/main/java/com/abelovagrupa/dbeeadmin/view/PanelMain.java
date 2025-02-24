@@ -180,6 +180,7 @@ public class PanelMain implements Initializable {
     }
 
     public void runScript(ActionEvent actionEvent) {
+        if(codeArea.getText() == null || codeArea.getText().isEmpty()) return;
         Pair<ResultSet, Integer> result = QueryExecutor.executeQuery(codeArea.getText());
         printResultSet(result.getFirst());
         printHistory((result.getSecond() != null) ? result.getSecond() : 0, result.getFirst() != null);
