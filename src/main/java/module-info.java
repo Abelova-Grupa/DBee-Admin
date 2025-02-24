@@ -7,6 +7,7 @@ module com.abelovagrupa.dbeeadmin {
     requires org.kordamp.ikonli.fontawesome5;
     requires java.sql;
     requires java.dotenv;
+    requires java.desktop;
 
 
     opens com.abelovagrupa.dbeeadmin to javafx.fxml;

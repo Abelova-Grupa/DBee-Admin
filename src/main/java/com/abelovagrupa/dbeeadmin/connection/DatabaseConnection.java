@@ -1,8 +1,6 @@
 package com.abelovagrupa.dbeeadmin.connection;
 
-import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
