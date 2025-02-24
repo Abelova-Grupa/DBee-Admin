@@ -41,8 +41,12 @@ import java.util.regex.Pattern;
 public class PanelMain implements Initializable {
 
     // Main panel components
+    @FXML
+    SplitPane leftPanel;
 
-    Parent leftPanel;
+    PanelBrowser browserController;
+
+    PanelInfo infoController;
 
     @FXML
     Button btnConnection;
@@ -118,6 +122,9 @@ public class PanelMain implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+            loadBrowser();
+            loadInfo();
+
         // Left panel initialization
 //        schemaViews = List.of(treeView1,treeView2);
 //
@@ -154,6 +161,49 @@ public class PanelMain implements Initializable {
 //            codeArea.setStyleSpans(0, computeHighlighting(newText));
 //        });
 
+    }
+
+    public PanelBrowser getBrowserController() {
+        return browserController;
+    }
+
+    public void setBrowserController(PanelBrowser browserController) {
+        this.browserController = browserController;
+    }
+
+    public PanelInfo getInfoController() {
+        return infoController;
+    }
+
+    public void setInfoController(PanelInfo infoController) {
+        this.infoController = infoController;
+    }
+
+    public void loadBrowser(){
+
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelBrowser.fxml"));
+            setBrowserController(fxmlLoader.getController());
+            Parent root = fxmlLoader.load();
+            leftPanel.getItems().add(root);
+
+
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void loadInfo(){
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelInfo.fxml"));
+            setInfoController(fxmlLoader.getController());
+            Parent root = fxmlLoader.load();
+            leftPanel.getItems().add(root);
+
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     // Event handling methods

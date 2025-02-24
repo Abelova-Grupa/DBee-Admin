@@ -57,8 +57,8 @@
 <?import javafx.scene.text.Font?>
 <?import org.fxmisc.richtext.CodeArea?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelMain">
+<!--        fx:controller="com.abelovagrupa.dbeeadmin.view.PanelMain"-->
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" >
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -150,12 +150,10 @@
 
         <HBox prefWidth="250.0">
           <children>
-            <SplitPane dividerPositions="0.6823530947883893" orientation="VERTICAL" prefHeight="200.0" prefWidth="225.0" HBox.hgrow="ALWAYS" >
+            <SplitPane dividerPositions="0.6823530947883893" orientation="VERTICAL" prefHeight="200.0" prefWidth="225.0" HBox.hgrow="ALWAYS" fx:id="leftPanel">
               <items>
 <!--                PLACE FOR BROWSER-->
-                <fx:include source="panelBrowser.fxml"/>
 <!--                PLACE FOR INFO-->
-                <fx:include source="panelInfo.fxml"/>
               </items>
             </SplitPane>
           </children>
