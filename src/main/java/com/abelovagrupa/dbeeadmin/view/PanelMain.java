@@ -8,12 +8,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.fxmisc.richtext.CodeArea;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -42,21 +39,7 @@ public class PanelMain implements Initializable {
     @FXML
     Button btnConnection;
 
-    @FXML
-    private VBox rightPanel;
-
-    @FXML
-    private TabPane editorPanel;
-
-    @FXML
-    private SplitPane resultsPanel;
-
-    @FXML
-    CodeArea codeArea;
-
-    @FXML
-    ScrollPane historyPane;
-
+    // TODO: Fix format issues with HelpPanel(Vbox)
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
             loadBrowser();
@@ -135,7 +118,10 @@ public class PanelMain implements Initializable {
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Each load method first loads the fxml file with its root component and then extracts its controller
+     * Sets the reference to main controller in the created controller
+     */
     public void loadEditor(){
         try{
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelEditor.fxml"));
@@ -175,7 +161,13 @@ public class PanelMain implements Initializable {
         }
     }
 
+    /**
+     * Links controllers with each other.
+     * MainController is used to create this bond
+     * Each Controller has the reference to main and other needed controllers
+     */
     private void linkControllers() {
+        // Add needed controller relations
         editorController.setResultsController(resultsController);
     }
 
@@ -206,10 +198,6 @@ public class PanelMain implements Initializable {
         ;
         stage.show();
     }
-
-//
-
-    // Miscellaneous and Other methods
 
     // TODO: MOVE!
     /**
