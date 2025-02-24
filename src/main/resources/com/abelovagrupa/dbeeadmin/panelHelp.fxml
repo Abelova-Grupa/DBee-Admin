@@ -11,7 +11,7 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.abelovagrupa.dbeeadmin.view.PanelHelp"
-      alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" >
+      alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
     <children>
         <Label text="Get Help">
             <font>
