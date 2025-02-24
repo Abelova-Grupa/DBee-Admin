@@ -2,6 +2,8 @@ package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
+import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
+import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,6 +26,8 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -68,6 +72,12 @@ public class PanelMain implements Initializable {
 
     @FXML
     CodeArea codeArea;
+
+    @FXML
+    ScrollPane historyPane;
+
+    @FXML
+    VBox resultContainer;
 
     // Right panel components
 
@@ -170,7 +180,10 @@ public class PanelMain implements Initializable {
     }
 
     public void runScript(ActionEvent actionEvent) {
-        executeQuery(codeArea.getText());
+        Pair<ResultSet, Integer> result = QueryExecutor.executeQuery(codeArea.getText());
+        printResultSet(result.getFirst());
+        printHistory((result.getSecond() != null) ? result.getSecond() : 0, result.getFirst() != null);
+
     }
 
     // Miscellaneous and Other methods
@@ -194,46 +207,13 @@ public class PanelMain implements Initializable {
         return spansBuilder.create();
     }
 
-    // TODO: MOVE!
-    private void executeQuery(String sql) {
-
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-
-        try {
-            connection = DatabaseConnection.getInstance().getConnection();
-
-            statement = connection.createStatement();
-
-            boolean isResultSet = statement.execute(sql);
-
-            // NOTE: This method requires to
-            // TODO: Find a way to set a selected schema (for which I created the State class).
-
-            // Process the result (if it's a SELECT query)
-            if (isResultSet) {
-                resultSet = statement.getResultSet();
-
-                printResultSet(resultSet);
-
-            } else {
-                // For non-SELECT queries (INSERT, UPDATE, DELETE), print the number of rows affected
-                int rowsAffected = statement.getUpdateCount();
-                System.out.println("Rows affected: " + rowsAffected);
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error executing SQL query: " + e.getMessage());
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing resources: " + e.getMessage());
-            }
-        }
-
+    // TODO: Think of a more appropriate name
+    private void printHistory(Integer rowsAffected, boolean isSelect) {
+        String text = (isSelect) ? "(DQL) SELECT RETURNED DATA " : "ROWS AFFECTED: ";
+        if(rowsAffected != null && rowsAffected != 0)
+            text = text + rowsAffected + " ";
+        text = text + "@ " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        resultContainer.getChildren().add(new Label(text));
     }
 
     // TODO: MOVE!
@@ -242,6 +222,7 @@ public class PanelMain implements Initializable {
      * @param resultSet to be printed to std out
      */
     public static void printResultSet(ResultSet resultSet) {
+        if(resultSet == null) return;
         try {
             // Get metadata about the ResultSet
             ResultSetMetaData metaData = resultSet.getMetaData();
