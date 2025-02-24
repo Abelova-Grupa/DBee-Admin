@@ -256,7 +256,7 @@
             </TabPane>
             <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
               <items>
-                <TableView prefHeight="200.0" prefWidth="200.0" />
+                <TableView fx:id="resultsTable" prefHeight="200.0" prefWidth="200.0" />
                 <ScrollPane fx:id="historyPane" prefHeight="200.0" prefWidth="200.0">
                            <content>
                               <VBox fx:id="resultContainer" prefHeight="200.0" />

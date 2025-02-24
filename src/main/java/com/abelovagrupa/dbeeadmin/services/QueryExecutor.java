@@ -29,12 +29,10 @@ public class QueryExecutor {
             // Process the result (if it's a SELECT query)
             if (isResultSet) {
                 resultSet = statement.getResultSet();
-                System.out.println("Getting rs");
 
             } else {
                 // For non-SELECT queries (INSERT, UPDATE, DELETE), print the number of rows affected
                 rowsAffected = statement.getUpdateCount();
-                System.out.println("Rows affected: " + rowsAffected);
             }
 
         } catch (SQLException e) {
