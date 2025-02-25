@@ -1,6 +1,7 @@
 package com.abelovagrupa.dbeeadmin.services;
 
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
+import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.util.Pair;
 
 import java.sql.Connection;
@@ -37,6 +38,7 @@ public class QueryExecutor {
 
         } catch (SQLException e) {
             System.err.println("Error executing SQL query: " + e.getMessage());
+            AlertManager.showErrorDialog(null, "Error executing SQL query:", e.getMessage());
         }
 
         return Pair.of(resultSet, rowsAffected);
