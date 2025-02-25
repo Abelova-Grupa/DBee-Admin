@@ -155,6 +155,7 @@ public class PanelMain implements Initializable {
             setHelpController(fxmlLoader.getController());
             rightPane.getItems().add(root);
             helpController.setMainController(this);
+            rightPane.setDividerPositions(0.15, 0.9);
 
         }catch(IOException e){
             throw new RuntimeException(e);

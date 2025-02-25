@@ -58,7 +58,7 @@
 <?import org.fxmisc.richtext.CodeArea?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <!--        fx:controller="com.abelovagrupa.dbeeadmin.view.PanelMain"-->
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" >
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -145,12 +145,12 @@
           </Button>
         </items>
       </ToolBar>
-    <SplitPane dividerPositions="0.16072871667421143, 0.8999069981425871" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" fx:id="rightPane">
+    <SplitPane dividerPositions="0.16, 0.9" focusTraversable="true" VBox.vgrow="ALWAYS" fx:id="rightPane">
       <items>
 
         <HBox prefWidth="250.0">
           <children>
-            <SplitPane dividerPositions="0.6823530947883893" orientation="VERTICAL" prefHeight="200.0" prefWidth="225.0" HBox.hgrow="ALWAYS" fx:id="leftPane">
+            <SplitPane dividerPositions="0.7" orientation="VERTICAL" prefHeight="200.0" prefWidth="225.0" HBox.hgrow="ALWAYS" fx:id="leftPane">
               <items>
 <!--                PLACE FOR BROWSER-->
 <!--                PLACE FOR INFO-->
