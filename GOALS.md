@@ -5,8 +5,8 @@ This document contains a list of objectives that must be accomplished in order t
 
 ### Structure
 - [x] SQL Code editor
-- [ ] Result table
-- [ ] History panel
+- [x] Result table
+- [x] History panel
 - [ ] Tree browser
 - [ ] Database connector
 
