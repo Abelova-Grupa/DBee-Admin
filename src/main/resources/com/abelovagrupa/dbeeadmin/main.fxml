@@ -109,9 +109,9 @@
                   <Tooltip text="Connection" />
                </tooltip>
           </Button>
-          <Button layoutX="10.0" layoutY="12.0" mnemonicParsing="false">
+          <Button layoutX="10.0" layoutY="12.0" mnemonicParsing="false" onAction="#newSchemaTab">
             <graphic>
-              <FontIcon fx:id="btnNewDatabase" iconLiteral="fas-database" iconSize="16" />
+              <FontIcon fx:id="btnNewDatabase" iconLiteral="fas-database" iconSize="16"/>
             </graphic>
                <tooltip>
                   <Tooltip text="New Database" />
