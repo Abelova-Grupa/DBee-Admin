@@ -2,6 +2,8 @@ package com.abelovagrupa.dbeeadmin.model.column;
 
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 
+import java.util.Objects;
+
 public class Column {
 
     private String name;
@@ -12,14 +14,30 @@ public class Column {
     private boolean unsigned;
     private boolean zeroFill;
     private boolean autoIncrement;
-    private boolean generated;
+    private Integer size;
+    private String generationExpression;
+    private String defaultValue;
+    private String comment;
     private DataType type;
     private Table table;
 
     public Column() {
     }
 
-    public Column(String name, boolean isPrimaryKey, boolean notNull, boolean unique, boolean binary, boolean unsigned, boolean zeroFill, boolean autoIncrement, boolean generated, DataType type, Table table) {
+    public Column(String name,
+                  boolean isPrimaryKey,
+                  boolean notNull,
+                  boolean unique,
+                  boolean binary,
+                  boolean unsigned,
+                  boolean zeroFill,
+                  boolean autoIncrement,
+                  Integer size,
+                  String generationExpression,
+                  String defaultValue,
+                  String comment,
+                  DataType type,
+                  Table table) {
         this.name = name;
         this.isPrimaryKey = isPrimaryKey;
         this.notNull = notNull;
@@ -28,7 +46,10 @@ public class Column {
         this.unsigned = unsigned;
         this.zeroFill = zeroFill;
         this.autoIncrement = autoIncrement;
-        this.generated = generated;
+        this.size = size;
+        this.generationExpression = generationExpression;
+        this.defaultValue = defaultValue;
+        this.comment = comment;
         this.type = type;
         this.table = table;
     }
@@ -97,14 +118,6 @@ public class Column {
         this.autoIncrement = autoIncrement;
     }
 
-    public boolean isGenerated() {
-        return generated;
-    }
-
-    public void setGenerated(boolean generated) {
-        this.generated = generated;
-    }
-
     public DataType getType() {
         return type;
     }
@@ -121,43 +134,79 @@ public class Column {
         this.table = table;
     }
 
-    @Override
-    public String toString() {
-        return "Column{" +
-                "name='" + name + '\'' +
-                ", isPrimaryKey=" + isPrimaryKey +
-                ", notNull=" + notNull +
-                ", unique=" + unique +
-                ", binary=" + binary +
-                ", unsigned=" + unsigned +
-                ", zeroFill=" + zeroFill +
-                ", autoIncrement=" + autoIncrement +
-                ", generated=" + generated +
-                ", type=" + type +
-                ", table=" + table +
-                '}';
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
+
+    public String getGenerationExpression() {
+        return generationExpression;
+    }
+
+    public void setGenerationExpression(String generationExpression) {
+        this.generationExpression = generationExpression;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Column column)) return false;
+    public String toString() {
+        return "Column{" + "name='" + name + '\'' +
+            ", isPrimaryKey=" + isPrimaryKey +
+            ", notNull=" + notNull +
+            ", unique=" + unique +
+            ", binary=" + binary +
+            ", unsigned=" + unsigned +
+            ", zeroFill=" + zeroFill +
+            ", autoIncrement=" + autoIncrement +
+            ", size=" + size +
+            ", generationExpression='" + generationExpression + '\'' +
+            ", defaultValue='" + defaultValue + '\'' +
+            ", comment='" + comment + '\'' +
+            ", type=" + type +
+            ", table=" + table +
+            '}';
+    }
 
-        return isPrimaryKey() == column.isPrimaryKey() && isNotNull() == column.isNotNull() && isUnique() == column.isUnique() && isBinary() == column.isBinary() && isUnsigned() == column.isUnsigned() && isZeroFill() == column.isZeroFill() && isAutoIncrement() == column.isAutoIncrement() && isGenerated() == column.isGenerated() && getName().equals(column.getName())  && getType() == column.getType();
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Column column = (Column) o;
+        return (isPrimaryKey == column.isPrimaryKey) &&
+            (notNull == column.notNull) &&
+            (unique == column.unique) &&
+            (binary == column.binary) &&
+            (unsigned == column.unsigned) &&
+            (zeroFill == column.zeroFill) &&
+            (autoIncrement == column.autoIncrement) &&
+            Objects.equals(name, column.name) &&
+            Objects.equals(size, column.size) &&
+            Objects.equals(generationExpression, column.generationExpression) &&
+            Objects.equals(defaultValue, column.defaultValue) &&
+            Objects.equals(comment, column.comment) &&
+            (type == column.type) &&
+            Objects.equals(table, column.table);
     }
 
     @Override
     public int hashCode() {
-        int result = getName().hashCode();
-        result = 31 * result + Boolean.hashCode(isPrimaryKey());
-        result = 31 * result + Boolean.hashCode(isNotNull());
-        result = 31 * result + Boolean.hashCode(isUnique());
-        result = 31 * result + Boolean.hashCode(isBinary());
-        result = 31 * result + Boolean.hashCode(isUnsigned());
-        result = 31 * result + Boolean.hashCode(isZeroFill());
-        result = 31 * result + Boolean.hashCode(isAutoIncrement());
-        result = 31 * result + Boolean.hashCode(isGenerated());
-        result = 31 * result + getType().hashCode();
-        return result;
+        return Objects.hash(name, isPrimaryKey, notNull, unique, binary, unsigned, zeroFill, autoIncrement, size, generationExpression, defaultValue, comment, type, table);
     }
 }
