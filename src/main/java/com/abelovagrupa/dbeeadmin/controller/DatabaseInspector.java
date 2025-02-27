@@ -66,6 +66,7 @@ public class DatabaseInspector {
         return tableNames;
     }
 
+    // TODO: Convert to builder
     public List<Table> getTables(Schema schema){
 
         List<Table> tables = new LinkedList<>();
@@ -117,6 +118,8 @@ public class DatabaseInspector {
         return table;
     }
 
+
+    // TODO: Convert to builder
     /**
      * Retrieves (maps) all columns of a given table.
      * @param table Table from which columns shall be returned
@@ -161,7 +164,7 @@ public class DatabaseInspector {
                     column.setAutoIncrement(extra != null && extra.contains("auto_increment"));
                     column.setUnsigned(extra != null && extra.contains("unsigned"));
                     column.setZeroFill(extra != null && extra.contains("zerofill"));
-                    column.setGenerated(extra != null && extra.contains("generated"));
+//                    column.setGenerated(extra != null && extra.contains("generated"));
 
                     DataType type = DataType.valueOf(dataType.toUpperCase());
                     column.setType(type);
@@ -177,6 +180,8 @@ public class DatabaseInspector {
         return columns;
     }
 
+
+    // TODO: Convert to builder
     /**
      * Retrieves (maps) a single column of a given table.
      * @param table Table from which the column shall be returned
@@ -220,7 +225,7 @@ public class DatabaseInspector {
                     column.setAutoIncrement(extra != null && extra.contains("auto_increment"));
                     column.setUnsigned(extra != null && extra.contains("unsigned"));
                     column.setZeroFill(extra != null && extra.contains("zerofill"));
-                    column.setGenerated(extra != null && extra.contains("generated"));
+//                    column.setGenerated(extra != null && extra.contains("generated"));
 
                     DataType type = DataType.valueOf(dataType.toUpperCase());
                     column.setType(type);

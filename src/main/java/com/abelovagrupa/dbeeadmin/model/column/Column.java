@@ -7,7 +7,7 @@ import java.util.Objects;
 public class Column {
 
     private String name;
-    private boolean isPrimaryKey;
+    private boolean primaryKey;
     private boolean notNull;
     private boolean unique;
     private boolean binary;
@@ -25,7 +25,7 @@ public class Column {
     }
 
     public Column(String name,
-                  boolean isPrimaryKey,
+                  boolean primaryKey,
                   boolean notNull,
                   boolean unique,
                   boolean binary,
@@ -39,7 +39,7 @@ public class Column {
                   DataType type,
                   Table table) {
         this.name = name;
-        this.isPrimaryKey = isPrimaryKey;
+        this.primaryKey = primaryKey;
         this.notNull = notNull;
         this.unique = unique;
         this.binary = binary;
@@ -54,6 +54,23 @@ public class Column {
         this.table = table;
     }
 
+    protected Column(ColumnBuilder columnBuilder) {
+        this.name = columnBuilder.name;
+        this.primaryKey = columnBuilder.primaryKey;
+        this.notNull = columnBuilder.notNull;
+        this.unique = columnBuilder.unique;
+        this.binary = columnBuilder.binary;
+        this.unsigned = columnBuilder.unsigned;
+        this.zeroFill = columnBuilder.zeroFill;
+        this.autoIncrement = columnBuilder.autoIncrement;
+        this.size = columnBuilder.size;
+        this.generationExpression = columnBuilder.generationExpression;
+        this.defaultValue = columnBuilder.defaultValue;
+        this.comment = columnBuilder.comment;
+        this.type = columnBuilder.type;
+        this.table = columnBuilder.table;
+    }
+
     public String getName() {
         return name;
     }
@@ -63,11 +80,11 @@ public class Column {
     }
 
     public boolean isPrimaryKey() {
-        return isPrimaryKey;
+        return primaryKey;
     }
 
     public void setPrimaryKey(boolean primaryKey) {
-        this.isPrimaryKey = primaryKey;
+        this.primaryKey = primaryKey;
     }
 
     public boolean isNotNull() {
@@ -169,7 +186,7 @@ public class Column {
     @Override
     public String toString() {
         return "Column{" + "name='" + name + '\'' +
-            ", isPrimaryKey=" + isPrimaryKey +
+            ", isPrimaryKey=" + primaryKey +
             ", notNull=" + notNull +
             ", unique=" + unique +
             ", binary=" + binary +
@@ -189,7 +206,7 @@ public class Column {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Column column = (Column) o;
-        return (isPrimaryKey == column.isPrimaryKey) &&
+        return (primaryKey == column.primaryKey) &&
             (notNull == column.notNull) &&
             (unique == column.unique) &&
             (binary == column.binary) &&
@@ -207,6 +224,92 @@ public class Column {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, isPrimaryKey, notNull, unique, binary, unsigned, zeroFill, autoIncrement, size, generationExpression, defaultValue, comment, type, table);
+        return Objects.hash(name, primaryKey, notNull, unique, binary, unsigned, zeroFill, autoIncrement, size, generationExpression, defaultValue, comment, type, table);
     }
+
+    // Builder
+    public static class ColumnBuilder {
+
+        private String name;
+        private boolean primaryKey;
+        private boolean notNull;
+        private boolean unique;
+        private boolean binary;
+        private boolean unsigned;
+        private boolean zeroFill;
+        private boolean autoIncrement;
+        private Integer size;
+        private String generationExpression;
+        private String defaultValue;
+        private String comment;
+        private DataType type;
+        private Table table;
+
+        public ColumnBuilder(String name, DataType type, Table table) {
+            this.name = name;
+            this.type = type;
+            this.table = table;
+        }
+
+        public ColumnBuilder setPrimaryKey(boolean primaryKey) {
+            this.primaryKey = primaryKey;
+            this.notNull = true;
+            return this;
+        }
+
+        public ColumnBuilder setNotNull(boolean notNull) {
+            this.notNull = notNull;
+            return this;
+        }
+
+        public ColumnBuilder setUnique(boolean unique) {
+            this.unique = unique;
+            return this;
+        }
+
+        public ColumnBuilder setBinary(boolean binary) {
+            this.binary = binary;
+            return this;
+        }
+
+        public ColumnBuilder setUnsigned(boolean unsigned) {
+            this.unsigned = unsigned;
+            return this;
+        }
+
+        public ColumnBuilder setZeroFill(boolean zeroFill) {
+            this.zeroFill = zeroFill;
+            return this;
+        }
+
+        public ColumnBuilder setAutoIncrement(boolean autoIncrement) {
+            this.autoIncrement = autoIncrement;
+            return this;
+        }
+
+        public ColumnBuilder setSize(Integer size) {
+            this.size = size;
+            return this;
+        }
+
+        public ColumnBuilder setGenerationExpression(String generationExpression) {
+            this.generationExpression = generationExpression;
+            return this;
+        }
+
+        public ColumnBuilder setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
+        public ColumnBuilder setComment(String comment) {
+            this.comment = comment;
+            return this;
+        }
+
+        public Column build() {
+            return new Column(this);
+        }
+    }
+
 }
