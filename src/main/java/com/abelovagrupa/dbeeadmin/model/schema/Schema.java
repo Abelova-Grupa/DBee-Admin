@@ -29,6 +29,15 @@ public class Schema {
         this.databaseSize = databaseSize;
     }
 
+    protected Schema(SchemaBuilder schemaBuilder) {
+        this.name = schemaBuilder.name;
+        this.charset = schemaBuilder.charset;
+        this.collation = schemaBuilder.collation;
+        this.tables = schemaBuilder.tables;
+        this.tableCount = schemaBuilder.tableCount;
+        this.databaseSize = schemaBuilder.databaseSize;
+    }
+
     @Override
     public String toString() {
         return "Schema{" +
@@ -108,5 +117,43 @@ public class Schema {
         return result;
     }
 
+    // Builder
+    public static class SchemaBuilder {
+
+        private String name;
+        private Charset charset;
+        private Collation collation;
+        private List<Table> tables;
+        private int tableCount;
+        private double databaseSize;
+
+        public SchemaBuilder(String name, Charset charset, Collation collation) {
+            this.name = name;
+            this.charset = charset;
+            this.collation = collation;
+        }
+
+        public SchemaBuilder setTables(List<Table> tables) {
+            this.tables = tables;
+            this.tableCount = tables.size();
+            return this;
+        }
+
+        // WARNING: Should NOT be used for table count is set in the setTables method!
+        public SchemaBuilder setTableCount(int tableCount) {
+            this.tableCount = tableCount;
+            return this;
+        }
+
+        public SchemaBuilder setDatabaseSize(double databaseSize) {
+            // TODO: Avoid this by implementing size calculation method.
+            this.databaseSize = databaseSize;
+            return this;
+        }
+
+        public Schema build() {
+            return new Schema(this);
+        }
+    }
 
 }
