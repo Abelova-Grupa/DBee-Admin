@@ -32,6 +32,16 @@ public class Table {
         this.schema = schema;
     }
 
+    protected Table(TableBuilder tableBuilder) {
+        this.name = tableBuilder.name;
+        this.columns = tableBuilder.columns;
+        this.indexes = tableBuilder.indexes;
+        this.foreignKeys = tableBuilder.foreignKeys;
+        this.triggers = tableBuilder.triggers;
+        this.dbEngine = tableBuilder.dbEngine;
+        this.schema = tableBuilder.schema;
+    }
+
     public String getName() {
         return name;
     }
@@ -119,5 +129,43 @@ public class Table {
         result = 31 * result + getDbEngine().hashCode();
         result = 31 * result + getSchema().hashCode();
         return result;
+    }
+
+    public static class TableBuilder {
+
+        private String name;
+        private List<Column> columns;
+        private List<Index> indexes;
+        private List<ForeignKey> foreignKeys;
+        private List<Trigger> triggers;
+        private DBEngine dbEngine;
+        private Schema schema;
+
+        public TableBuilder(List<Column> columns, String name, Schema schema, DBEngine dbEngine) {
+            this.columns = columns;
+            this.name = name;
+            this.schema = schema;
+            this.dbEngine = dbEngine;
+        }
+
+        public TableBuilder setIndexes(List<Index> indexes) {
+            this.indexes = indexes;
+            return this;
+        }
+
+        public TableBuilder setForeignKeys(List<ForeignKey> foreignKeys) {
+            this.foreignKeys = foreignKeys;
+            return this;
+        }
+
+        public TableBuilder setTriggers(List<Trigger> triggers) {
+            this.triggers = triggers;
+            return this;
+        }
+
+        public Table build() {
+            return new Table(this);
+        }
+
     }
 }
