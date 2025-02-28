@@ -67,9 +67,16 @@ public class DDLGenerator {
             queryBuilder.append(c.getName());
             queryBuilder.append(" ");
 
-            // Append type
-            queryBuilder.append(c.getType().name());
-            queryBuilder.append(" ");
+            // Append type (Either normal or binary)
+            if(c.isBinary()) queryBuilder.append("BINARY");
+            else queryBuilder.append(c.getType().name());
+
+            // Append size
+            if(c.getSize() != null) {
+                queryBuilder.append("(");
+                queryBuilder.append(c.getSize());
+                queryBuilder.append(") ");
+            }
 
             if(c.isUnsigned()) queryBuilder.append("UNSIGNED ");
 
@@ -77,21 +84,29 @@ public class DDLGenerator {
             if(c.isPrimaryKey()) queryBuilder.append("PRIMARY KEY ");
             if(c.isUnique()) queryBuilder.append("UNIQUE ");
             if(c.isAutoIncrement()) queryBuilder.append("AUTO_INCREMENT ");
-            // TODO: Binary, Generated, Default, Zerofill, Comment, Variable size
-
+            if(c.isZeroFill()) queryBuilder.append("ZEROFILL ");
+            if(c.getDefaultValue() != null) {
+                queryBuilder.append("DEFAULT ");
+                queryBuilder.append(c.getDefaultValue());
+            }
+            if(c.getGenerationExpression() != null) {
+                queryBuilder.append("GENERATED ALWAYS AS ");
+                queryBuilder.append(c.getGenerationExpression());
+            }
+            queryBuilder.setLength(queryBuilder.length() - 1); // Cut trailing space
             queryBuilder.append(",\n");
         }
 
         // TODO: Engine
-
-        queryBuilder.append(");");
+        queryBuilder.setLength(queryBuilder.length() - 2); // Cut trailing comma and enter
+        queryBuilder.append("\n);");
         String query = queryBuilder.toString();
-        //System.out.println(queryBuilder.toString());
+        System.out.println(query);
 
-        // Execute query
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        // Execute query (UNCOMMENT AFTER TESTS!)
+//        Connection conn = DatabaseConnection.getInstance().getConnection();
+//        Statement st = conn.createStatement();
+//        st.executeUpdate(query);
 
     }
 
