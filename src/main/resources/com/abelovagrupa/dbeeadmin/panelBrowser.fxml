@@ -27,7 +27,7 @@
                         <right>
                             <Button mnemonicParsing="false" prefHeight="27.0" BorderPane.alignment="CENTER">
                                 <graphic>
-                                    <FontIcon iconLiteral="fas-sync-alt" />
+                                    <FontIcon iconLiteral="fas-sync-alt" styleClass="font-icon"/>
                                 </graphic>
                                 <tooltip>
                                     <Tooltip text="Refresh" />

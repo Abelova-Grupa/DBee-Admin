@@ -21,7 +21,7 @@
                             <items>
                                 <Button mnemonicParsing="false" onAction="#runScript">
                                     <graphic>
-                                        <FontIcon iconLiteral="fas-angle-double-right:16" />
+                                        <FontIcon iconLiteral="fas-angle-double-right:16" styleClass="font-icon"/>
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Execute Script" />
@@ -29,7 +29,7 @@
                                 </Button>
                                 <Button mnemonicParsing="false">
                                     <graphic>
-                                        <FontIcon iconLiteral="fas-angle-right:16" />
+                                        <FontIcon iconLiteral="fas-angle-right:16" styleClass="font-icon"/>
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Execute Line" />
@@ -37,7 +37,7 @@
                                 </Button>
                                 <Button mnemonicParsing="false">
                                     <graphic>
-                                        <FontIcon iconLiteral="fas-file-import:16" />
+                                        <FontIcon iconLiteral="fas-file-import:16" styleClass="font-icon"/>
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Import" />
@@ -45,7 +45,7 @@
                                 </Button>
                                 <Button mnemonicParsing="false">
                                     <graphic>
-                                        <FontIcon iconLiteral="fas-file-export:16" />
+                                        <FontIcon iconLiteral="fas-file-export:16" styleClass="font-icon"/>
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Export" />

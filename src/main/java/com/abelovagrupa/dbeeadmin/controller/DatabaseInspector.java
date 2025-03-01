@@ -19,6 +19,9 @@ import java.util.List;
 
 public class DatabaseInspector {
 
+
+    // TODO: Singleton? Static? New Thread?
+
     private final Connection connection;
 
     public DatabaseInspector(DatabaseConnection databaseConnection) {
@@ -66,7 +69,6 @@ public class DatabaseInspector {
         return tableNames;
     }
 
-    // TODO: Convert to builder
     public List<Table> getTables(Schema schema){
 
         List<Table> tables = new LinkedList<>();
@@ -118,8 +120,6 @@ public class DatabaseInspector {
         return table;
     }
 
-
-    // TODO: Convert to builder
     /**
      * Retrieves (maps) all columns of a given table.
      * @param table Table from which columns shall be returned
@@ -180,8 +180,6 @@ public class DatabaseInspector {
         return columns;
     }
 
-
-    // TODO: Convert to builder
     /**
      * Retrieves (maps) a single column of a given table.
      * @param table Table from which the column shall be returned
@@ -248,7 +246,8 @@ public class DatabaseInspector {
         List<Schema> databases = new LinkedList<>();
 
         try {
-            String query = "SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.schemata;";
+            String query = "SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME," +
+                " DEFAULT_COLLATION_NAME FROM information_schema.schemata;";
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(query);
 
@@ -270,6 +269,41 @@ public class DatabaseInspector {
         }
 
         return databases;
+    }
+
+    /**
+     * Returns (maps) a single schema.
+     * @param name Schema name
+     * @return Mapped schema
+     */
+    public Schema getDatabaseByName(String name) {
+
+        Schema schema = null;
+        try {
+            String query = "SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME," +
+                " DEFAULT_COLLATION_NAME FROM information_schema.schemata WHERE SCHEMA_NAME=" + name;
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+
+            if(rs.next()){
+                schema = new Schema.SchemaBuilder(
+                    rs.getString("SCHEMA_NAME"),
+                    Charset.valueOf(rs.getString("DEFAULT_CHARACTER_SET_NAME").toUpperCase()),
+                    Collation.valueOf(rs.getString("DEFAULT_COLLATION_NAME").toUpperCase())
+                ).build();
+
+                schema.setTables(getTables(schema));
+                schema.setTableCount(schema.getTableCount());
+                schema.setDatabaseSize(getDatabaseSize(schema.getName()));
+
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return schema;
+
     }
 
     public List<ForeignKey> getForeignKeys(Table table) {

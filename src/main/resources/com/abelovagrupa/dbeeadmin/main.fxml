@@ -103,7 +103,7 @@
         <items>
           <Button fx:id="btnConnection" mnemonicParsing="false" onAction="#openConnectionSettings">
             <graphic>
-              <FontIcon iconLiteral="fas-plug" iconSize="16" />
+              <FontIcon iconLiteral="fas-plug" iconSize="16" styleClass="font-icon"/>
             </graphic>
                <tooltip>
                   <Tooltip text="Connection" />
@@ -111,7 +111,7 @@
           </Button>
           <Button layoutX="10.0" layoutY="12.0" mnemonicParsing="false" onAction="#newSchemaTab">
             <graphic>
-              <FontIcon fx:id="btnNewDatabase" iconLiteral="fas-database" iconSize="16"/>
+              <FontIcon fx:id="btnNewDatabase" iconLiteral="fas-database" iconSize="16" styleClass="font-icon"/>
             </graphic>
                <tooltip>
                   <Tooltip text="New Database" />
@@ -120,7 +120,7 @@
             <Separator orientation="VERTICAL" prefHeight="12.0" />
             <Button layoutX="74.0" layoutY="12.0" mnemonicParsing="false">
               <graphic>
-                <FontIcon iconLiteral="fas-file-import" iconSize="16" />
+                <FontIcon iconLiteral="fas-file-import" iconSize="16" styleClass="font-icon"/>
               </graphic>
                <tooltip>
                   <Tooltip text="Import" />
@@ -128,7 +128,7 @@
             </Button>
             <Button layoutX="162.0" layoutY="12.0" mnemonicParsing="false">
               <graphic>
-                <FontIcon iconLiteral="fas-file-export" iconSize="16" />
+                <FontIcon iconLiteral="fas-file-export" iconSize="16" styleClass="font-icon"/>
               </graphic>
                <tooltip>
                   <Tooltip text="Export" />
@@ -137,7 +137,7 @@
             <Separator orientation="VERTICAL" prefHeight="12.0" />
           <Button layoutX="162.0" layoutY="12.0" mnemonicParsing="false">
             <graphic>
-              <FontIcon fx:id="btnNewScript" iconLiteral="fas-scroll" iconSize="16" />
+              <FontIcon fx:id="btnNewScript" iconLiteral="fas-scroll" iconSize="16" styleClass="font-icon"/>
             </graphic>
                <tooltip>
                   <Tooltip text="New Script" />

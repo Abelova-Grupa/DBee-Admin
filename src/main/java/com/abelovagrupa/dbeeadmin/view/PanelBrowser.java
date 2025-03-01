@@ -3,6 +3,7 @@ package com.abelovagrupa.dbeeadmin.view;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -47,7 +48,6 @@ public class PanelBrowser implements Initializable {
 
             TreeItem<String> table1 = new TreeItem<>("Table 1");
             TreeItem<String> table2 = new TreeItem<>("Table 2");
-
             tableBranch.getChildren().addAll(table1,table2);
             schema.getChildren().addAll(tableBranch,viewBranch,procedureBranch,functionBranch);
 
