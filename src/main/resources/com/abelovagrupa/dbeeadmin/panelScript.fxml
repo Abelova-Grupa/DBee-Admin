@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import org.fxmisc.richtext.CodeArea?>
+<Tab xmlns="http://javafx.com/javafx"
+     xmlns:fx="http://javafx.com/fxml"
+     fx:controller="com.abelovagrupa.dbeeadmin.view.PanelScript"
+     text="SQL Script">
+        <content>
+            <VBox>
+                <children>
+                    <ToolBar prefHeight="40.0" prefWidth="200.0">
+                        <items>
+                            <Button mnemonicParsing="false" onAction="#runScript">
+                                <graphic>
+                                    <FontIcon iconLiteral="fas-angle-double-right:16" styleClass="font-icon"/>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Execute Script" />
+                                </tooltip>
+                            </Button>
+                            <Button mnemonicParsing="false">
+                                <graphic>
+                                    <FontIcon iconLiteral="fas-angle-right:16" styleClass="font-icon"/>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Execute Line" />
+                                </tooltip>
+                            </Button>
+                            <Button mnemonicParsing="false">
+                                <graphic>
+                                    <FontIcon iconLiteral="fas-file-import:16" styleClass="font-icon"/>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Import" />
+                                </tooltip>
+                            </Button>
+                            <Button mnemonicParsing="false">
+                                <graphic>
+                                    <FontIcon iconLiteral="fas-file-export:16" styleClass="font-icon"/>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Export" />
+                                </tooltip>
+                            </Button>
+                        </items>
+                    </ToolBar>
+                    <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS">
+                    </CodeArea>
+                </children>
+            </VBox>
+        </content>
+</Tab>
