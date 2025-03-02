@@ -13,6 +13,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class PanelMain implements Initializable {
@@ -38,6 +39,9 @@ public class PanelMain implements Initializable {
 
     @FXML
     Button btnConnection;
+
+    @FXML
+    Button btnNewScript;
 
     // TODO: Fix format issues with HelpPanel(Vbox)
     @Override
@@ -170,6 +174,7 @@ public class PanelMain implements Initializable {
     private void linkControllers() {
         // Add needed controller relations
         editorController.setResultsController(resultsController);
+        editorController.getScriptController().setResultsController(resultsController);
     }
 
     // Event handling methods
@@ -225,6 +230,11 @@ public class PanelMain implements Initializable {
         });
         ;
         stage.show();
+    }
+
+    public void newScriptTab(){
+        editorController.setResultsController(resultsController);
+        editorController.createNewScript();
     }
 
     // TODO: MOVE!
