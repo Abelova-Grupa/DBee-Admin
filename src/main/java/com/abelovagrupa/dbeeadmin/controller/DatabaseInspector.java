@@ -16,6 +16,7 @@ import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class DatabaseInspector {
 
@@ -81,8 +82,10 @@ public class DatabaseInspector {
                 Table table = new Table();
                 table.setSchema(schema);
                 table.setName(rs.getString("TABLE_NAME"));
-                // FIXME: Cannot invoke "String.toUpperCase()" if the return value of rs.getString("ENGINE") is null
-                table.setDbEngine(DBEngine.valueOf(rs.getString("ENGINE").toUpperCase()));
+                Optional<String> engineNullable = Optional.ofNullable(rs.getString("ENGINE"));
+                if(engineNullable.isPresent()){
+                    table.setDbEngine(DBEngine.valueOf(rs.getString("ENGINE").toUpperCase()));
+                }
                 table.setColumns(getColumns(table));
                 // A lot more table attributes, implementation depends on scope
 
@@ -255,8 +258,15 @@ public class DatabaseInspector {
                 // DO NOT CHANGE ORDER, FRAGILE TO ORDER CHANGE
                 Schema newDatabase = new Schema();
                 newDatabase.setName(rs.getString("SCHEMA_NAME"));
-                newDatabase.setCharset(Charset.valueOf(rs.getString("DEFAULT_CHARACTER_SET_NAME").toUpperCase()));
-                newDatabase.setCollation(Collation.valueOf(rs.getString("DEFAULT_COLLATION_NAME").toUpperCase()));
+                Optional<String> charsetNullable = Optional.ofNullable(rs.getString("DEFAULT_CHARACTER_SET_NAME"));
+                if(charsetNullable.isPresent()){
+                    newDatabase.setCharset(Charset.valueOf(rs.getString("DEFAULT_CHARACTER_SET_NAME").toUpperCase()));
+                }
+                Optional<String> collationNullable = Optional.ofNullable(rs.getString("DEFAULT_COLLATION_NAME"));
+                if(collationNullable.isPresent()){
+                    newDatabase.setCollation(Collation.valueOf(rs.getString("DEFAULT_COLLATION_NAME").toUpperCase()));
+
+                }
                 newDatabase.setTables(getTables(newDatabase));
                 newDatabase.setTableCount(newDatabase.getTableCount());
                 newDatabase.setDatabaseSize(getDatabaseSize(newDatabase.getName()));
@@ -343,6 +353,11 @@ public class DatabaseInspector {
         }
 
         return databaseSize;
+    }
+
+    public static void main(String[] args) {
+        DatabaseInspector di = new DatabaseInspector(DatabaseConnection.getInstance());
+        System.out.println(di.getDatabases());
     }
 
 }
