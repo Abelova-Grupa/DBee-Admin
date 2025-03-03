@@ -25,8 +25,21 @@ public class DatabaseInspector {
 
     private final Connection connection;
 
-    public DatabaseInspector(DatabaseConnection databaseConnection) {
-        this.connection = databaseConnection.getConnection();
+    private static DatabaseInspector instance;
+
+//    public DatabaseInspector(DatabaseConnection databaseConnection) {
+//        this.connection = databaseConnection.getConnection();
+//    }
+
+    private DatabaseInspector(){
+        this.connection = DatabaseConnection.getInstance().getConnection();
+    }
+
+    public static DatabaseInspector getInstance() {
+        if (instance == null) {
+            instance = new DatabaseInspector();
+        }
+        return instance;
     }
 
     public List<String> getDatabaseNames() {
@@ -355,9 +368,9 @@ public class DatabaseInspector {
         return databaseSize;
     }
 
-    public static void main(String[] args) {
-        DatabaseInspector di = new DatabaseInspector(DatabaseConnection.getInstance());
-        System.out.println(di.getDatabases());
-    }
+//    public static void main(String[] args) {
+//        DatabaseInspector di = new DatabaseInspector(DatabaseConnection.getInstance());
+//        System.out.println(di.getDatabases());
+//    }
 
 }

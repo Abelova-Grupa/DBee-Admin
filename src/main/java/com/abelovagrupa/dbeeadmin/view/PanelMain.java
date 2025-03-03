@@ -175,6 +175,11 @@ public class PanelMain implements Initializable {
         // Add needed controller relations
         editorController.setResultsController(resultsController);
         editorController.getScriptController().setResultsController(resultsController);
+
+        for(PanelSchemaTree schemaTree: browserController.getSchemaControllers()){
+            schemaTree.setBrowserController(browserController);
+        }
+
     }
 
     // Event handling methods

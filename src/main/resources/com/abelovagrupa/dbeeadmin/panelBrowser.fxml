@@ -48,8 +48,8 @@
                 <center>
                     <VBox fx:id="vboxBrowser" prefHeight="250.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                         <children>
-                            <TreeView fx:id="treeView1" prefHeight="130.0" prefWidth="250.0" styleClass="tree-view" />
-                            <TreeView fx:id="treeView2" prefHeight="130.0" prefWidth="250.0" styleClass="tree-view" />
+<!--                            <TreeView fx:id="treeView1" prefHeight="130.0" prefWidth="250.0" styleClass="tree-view" />-->
+<!--                            <TreeView fx:id="treeView2" prefHeight="130.0" prefWidth="250.0" styleClass="tree-view" />-->
                         </children>
                     </VBox>
                 </center>

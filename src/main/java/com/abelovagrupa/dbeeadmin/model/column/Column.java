@@ -186,7 +186,7 @@ public class Column {
     @Override
     public String toString() {
         // Avoiding stackoverflow from circular dependency
-        // toString methods from table column and schema are calling eachother
+        // toString methods from table column and schema are calling each other
         return "Column{" + "name='" + name + '\'' +
             ", isPrimaryKey=" + primaryKey +
             ", notNull=" + notNull +
