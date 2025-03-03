@@ -13,6 +13,14 @@ import java.util.Optional;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+
+        // Temporary solution
+        if(DatabaseConnection.getInstance().getConnection() == null) {
+            AlertManager.showErrorDialog(null, "Fatal: connection refused.",
+                "Check the server availability and try again.");
+            return;
+        }
+
         //Manually setting up the controller
         PanelMain mainController = new PanelMain();
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("main.fxml"));
