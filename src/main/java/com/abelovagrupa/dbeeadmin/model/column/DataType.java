@@ -15,6 +15,8 @@ public enum DataType {
 
     // BIT type
     BIT,
+    BINARY,
+    VARBINARY,
 
     // DATE and TIME types
     DATE,

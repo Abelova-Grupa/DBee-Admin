@@ -40,6 +40,8 @@ public class Schema {
 
     @Override
     public String toString() {
+        // Avoiding stackoverflow from circular dependency
+        // toString methods from table column and schema are calling eachother
         return "Schema{" +
                 "name='" + name + '\'' +
                 ", charset=" + charset +

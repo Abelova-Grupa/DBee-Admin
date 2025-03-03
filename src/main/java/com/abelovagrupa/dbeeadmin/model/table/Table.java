@@ -100,6 +100,8 @@ public class Table {
 
     @Override
     public String toString() {
+        // Avoiding stackoverflow from circular dependency
+        // toString methods from table column and schema are calling eachother
         return "Table{" +
                 "name='" + name + '\'' +
                 ", columns=" + columns +
@@ -107,7 +109,7 @@ public class Table {
                 ", foreignKeys=" + foreignKeys +
                 ", triggers=" + triggers +
                 ", dbEngine=" + dbEngine +
-                ", schema=" + schema +
+//                ", schema=" + schema +
                 '}';
     }
 

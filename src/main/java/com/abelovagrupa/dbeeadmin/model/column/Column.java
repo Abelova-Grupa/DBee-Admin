@@ -185,6 +185,8 @@ public class Column {
 
     @Override
     public String toString() {
+        // Avoiding stackoverflow from circular dependency
+        // toString methods from table column and schema are calling eachother
         return "Column{" + "name='" + name + '\'' +
             ", isPrimaryKey=" + primaryKey +
             ", notNull=" + notNull +
@@ -198,7 +200,7 @@ public class Column {
             ", defaultValue='" + defaultValue + '\'' +
             ", comment='" + comment + '\'' +
             ", type=" + type +
-            ", table=" + table +
+//            ", table=" + table +
             '}';
     }
 
