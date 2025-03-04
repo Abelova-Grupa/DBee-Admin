@@ -1,5 +1,7 @@
 package com.abelovagrupa.dbeeadmin;
 
+import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
+import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.view.PanelMain;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

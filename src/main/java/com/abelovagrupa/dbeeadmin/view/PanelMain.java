@@ -176,6 +176,7 @@ public class PanelMain implements Initializable {
         editorController.setResultsController(resultsController);
         editorController.getScriptController().setResultsController(resultsController);
 
+        browserController.setInfoController(infoController);
         for(PanelSchemaTree schemaTree: browserController.getSchemaControllers()){
             schemaTree.setBrowserController(browserController);
         }

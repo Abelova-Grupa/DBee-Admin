@@ -16,6 +16,7 @@ public class PanelSchemaTree {
 
     Schema schema;
 
+
     @FXML
     TreeView schemaView;
 
