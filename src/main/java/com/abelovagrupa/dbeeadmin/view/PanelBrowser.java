@@ -8,7 +8,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -25,9 +24,13 @@ public class PanelBrowser implements Initializable {
 
     private PanelMain mainController;
 
+    private List<PanelSchemaTree> schemaControllers;
+
+    private PanelInfo infoController;
+
     private List<Schema> schemas;
 
-    private List<PanelSchemaTree> schemaControllers;
+
 
     @FXML
     VBox vboxBrowser;
@@ -46,6 +49,14 @@ public class PanelBrowser implements Initializable {
 
     public void setMainController(PanelMain mainController) {
         this.mainController = mainController;
+    }
+
+    public PanelInfo getInfoController() {
+        return infoController;
+    }
+
+    public void setInfoController(PanelInfo infoController) {
+        this.infoController = infoController;
     }
 
     @Override
@@ -68,6 +79,7 @@ public class PanelBrowser implements Initializable {
 
                 for(Table table : schema.getTables()){
                     TreeItem<String> tableNode = new TreeItem<>(table.getName(),new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
+
                     tableBranch.getChildren().add(tableNode);
                 }
 
@@ -80,6 +92,17 @@ public class PanelBrowser implements Initializable {
                 schemaView.getRoot().addEventHandler(TreeItem.branchCollapsedEvent(), event -> {
                     Platform.runLater(() -> schemaView.setPrefHeight(schemaView.getExpandedItemCount() * 24));
                 });
+
+                schemaView.setOnMouseClicked(event -> {
+                    TreeItem<String> selectedTable = schemaView.getSelectionModel().getSelectedItem();
+                    if(selectedTable != null){
+                        if(getTreeItemDepth(selectedTable) == 3 && (isChildOf(selectedTable,tableBranch))){
+                            infoController.getTableName().setText(selectedTable.getValue());
+                        }
+                    }
+                });
+
+
                 vboxBrowser.getChildren().add(schemaView);
             }
 
@@ -87,4 +110,36 @@ public class PanelBrowser implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
+    public static boolean isChildOf(TreeItem<?> item, TreeItem<?> potentialParent){
+
+        if(item == null || potentialParent == null)
+            return false;
+
+        TreeItem<?> parent = item.getParent();
+
+        if(parent == potentialParent){
+            return true;
+        }
+
+        while(parent != null){
+            if(parent == potentialParent)
+                return true;
+            parent = parent.getParent();
+        }
+        return false;
+    }
+
+    public static int getTreeItemDepth(TreeItem<?> item) {
+        int depth = 0;
+        TreeItem<?> current = item;
+
+        while (current != null) {
+            depth++;
+            current = current.getParent();
+        }
+
+        return depth;
+    }
+
 }
