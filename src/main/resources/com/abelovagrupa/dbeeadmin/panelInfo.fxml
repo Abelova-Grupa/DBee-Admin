@@ -1,13 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
 <!--        -->
-<VBox xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.abelovagrupa.dbeeadmin.view.PanelInfo"
-      prefHeight="200.0" HBox.hgrow="ALWAYS">
+
+
+<VBox prefHeight="200.0" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelInfo">
+   <children>
+      <StackPane prefHeight="150.0" prefWidth="200.0">
+         <children>
+            <AnchorPane prefHeight="217.0" prefWidth="200.0" />
+            <AnchorPane prefHeight="216.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="21.0" layoutY="21.0" prefHeight="27.0" prefWidth="49.0" text="Table: ">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="70.0" layoutY="22.0" text="Table" textFill="#0ae465">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="21.0" layoutY="47.0" prefHeight="27.0" prefWidth="77.0" text="Columns: ">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <VBox layoutX="22.0" layoutY="70.0" prefHeight="131.0" prefWidth="146.0">
+                     <children>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <left>
+                              <Label text="Id:" BorderPane.alignment="CENTER">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                           </left>
+                        </BorderPane>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <left>
+                              <Label text="Atr1:" BorderPane.alignment="CENTER" />
+                           </left>
+                        </BorderPane>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <left>
+                              <Label text="Atr2:" BorderPane.alignment="CENTER" />
+                           </left>
+                        </BorderPane>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <left>
+                              <Label text="Atr3:" BorderPane.alignment="CENTER" />
+                           </left>
+                        </BorderPane>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <left>
+                              <Label text="Atr4:" BorderPane.alignment="CENTER" />
+                           </left>
+                        </BorderPane>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+   </children>
 </VBox>
