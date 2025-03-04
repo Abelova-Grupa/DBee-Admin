@@ -2,22 +2,26 @@ package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
+import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class PanelBrowser implements Initializable {
@@ -94,10 +98,23 @@ public class PanelBrowser implements Initializable {
                 });
 
                 schemaView.setOnMouseClicked(event -> {
-                    TreeItem<String> selectedTable = schemaView.getSelectionModel().getSelectedItem();
-                    if(selectedTable != null){
-                        if(getTreeItemDepth(selectedTable) == 3 && (isChildOf(selectedTable,tableBranch))){
-                            infoController.getTableName().setText(selectedTable.getValue());
+                    TreeItem<String> selectedItem = schemaView.getSelectionModel().getSelectedItem();
+                    Optional<Table> selectedTable = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
+                    if(selectedTable.isPresent()){
+                        if(getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem,tableBranch))){
+                            infoController.getTableName().setText(selectedItem.getValue());
+                            infoController.getAttributeContainer().getChildren().clear();
+                            infoController.setAttributes(new LinkedList<>());
+                            for(Column column : selectedTable.get().getColumns()){
+                                Label attributeName = new Label(column.getName());
+                                Label attributeType = new Label(column.getType().toString());
+                                BorderPane attributePane = new BorderPane();
+                                attributePane.setLeft(attributeName);
+                                attributePane.setRight(attributeType);
+                                infoController.addAttributePane(attributePane);
+                            }
+
+
                         }
                     }
                 });

@@ -33,38 +33,8 @@
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <VBox layoutX="22.0" layoutY="70.0" prefHeight="131.0" prefWidth="146.0">
-                     <children>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
-                           <left>
-                              <Label text="Id:" BorderPane.alignment="CENTER">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                           </left>
-                        </BorderPane>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
-                           <left>
-                              <Label text="Atr1:" BorderPane.alignment="CENTER" />
-                           </left>
-                        </BorderPane>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
-                           <left>
-                              <Label text="Atr2:" BorderPane.alignment="CENTER" />
-                           </left>
-                        </BorderPane>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
-                           <left>
-                              <Label text="Atr3:" BorderPane.alignment="CENTER" />
-                           </left>
-                        </BorderPane>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
-                           <left>
-                              <Label text="Atr4:" BorderPane.alignment="CENTER" />
-                           </left>
-                        </BorderPane>
-                     </children>
+                  <VBox layoutX="22.0" layoutY="70.0" prefHeight="131.0" prefWidth="146.0" fx:id="attributeContainer">
+
                   </VBox>
                </children>
             </AnchorPane>
