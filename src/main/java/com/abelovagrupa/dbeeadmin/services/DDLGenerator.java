@@ -76,10 +76,9 @@ public class DDLGenerator {
         String query = queryBuilder.toString();
         System.out.println(query);
 
-        // Execute query (UNCOMMENT AFTER TESTS!)
-//        Connection conn = DatabaseConnection.getInstance().getConnection();
-//        Statement st = conn.createStatement();
-//        st.executeUpdate(query);
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        Statement st = conn.createStatement();
+        st.executeUpdate(query);
 
     }
 
