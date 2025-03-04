@@ -135,6 +135,11 @@ public class DDLGenerator {
         return sql.toString();
     }
 
+    /**
+     * Drops the schema/database
+     * @param schema Schema to be dropped
+     * @throws SQLException
+     */
     public static void dropDatabase(Schema schema) throws SQLException {
 
         // Validate
@@ -150,6 +155,11 @@ public class DDLGenerator {
         st.executeUpdate(query);
     }
 
+    /**
+     * Drops the table
+     * @param table Table to be dropped.
+     * @throws SQLException
+     */
     public static void dropTable(Table table) throws SQLException {
 
         // Validate
@@ -169,11 +179,21 @@ public class DDLGenerator {
         st.executeUpdate(query);
     }
 
+    /**
+     * Truncates the database
+     * @param schema Database to be truncated.
+     * @throws SQLException
+     */
     public static void truncateDatabase(Schema schema) throws SQLException {
         /* MySQL doesn't have a single command to truncate the whole schema?? Wtf? */
         throw new UnsupportedOperationException("Not yet implemented...");
     }
 
+    /**
+     * Truncates (erases all data but keeps the structure) the table.
+     * @param table Table to be truncated, schema must be set.
+     * @throws SQLException
+     */
     public static void truncateTable(Table table) throws SQLException {
 
         // Validate
@@ -190,6 +210,12 @@ public class DDLGenerator {
 
     }
 
+    /**
+     * Table alteration: Adds a new column to the table.
+     * @param table Table that is being altered.
+     * @param column Column to be added.
+     * @throws SQLException
+     */
     public static void addColumn(Table table, Column column) throws SQLException {
 
         // Validate
@@ -217,6 +243,12 @@ public class DDLGenerator {
         st.executeUpdate(query);
     }
 
+    /**
+     * Table alteration: Drops a column from the table.
+     * @param table Table that is being altered.
+     * @param column Column to be dropped.
+     * @throws SQLException
+     */
     public static void dropColumn(Table table, Column column) throws SQLException {
 
         // Validate
@@ -242,6 +274,13 @@ public class DDLGenerator {
         st.executeUpdate(query);
     }
 
+    /**
+     * Table alteration: Renames a column.
+     * @param table Table that is being altered.
+     * @param column Column, with set name.
+     * @param newName New name for the column.
+     * @throws SQLException
+     */
     public static void renameColumn(Table table, Column column, String newName) throws SQLException {
 
         // Validate
@@ -269,6 +308,13 @@ public class DDLGenerator {
         st.executeUpdate(query);
     }
 
+    /**
+     * Table alteration: Modifies a column by replacing its parameters.<br>
+     * Name of the column should stay the same and parameters shall be updated before calling this method.
+     * @param table Table that is being altered.
+     * @param column Column with new parameters, but with <b>old name</b>.
+     * @throws SQLException
+     */
     public static void modifyColumn(Table table, Column column) throws SQLException {
 
         // Validate
