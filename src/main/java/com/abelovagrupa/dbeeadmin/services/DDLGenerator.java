@@ -346,6 +346,8 @@ public class DDLGenerator {
         if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
         if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
         if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
+        if(foreignKey.getReferencedColumns() == null || foreignKey.getReferencedColumns().isEmpty()) throw new IllegalArgumentException("Referenced columns are not set");
+        if(foreignKey.getReferencingColumns() == null || foreignKey.getReferencingColumns().isEmpty()) throw new IllegalArgumentException("Referencing columns are not set")
 
         StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
         queryBuilder.append(schema.getName());
@@ -373,6 +375,42 @@ public class DDLGenerator {
         String query = queryBuilder.toString();
         Connection conn = DatabaseConnection.getInstance().getConnection();
         Statement st = conn.createStatement();
+        st.executeUpdate(query);
+
+    }
+
+    public static void renameForeignKey(Schema schema, Table table, ForeignKey foreignKey, String newName) throws SQLException{
+        if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
+        if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
+        if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
+
+        StringBuilder dropQueryBuilder = new StringBuilder("ALTER TABLE ");
+        dropQueryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
+        dropQueryBuilder.append("DROP FOREIGN KEY ").append(foreignKey.getName()).append(";").append("\n");
+
+        String query = dropQueryBuilder.toString();
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        Statement st = conn.createStatement();
+        st.executeUpdate(query);
+
+        StringBuilder newQueryBuilder = new StringBuilder("ALTER TABLE ");
+        newQueryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
+        newQueryBuilder.append("ADD CONSTRAINT ").append(newName).append("\n");
+        newQueryBuilder.append("FOREIGN KEY (");
+        for (Column referencingColumn : foreignKey.getReferencingColumns()){
+            newQueryBuilder.append(referencingColumn.getName());
+            newQueryBuilder.append(", ");
+        }
+        newQueryBuilder.append(")\n");
+        newQueryBuilder.append("REFERENCES ").append(foreignKey.getReferencedSchema()).append(".").append(foreignKey.getReferencedTable());
+        newQueryBuilder.append(" (");
+        for (Column referencedColumn : foreignKey.getReferencedColumns()){
+            newQueryBuilder.append(referencedColumn.getName());
+            newQueryBuilder.append(", ");
+        }
+        newQueryBuilder.append(");");
+
+        query = newQueryBuilder.toString();
         st.executeUpdate(query);
 
     }
