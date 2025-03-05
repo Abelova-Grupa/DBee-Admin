@@ -347,7 +347,7 @@ public class DDLGenerator {
         if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
         if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
         if(foreignKey.getReferencedColumns() == null || foreignKey.getReferencedColumns().isEmpty()) throw new IllegalArgumentException("Referenced columns are not set");
-        if(foreignKey.getReferencingColumns() == null || foreignKey.getReferencingColumns().isEmpty()) throw new IllegalArgumentException("Referencing columns are not set")
+        if(foreignKey.getReferencingColumns() == null || foreignKey.getReferencingColumns().isEmpty()) throw new IllegalArgumentException("Referencing columns are not set");
 
         StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
         queryBuilder.append(schema.getName());
@@ -383,6 +383,8 @@ public class DDLGenerator {
         if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
         if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
         if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
+        if(foreignKey.getReferencedColumns() == null || foreignKey.getReferencedColumns().isEmpty()) throw new IllegalArgumentException("Referenced columns are not set");
+        if(foreignKey.getReferencingColumns() == null || foreignKey.getReferencingColumns().isEmpty()) throw new IllegalArgumentException("Referencing columns are not set");
 
         StringBuilder dropQueryBuilder = new StringBuilder("ALTER TABLE ");
         dropQueryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
@@ -391,7 +393,7 @@ public class DDLGenerator {
         String query = dropQueryBuilder.toString();
         Connection conn = DatabaseConnection.getInstance().getConnection();
         Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        st.addBatch(query);
 
         StringBuilder newQueryBuilder = new StringBuilder("ALTER TABLE ");
         newQueryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
@@ -411,6 +413,22 @@ public class DDLGenerator {
         newQueryBuilder.append(");");
 
         query = newQueryBuilder.toString();
+        st.addBatch(query);
+        st.executeBatch();
+    }
+
+    public static void dropForeignKey(Schema schema, Table table, ForeignKey foreignKey) throws SQLException {
+        if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
+        if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
+        if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
+        queryBuilder.append("DROP FOREIGN KEY").append(foreignKey.getName()).append(";");
+
+        String query = queryBuilder.toString();
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        Statement st = conn.createStatement();
         st.executeUpdate(query);
 
     }
