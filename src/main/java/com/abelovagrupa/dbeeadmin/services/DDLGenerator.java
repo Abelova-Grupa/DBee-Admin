@@ -2,6 +2,7 @@ package com.abelovagrupa.dbeeadmin.services;
 
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 
@@ -340,4 +341,40 @@ public class DDLGenerator {
         Statement st = conn.createStatement();
         st.executeUpdate(query);
     }
+
+    public static void addForeignKey(Schema schema, Table table, ForeignKey foreignKey)throws SQLException{
+        if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
+        if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
+        if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(schema.getName());
+        queryBuilder.append(".");
+        queryBuilder.append(table.getName());
+        queryBuilder.append("\n");
+        queryBuilder.append("ADD CONSTRAINT ").append(foreignKey.getName()).append("\n");
+        queryBuilder.append("FOREIGN KEY (");
+        for (Column referencingColumn : foreignKey.getReferencingColumns()){
+            queryBuilder.append(referencingColumn.getName());
+            queryBuilder.append(", ");
+        }
+        queryBuilder.append(")\n");
+        queryBuilder.append("REFERENCES ").append(foreignKey.getReferencedSchema()).append(".").append(foreignKey.getReferencedTable());
+        queryBuilder.append(" (");
+        for (Column referencedColumn : foreignKey.getReferencedColumns()){
+            queryBuilder.append(referencedColumn.getName());
+            queryBuilder.append(", ");
+        }
+        queryBuilder.append(")\n");
+        queryBuilder.append("ON DELETE ").append(foreignKey.getOnDeleteAction().toString().replace("_","")).append("\n");
+        queryBuilder.append("ON UPDATE ").append(foreignKey.getOnUpdateAction().toString().replace("_",""));
+        queryBuilder.append(";");
+
+        String query = queryBuilder.toString();
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        Statement st = conn.createStatement();
+        st.executeUpdate(query);
+
+    }
+
 }
