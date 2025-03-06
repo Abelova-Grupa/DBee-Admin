@@ -1,5 +1,6 @@
 package com.abelovagrupa.dbeeadmin.view;
 import com.abelovagrupa.dbeeadmin.Main;
+import com.abelovagrupa.dbeeadmin.services.FileExporter;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -243,34 +244,5 @@ public class PanelMain implements Initializable {
         editorController.createNewScript();
     }
 
-    // TODO: MOVE!
-    /**
-     * Prints a ResultSet to the standard output. For testing purposes.
-     * @param resultSet to be printed to std out
-     */
-//    public static void printResultSet(ResultSet resultSet) {
-//        if(resultSet == null) return;
-//        try {
-//            // Get metadata about the ResultSet
-//            ResultSetMetaData metaData = resultSet.getMetaData();
-//            int columnCount = metaData.getColumnCount();
-//
-//            // Print column headers
-//            for (int i = 1; i <= columnCount; i++) {
-//                System.out.print(metaData.getColumnLabel(i) +"\t");
-//            }
-//            System.out.println();
-//
-//            // Print rows of data
-//            while (resultSet.next()) {
-//                for (int i = 1; i <= columnCount; i++) {
-//                    System.out.print(resultSet.getString(i) + "\t");
-//                }
-//                System.out.println();
-//            }
-//        } catch (SQLException e) {
-//            System.err.println("Error printing ResultSet: " + e.getMessage());
-//        }
-//    }
 
 }

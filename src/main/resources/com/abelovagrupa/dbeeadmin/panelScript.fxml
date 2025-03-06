@@ -41,7 +41,7 @@
                                     <Tooltip text="Import" />
                                 </tooltip>
                             </Button>
-                            <Button mnemonicParsing="false">
+                            <Button mnemonicParsing="false" onAction="#exportSQL">
                                 <graphic>
                                     <FontIcon iconLiteral="fas-file-export:16" styleClass="font-icon"/>
                                 </graphic>
