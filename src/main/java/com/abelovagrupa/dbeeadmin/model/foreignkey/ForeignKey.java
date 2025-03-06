@@ -9,6 +9,8 @@ import java.util.Objects;
 
 public class ForeignKey {
     private String name;
+    private Schema referencingSchema;
+    private Table referencingTable;
     private List<Column> referencingColumns;
     private Schema referencedSchema;
     private Table referencedTable;
@@ -19,8 +21,10 @@ public class ForeignKey {
     public ForeignKey() {
     }
 
-    public ForeignKey(String name, List<Column> referencingColumns, Schema referencedSchema, Table referencedTable, List<Column> referencedColumns, Action onDeleteAction, Action onUpdateAction) {
+    public ForeignKey(String name, Schema referencingSchema, Table referencingTable, List<Column> referencingColumns, Schema referencedSchema, Table referencedTable, List<Column> referencedColumns, Action onDeleteAction, Action onUpdateAction) {
         this.name = name;
+        this.referencingSchema = referencingSchema;
+        this.referencingTable = referencingTable;
         this.referencingColumns = referencingColumns;
         this.referencedSchema = referencedSchema;
         this.referencedTable = referencedTable;
@@ -35,6 +39,22 @@ public class ForeignKey {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Schema getReferencingSchema() {
+        return referencingSchema;
+    }
+
+    public void setReferencingSchema(Schema referencingSchema) {
+        this.referencingSchema = referencingSchema;
+    }
+
+    public Table getReferencingTable() {
+        return referencingTable;
+    }
+
+    public void setReferencingTable(Table referencingTable) {
+        this.referencingTable = referencingTable;
     }
 
     public List<Column> getReferencingColumns() {
@@ -99,9 +119,11 @@ public class ForeignKey {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof ForeignKey that)) return false;
-        return Objects.equals(name, that.name) && Objects.equals(referencingColumns, that.referencingColumns) && Objects.equals(referencedSchema, that.referencedSchema) && Objects.equals(referencedTable, that.referencedTable) && Objects.equals(referencedColumns, that.referencedColumns) && onDeleteAction == that.onDeleteAction && onUpdateAction == that.onUpdateAction;
+
+        return Objects.equals(getName(), that.getName()) && Objects.equals(getReferencingSchema(), that.getReferencingSchema()) && Objects.equals(getReferencingTable(), that.getReferencingTable()) && Objects.equals(getReferencingColumns(), that.getReferencingColumns()) && Objects.equals(getReferencedSchema(), that.getReferencedSchema()) && Objects.equals(getReferencedTable(), that.getReferencedTable()) && Objects.equals(getReferencedColumns(), that.getReferencedColumns()) && getOnDeleteAction() == that.getOnDeleteAction() && getOnUpdateAction() == that.getOnUpdateAction();
     }
 
     @Override

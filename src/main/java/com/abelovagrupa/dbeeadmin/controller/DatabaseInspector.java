@@ -3,6 +3,7 @@ package com.abelovagrupa.dbeeadmin.controller;
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.column.DataType;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.Action;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
@@ -86,7 +87,7 @@ public class DatabaseInspector {
     public List<Table> getTables(Schema schema){
 
         List<Table> tables = new LinkedList<>();
-        String query = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?;";
+        String query = "SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?;";
 
         try(PreparedStatement ps = connection.prepareStatement(query)){
             ps.setString(1,schema.getName());
@@ -114,7 +115,7 @@ public class DatabaseInspector {
     public Table getTableByName(Schema schema, String tableName) {
 
         Table table = null;
-        String query = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA =? AND TABLE_NAME=?;";
+        String query = "SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA =? AND TABLE_NAME=?;";
 
         try(PreparedStatement ps = connection.prepareStatement(query)){
             ps.setString(1, schema.getName());
@@ -329,8 +330,93 @@ public class DatabaseInspector {
 
     }
 
-    public List<ForeignKey> getForeignKeys(Table table) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public List<ForeignKey> getForeignKeys(Schema schema, Table table) {
+        List<ForeignKey> foreignKeys = new LinkedList<>();
+        String query = "SELECT CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME \n" +
+                "FROM information_schema.KEY_COLUMN_USAGE\n" +
+                "WHERE TABLE_SCHEMA=? AND TABLE_NAME=?;";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setString(1, schema.getName());
+            stmt.setString(2, table.getName());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String keyName = rs.getString("CONSTRAINT_NAME");
+                    String schemaName = rs.getString("TABLE_SCHEMA");
+                    String tableName = rs.getString("TABLE_NAME");
+                    Optional<String> referencedSchemaName = Optional.ofNullable(rs.getString("REFERENCED_TABLE_SCHEMA"));
+                    Optional<String> referencedTableName = Optional.ofNullable(rs.getString("REFERENCED_TABLE_NAME"));
+
+                    Schema referencingSchema = getDatabaseByName(schemaName);
+                    Table referencingTable = getTableByName(referencingSchema,tableName);
+
+                    Schema referencedSchema = getDatabaseByName(referencedSchemaName.orElse(null));
+                    Table referencedTable = null;
+
+                    if(referencedTableName.isPresent()){
+                        referencedTable = getTableByName(referencedSchema,referencedTableName.get());
+                    }
+
+                    //Mapping attributes into foreignKey object
+                    ForeignKey newForeignKey = new ForeignKey();
+                    newForeignKey.setName(keyName);
+                    newForeignKey.setReferencingSchema(referencingSchema);
+                    newForeignKey.setReferencingTable(referencingTable);
+                    newForeignKey.setReferencedSchema(referencedSchema);
+                    newForeignKey.setReferencedTable(referencedTable);
+
+                    String columnQuery = "SELECT COLUMN_NAME, REFERENCED_COLUMN_NAME\n" +
+                            "FROM information_schema.KEY_COLUMN_USAGE\n" +
+                            "WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND CONSTRAINT_NAME=?;";
+                    PreparedStatement ps = connection.prepareStatement(columnQuery);
+                    ps.setString(1,schemaName);
+                    ps.setString(2,tableName);
+                    ps.setString(3,keyName);
+
+                    ResultSet columnsRs = ps.executeQuery();
+
+                    newForeignKey.setReferencingColumns(new LinkedList<>());
+                    newForeignKey.setReferencedColumns(new LinkedList<>());
+
+                    while(columnsRs.next()){
+                        Optional<String> referencingColumn = Optional.ofNullable(columnsRs.getString("COLUMN_NAME"));
+                        Optional<String> referencedColumn = Optional.ofNullable(columnsRs.getString("REFERENCED_COLUMN_NAME"));
+                        if(referencingColumn.isPresent()){
+                            newForeignKey.getReferencingColumns()
+                                    .add(getColumnByName(referencingTable,referencingColumn.get()));
+                        }
+                        if(referencedColumn.isPresent()){
+                            newForeignKey.getReferencedColumns()
+                                    .add(getColumnByName(referencedTable,referencedColumn.get()));
+                        }
+
+
+                    }
+
+                    String actionQuery = "SELECT UPDATE_RULE, DELETE_RULE\n" +
+                            "FROM information_schema.REFERENTIAL_CONSTRAINTS\n" +
+                            "WHERE CONSTRAINT_NAME=?;";
+
+                    PreparedStatement actionStmt = connection.prepareStatement(actionQuery);
+                    actionStmt.setString(1,keyName);
+
+                    ResultSet actionRs = actionStmt.executeQuery();
+                    if(actionRs.next()){
+                        String onUpdate = actionRs.getString("UPDATE_RULE").replace(" ","_");
+                        newForeignKey.setOnUpdateAction(Action.valueOf(onUpdate));
+                        String onDelete = actionRs.getString("DELETE_RULE").replace(" ","_");
+                        newForeignKey.setOnDeleteAction(Action.valueOf(onDelete));
+                    }
+
+                    foreignKeys.add(newForeignKey);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return null;
     }
 
     public List<Index> getIndexes(Table table) {
