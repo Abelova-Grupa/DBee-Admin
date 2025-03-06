@@ -5,11 +5,11 @@ import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.input.KeyCode;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
@@ -66,6 +66,12 @@ public class PanelScript implements Initializable {
         codeArea.textProperty().addListener((_, _, newText) -> {
             codeArea.setStyleSpans(0, computeHighlighting(newText));
         });
+
+        // Setting shortcuts for editor.
+        codeArea.setOnKeyPressed(keyEvent -> {
+            if(keyEvent.getCode() == KeyCode.F5) runLine();
+            if(keyEvent.getCode() == KeyCode.F7) runScript();
+        });
     }
 
     public PanelEditor getEditorController() {
@@ -84,7 +90,18 @@ public class PanelScript implements Initializable {
         this.resultsController = resultsController;
     }
 
-    public void runScript(ActionEvent actionEvent) {
+    public void runLine() {
+        if(codeArea.getText() == null || codeArea.getText().isEmpty() || codeArea.getSelectedText().isEmpty()) return;
+        Pair<ResultSet, Integer> result = QueryExecutor.executeQuery(codeArea.getSelectedText());
+        printHistory((result.getSecond() != null) ? result.getSecond() : 0, result.getFirst() != null);
+        try {
+            printResultSetToTable(result.getFirst());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void runScript() {
         if(codeArea.getText() == null || codeArea.getText().isEmpty()) return;
         Pair<ResultSet, Integer> result = QueryExecutor.executeQuery(codeArea.getText());
         printHistory((result.getSecond() != null) ? result.getSecond() : 0, result.getFirst() != null);
