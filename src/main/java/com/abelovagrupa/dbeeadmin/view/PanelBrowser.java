@@ -84,8 +84,22 @@ public class PanelBrowser implements Initializable {
                 for(Table table : schema.getTables()){
                     TreeItem<String> tableNode = new TreeItem<>(table.getName(),new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
 
+                    TreeItem<String> columnBranch = new TreeItem<>("Columns",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
+                    TreeItem<String> indexBranch = new TreeItem<>("Indexes",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/indexes.png").toExternalForm())));
+                    TreeItem<String> foreignKeyBranch = new TreeItem<>("Foreign Keys",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/foreignkeys.png").toExternalForm())));
+                    TreeItem<String> triggersBranch = new TreeItem<>("Triggers",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/triggers.png").toExternalForm())));
+
+
+                    for(Column column : table.getColumns()){
+                        TreeItem<String> columnNode = new TreeItem<>(column.getName());
+                        columnBranch.getChildren().add(columnNode);
+                    }
+
+                    tableNode.getChildren().addAll(columnBranch,indexBranch,foreignKeyBranch,triggersBranch);
                     tableBranch.getChildren().add(tableNode);
                 }
+
+
 
                 schemaNode.getChildren().addAll(tableBranch,viewBranch,procedureBranch,functionBranch);
                 schemaView.setPrefHeight(24);
