@@ -3,12 +3,17 @@ package com.abelovagrupa.dbeeadmin.services;
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexType;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * A utility class that generates DDL statements from domain objects, and persists changes
@@ -443,4 +448,44 @@ public class DDLGenerator {
         addForeignKey(schema,table,newForeignKey);
     }
 
-}
+    public static void addIndex(Schema schema, Table table, Index index) throws SQLException {
+        if(schema == null ) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+        if(index == null) throw new IllegalArgumentException("Index is not set");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
+        queryBuilder.append("ADD ").append(
+                !index.getType().equals(IndexType.INDEX) ? index.getType() : ""
+        ).append(" INDEX ").append(index.getName()).append(" USING ").append(index.getStorageType()).append(" (");
+
+        Comparator<IndexedColumn> indexComparator = new Comparator<IndexedColumn>() {
+            @Override
+            public int compare(IndexedColumn o1, IndexedColumn o2) {
+                if (o1.getOrderNumber() == o2.getOrderNumber()) return 0;
+                else if (o1.getOrderNumber() < o2.getOrderNumber()) return 1;
+                else return -1;
+            }
+        };
+
+        List<IndexedColumn> sortedIndexedColumns = index.getIndexedColumns();
+        sortedIndexedColumns.sort(indexComparator);
+
+        for(IndexedColumn indexedColumn : sortedIndexedColumns){
+            queryBuilder.append(indexedColumn.getColumn().getName());
+            if(indexedColumn.getLength() != 0) queryBuilder.append("(").append(indexedColumn.getLength()).append(")");
+            queryBuilder.append(", ");
+        }
+        queryBuilder.append(") ");
+        if(index.getKeyBlockSize() != 0) queryBuilder.append(" KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize()).append(" ");
+        if(index.getParser() != null && !index.getParser().isEmpty()) queryBuilder.append(" WITH PARSER ").append(index.getParser()).append(" ");
+        queryBuilder.append(index.isVisible() ? "VISIBLE; " : "INVISIBLE; ");
+
+        String query = queryBuilder.toString();
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        Statement st = conn.createStatement();
+        st.executeUpdate(query);
+
+    }
+
+    }
