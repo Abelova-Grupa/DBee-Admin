@@ -309,6 +309,7 @@ public class DatabaseInspector {
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(query);
 
+
             if(rs.next()){
                 schema = new Schema.SchemaBuilder(
                     rs.getString("SCHEMA_NAME"),
@@ -457,9 +458,11 @@ public class DatabaseInspector {
         return databaseSize;
     }
 
-//    public static void main(String[] args) {
-//        DatabaseInspector di = new DatabaseInspector(DatabaseConnection.getInstance());
-//        System.out.println(di.getDatabases());
-//    }
+    public static void main(String[] args) {
+        DatabaseInspector di = new DatabaseInspector();
+        Schema schema = di.getDatabaseByName("veslanje");
+        Table table = di.getTableByName(schema,"klub_takmicenje");
+        System.out.println(di.getForeignKeys(schema,table));
+    }
 
 }
