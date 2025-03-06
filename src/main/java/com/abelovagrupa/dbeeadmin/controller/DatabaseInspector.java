@@ -331,6 +331,9 @@ public class DatabaseInspector {
     }
 
     public List<ForeignKey> getForeignKeys(Schema schema, Table table) {
+        if(schema == null) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+
         List<ForeignKey> foreignKeys = new LinkedList<>();
         String query = "SELECT CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME \n" +
                 "FROM information_schema.KEY_COLUMN_USAGE\n" +
@@ -383,6 +386,7 @@ public class DatabaseInspector {
                     while(columnsRs.next()){
                         Optional<String> referencingColumn = Optional.ofNullable(columnsRs.getString("COLUMN_NAME"));
                         Optional<String> referencedColumn = Optional.ofNullable(columnsRs.getString("REFERENCED_COLUMN_NAME"));
+
                         if(referencingColumn.isPresent()){
                             newForeignKey.getReferencingColumns()
                                     .add(getColumnByName(referencingTable,referencingColumn.get()));
@@ -391,7 +395,6 @@ public class DatabaseInspector {
                             newForeignKey.getReferencedColumns()
                                     .add(getColumnByName(referencedTable,referencedColumn.get()));
                         }
-
 
                     }
 
@@ -416,7 +419,7 @@ public class DatabaseInspector {
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
-        return null;
+        return foreignKeys;
     }
 
     public List<Index> getIndexes(Table table) {
