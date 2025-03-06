@@ -488,4 +488,15 @@ public class DDLGenerator {
 
     }
 
+    public static void renameIndex(Schema schema, Table table, Index index, String newName) throws SQLException {
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(schema.getName()).append(table.getName()).append(" ");
+        queryBuilder.append("RENAME INDEX ").append(index.getName()).append(" TO ").append(newName).append(";");
+
+        String query = queryBuilder.toString();
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        Statement st = conn.createStatement();
+        st.executeUpdate(query);
+    }
+
     }
