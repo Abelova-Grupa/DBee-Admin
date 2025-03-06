@@ -499,4 +499,15 @@ public class DDLGenerator {
         st.executeUpdate(query);
     }
 
+    public static void dropIndex(Schema schema, Table table, Index index) throws SQLException {
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ").append(schema.getName())
+                .append(".").append(table.getName()).append("\n");
+        queryBuilder.append("DROP INDEX ").append(index.getName());
+
+        String query = queryBuilder.toString();
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        Statement st = conn.createStatement();
+        st.executeUpdate(query);
+    }
+
     }
