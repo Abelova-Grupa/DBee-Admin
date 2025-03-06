@@ -34,8 +34,6 @@ public class PanelBrowser implements Initializable {
 
     private List<Schema> schemas;
 
-
-
     @FXML
     VBox vboxBrowser;
 
