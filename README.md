@@ -1,11 +1,22 @@
 # DBee Admin 🐝
-Cross-platform visual database design and administration tool 
+![Static Badge](https://img.shields.io/badge/Latest-0.1.0--SNAPSHOT-gold?style=flat)
+
+Cross-platform visual database design and administration tool
 
 ## Tech Stack ⚙️
 + UI: **JavaFX**, **CSS** 
-+ Logic: **Java (Maven)**
++ Logic: **Java**
++ Build: **Maven**
 
-## ENV Configuration ⚙️
+## Keyboard shortcuts ⌨️
+
+### Editor shortcuts
+| Command | Shortcut |
+|---------|:----------:|
+| Execute selected line | `F5` |
+| Execute entire script | `F7` |
+
+## ENV Configuration 💾
 The configuration of the database connection can be accomplished through two primary methods: either by utilizing a form-based interface or by manually editing the `.env` file located in the root directory of the application. The `.env` file should include the following parameters to establish the connection:
 
 | Parameter | Default | Description |
