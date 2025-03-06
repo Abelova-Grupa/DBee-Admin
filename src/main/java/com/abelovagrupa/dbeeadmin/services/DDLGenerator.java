@@ -433,4 +433,14 @@ public class DDLGenerator {
 
     }
 
+    public static void modifyForeignKey(Schema schema, Table table, ForeignKey oldForeignKey, ForeignKey newForeignKey) throws SQLException {
+        if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
+        if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
+        if(oldForeignKey == null || oldForeignKey.getName() == null || oldForeignKey.getName().isEmpty()) throw new IllegalArgumentException("Old foreign key is not set");
+        if(newForeignKey == null || newForeignKey.getName() == null || newForeignKey.getName().isEmpty()) throw new IllegalArgumentException("New foreign key is not set");
+
+        dropForeignKey(schema,table,oldForeignKey);
+        addForeignKey(schema,table,newForeignKey);
+    }
+
 }
