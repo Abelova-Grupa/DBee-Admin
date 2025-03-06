@@ -489,6 +489,10 @@ public class DDLGenerator {
     }
 
     public static void renameIndex(Schema schema, Table table, Index index, String newName) throws SQLException {
+        if(schema == null ) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+        if(index == null) throw new IllegalArgumentException("Index is not set");
+
         StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
         queryBuilder.append(schema.getName()).append(table.getName()).append(" ");
         queryBuilder.append("RENAME INDEX ").append(index.getName()).append(" TO ").append(newName).append(";");
@@ -500,6 +504,10 @@ public class DDLGenerator {
     }
 
     public static void dropIndex(Schema schema, Table table, Index index) throws SQLException {
+        if(schema == null ) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+        if(index == null) throw new IllegalArgumentException("Index is not set");
+
         StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ").append(schema.getName())
                 .append(".").append(table.getName()).append("\n");
         queryBuilder.append("DROP INDEX ").append(index.getName());
@@ -508,6 +516,16 @@ public class DDLGenerator {
         Connection conn = DatabaseConnection.getInstance().getConnection();
         Statement st = conn.createStatement();
         st.executeUpdate(query);
+    }
+
+    public static void modifyIndex(Schema schema, Table table, Index oldIndex, Index newIndex) throws SQLException {
+        if(schema == null ) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+        if(oldIndex == null) throw new IllegalArgumentException("Index is not set");
+        if(newIndex == null) throw new IllegalArgumentException("Index is not set");
+
+        dropIndex(schema,table,oldIndex);
+        addIndex(schema,table,newIndex);
     }
 
     }
