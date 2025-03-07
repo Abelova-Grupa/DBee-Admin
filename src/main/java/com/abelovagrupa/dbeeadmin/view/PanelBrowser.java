@@ -82,18 +82,8 @@ public class PanelBrowser implements Initializable {
                 TreeItem<String>  procedureBranch = new TreeItem<>("Stored Procedures",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));
                 TreeItem<String> functionBranch = new TreeItem<>("Functions",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));
 
-//                for(Table table : schema.getTables()){
-//                    TreeItem<String> tableNode = new TreeItem<>(table.getName(),new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
-//
-//                    for(Column column : table.getColumns()){
-//                        TreeItem<String> columnNode = new TreeItem<>(column.getName());
-//                        columnBranch.getChildren().add(columnNode);
-//                    }
-//
-//                    tableNode.getChildren().addAll(columnBranch,indexBranch,foreignKeyBranch,triggersBranch);
-//                    tableBranch.getChildren().add(tableNode);
-//                }
 
+                // Creating an initial tableDummy so that the tableBranch can be expandable
                 TreeItem<String> tableDummyNode = new TreeItem<>("Dummy table",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
                 tableBranch.getChildren().add(tableDummyNode);
 
@@ -111,12 +101,32 @@ public class PanelBrowser implements Initializable {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                         if(newValue){
+                            System.out.println("Triggering tableListener for the first time");
                             Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
+                            //TODO: CREATE A getTableNames method to not load whole tables initially
                             List<Table> tables = DatabaseInspector.getInstance().getTables(schema);
                             tableBranch.getChildren().remove(tableDummyNode);
                             for(Table table: tables){
+
                                 TreeItem<String> tableNode = new TreeItem<>(table.getName(),new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
                                 TreeItem<String> columnBranch = new TreeItem<>("Columns",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
+                                TreeItem<String> columnDummy = new TreeItem<>("Column Dummy");
+                                columnBranch.getChildren().add(columnDummy);
+
+                                ChangeListener<Boolean> columnListener = new ChangeListener<Boolean>() {
+                                    @Override
+                                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                                        System.out.println("Triggering column listener for the first time");
+                                        for(Column column : table.getColumns()){
+                                            TreeItem<String> columnNode = new TreeItem<>(column.getName());
+                                            columnBranch.getChildren().add(columnNode);
+                                        }
+                                        columnBranch.expandedProperty().removeListener(this);
+                                    }
+                                };
+
+                                columnBranch.expandedProperty().addListener(columnListener);
+
                                 TreeItem<String> indexBranch = new TreeItem<>("Indexes",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/indexes.png").toExternalForm())));
                                 TreeItem<String> foreignKeyBranch = new TreeItem<>("Foreign Keys",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/foreignkeys.png").toExternalForm())));
                                 TreeItem<String> triggersBranch = new TreeItem<>("Triggers",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/triggers.png").toExternalForm())));
@@ -131,31 +141,29 @@ public class PanelBrowser implements Initializable {
 
                 tableBranch.expandedProperty().addListener(tableListener);
 
-//                schemaView.setOnMouseClicked(event -> {
-//                    // TODO: Implement lazy loading
-//                    TreeItem<String> selectedItem = schemaView.getSelectionModel().getSelectedItem();
-////                    Optional<Table> selectedTable = DatabaseInspector.getInstance().getDatabaseByName(schemaName).getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
-////                    if(selectedTable.isPresent()){
-////                        if(getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem,tableBranch))){
-////                            infoController.getTableName().setText(selectedItem.getValue());
-////                            infoController.getAttributeContainer().getChildren().clear();
-////                            infoController.setAttributes(new LinkedList<>());
-////                            for(Column column : selectedTable.get().getColumns()){
-////                                Label attributeName = new Label(column.getName());
-////                                Label attributeType = new Label(column.getType().toString());
-////                                BorderPane attributePane = new BorderPane();
-////                                attributePane.setLeft(attributeName);
-////                                attributePane.setRight(attributeType);
-////                                infoController.addAttributePane(attributePane);
-////                            }
-////
-////
-////                        }
-////                    }
-//
-//
-//                });
+                schemaView.setOnMouseClicked(event -> {
+                    // TODO: Implement lazy loading
+                    Optional<TreeItem<String>> selectedItem = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
+                    if(selectedItem.isPresent()){
+                        Optional<Table> selectedTable = DatabaseInspector.getInstance().getDatabaseByName(schemaName).getTables().stream().filter(s -> s.getName().equals(selectedItem.get().getValue())).findFirst();
+                        if(selectedTable.isPresent()){
+                            if(getTreeItemDepth(selectedItem.get()) == 3 && (isChildOf(selectedItem.get(),tableBranch))){
+                                infoController.getTableName().setText(selectedItem.get().getValue());
+                                infoController.getAttributeContainer().getChildren().clear();
+                                infoController.setAttributes(new LinkedList<>());
 
+                                for(Column column : selectedTable.get().getColumns()){
+                                    Label attributeName = new Label(column.getName());
+                                    Label attributeType = new Label(column.getType().toString());
+                                    BorderPane attributePane = new BorderPane();
+                                    attributePane.setLeft(attributeName);
+                                    attributePane.setRight(attributeType);
+                                    infoController.addAttributePane(attributePane);
+                                }
+                            }
+                        }
+                    }
+                });
 
                 vboxBrowser.getChildren().add(schemaView);
             }
