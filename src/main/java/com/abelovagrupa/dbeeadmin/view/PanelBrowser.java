@@ -3,6 +3,7 @@ package com.abelovagrupa.dbeeadmin.view;
 import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.application.Platform;
@@ -84,7 +85,7 @@ public class PanelBrowser implements Initializable {
 
 
                 // Creating an initial tableDummy so that the tableBranch can be expandable
-                TreeItem<String> tableDummyNode = new TreeItem<>("Dummy table",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
+                TreeItem<String> tableDummyNode = new TreeItem<>("Dummy table");
                 tableBranch.getChildren().add(tableDummyNode);
 
                 schemaNode.getChildren().addAll(tableBranch,viewBranch,procedureBranch,functionBranch);
@@ -108,6 +109,7 @@ public class PanelBrowser implements Initializable {
                             for(String tableName: tableNames){
 
                                 TreeItem<String> tableNode = new TreeItem<>(tableName,new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
+
                                 TreeItem<String> columnBranch = new TreeItem<>("Columns",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
                                 TreeItem<String> columnDummy = new TreeItem<>("Column Dummy");
                                 columnBranch.getChildren().add(columnDummy);
@@ -115,19 +117,42 @@ public class PanelBrowser implements Initializable {
                                 ChangeListener<Boolean> columnListener = new ChangeListener<Boolean>() {
                                     @Override
                                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                                        Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
-                                        for(Column column : table.getColumns()){
-                                            TreeItem<String> columnNode = new TreeItem<>(column.getName());
-                                            columnBranch.getChildren().add(columnNode);
+                                        if(newValue){
+                                            columnBranch.getChildren().remove(columnDummy);
+                                            Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
+                                            for(Column column : table.getColumns()){
+                                                TreeItem<String> columnNode = new TreeItem<>(column.getName());
+                                                columnBranch.getChildren().add(columnNode);
+                                            }
+                                            columnBranch.expandedProperty().removeListener(this);
                                         }
-                                        columnBranch.expandedProperty().removeListener(this);
                                     }
                                 };
-
                                 columnBranch.expandedProperty().addListener(columnListener);
 
                                 TreeItem<String> indexBranch = new TreeItem<>("Indexes",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/indexes.png").toExternalForm())));
+
                                 TreeItem<String> foreignKeyBranch = new TreeItem<>("Foreign Keys",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/foreignkeys.png").toExternalForm())));
+                                TreeItem<String> foreignKeyDummy = new TreeItem<>("ForeignKeyDummy");
+                                foreignKeyBranch.getChildren().add(foreignKeyDummy);
+
+                                ChangeListener<Boolean> foreignKeyListener = new ChangeListener<Boolean>() {
+                                    @Override
+                                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                                        if(newValue){
+                                            foreignKeyBranch.getChildren().remove(foreignKeyDummy);
+                                            Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
+                                            List<ForeignKey> foreignKeys = DatabaseInspector.getInstance().getForeignKeys(schema,table);
+                                            for(ForeignKey foreignKey: foreignKeys){
+                                                TreeItem<String> foreignKeyNode = new TreeItem<>(foreignKey.getName());
+                                                foreignKeyBranch.getChildren().add(foreignKeyNode);
+                                            }
+                                            foreignKeyBranch.expandedProperty().removeListener(this);
+                                        }
+                                    }
+                                };
+                                foreignKeyBranch.expandedProperty().addListener(foreignKeyListener);
+
                                 TreeItem<String> triggersBranch = new TreeItem<>("Triggers",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/triggers.png").toExternalForm())));
 
                                 tableNode.getChildren().addAll(columnBranch,indexBranch,foreignKeyBranch,triggersBranch);
@@ -141,10 +166,10 @@ public class PanelBrowser implements Initializable {
                 tableBranch.expandedProperty().addListener(tableListener);
 
                 schemaView.setOnMouseClicked(event -> {
-                    // TODO: Implement lazy loading
                     Optional<TreeItem<String>> selectedItem = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
+                    Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
                     if(selectedItem.isPresent()){
-                        Optional<Table> selectedTable = DatabaseInspector.getInstance().getDatabaseByName(schemaName).getTables().stream().filter(s -> s.getName().equals(selectedItem.get().getValue())).findFirst();
+                        Optional<Table> selectedTable = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.get().getValue())).findFirst();
                         if(selectedTable.isPresent()){
                             if(getTreeItemDepth(selectedItem.get()) == 3 && (isChildOf(selectedItem.get(),tableBranch))){
                                 infoController.getTableName().setText(selectedItem.get().getValue());
