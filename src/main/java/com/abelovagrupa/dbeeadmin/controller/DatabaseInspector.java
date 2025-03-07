@@ -305,9 +305,10 @@ public class DatabaseInspector {
         Schema schema = null;
         try {
             String query = "SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME," +
-                " DEFAULT_COLLATION_NAME FROM information_schema.schemata WHERE SCHEMA_NAME=" + name;
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(query);
+                " DEFAULT_COLLATION_NAME FROM information_schema.schemata WHERE SCHEMA_NAME=?;";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1,name);
+            ResultSet rs = stmt.executeQuery();
 
 
             if(rs.next()){
@@ -458,11 +459,11 @@ public class DatabaseInspector {
         return databaseSize;
     }
 
-//    public static void main(String[] args) {
-//        DatabaseInspector di = new DatabaseInspector();
-//        Schema schema = di.getDatabaseByName("veslanje");
-//        Table table = di.getTableByName(schema,"klub_takmicenje");
-//        System.out.println(di.getForeignKeys(schema,table));
-//    }
+    public static void main(String[] args) {
+        DatabaseInspector di = new DatabaseInspector();
+        Schema schema = di.getDatabaseByName("veslanje");
+        Table table = di.getTableByName(schema,"klub_takmicenje");
+        System.out.println(di.getForeignKeys(schema,table));
+    }
 
 }
