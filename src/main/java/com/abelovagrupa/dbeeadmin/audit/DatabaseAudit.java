@@ -1,11 +1,13 @@
 package com.abelovagrupa.dbeeadmin.audit;
 
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
+import com.abelovagrupa.dbeeadmin.model.table.Table;
+
 public class DatabaseAudit {
     private static DatabaseAudit instance = null;
 
-    private String selectedDatabase;
-    private String selectedSchema;
-    private String selectedTable;
+    private Schema selectedSchema;
+    private Table selectedTable;
 
     private DatabaseAudit() {}
 
@@ -16,36 +18,27 @@ public class DatabaseAudit {
         return instance;
     }
 
-    public String getSelectedDatabase() {
-        return selectedDatabase;
-    }
-
-    public void setSelectedDatabase(String selectedDatabase) {
-        this.selectedDatabase = selectedDatabase;
-    }
-
-    public String getSelectedSchema() {
+    public Schema getSelectedSchema() {
         return selectedSchema;
     }
 
-    public void setSelectedSchema(String selectedSchema) {
+    public void setSelectedSchema(Schema selectedSchema) {
         this.selectedSchema = selectedSchema;
     }
 
-    public String getSelectedTable() {
+    public Table getSelectedTable() {
         return selectedTable;
     }
 
-    public void setSelectedTable(String selectedTable) {
+    public void setSelectedTable(Table selectedTable) {
         this.selectedTable = selectedTable;
     }
 
     @Override
     public String toString() {
         return "DatabaseAudit{" +
-                "selectedDatabase='" + selectedDatabase + '\'' +
-                ", selectedSchema='" + selectedSchema + '\'' +
-                ", selectedTable='" + selectedTable + '\'' +
+                "selectedSchema=" + selectedSchema +
+                ", selectedTable=" + selectedTable +
                 '}';
     }
 }
