@@ -459,11 +459,11 @@ public class DatabaseInspector {
         return databaseSize;
     }
 
-    public static void main(String[] args) {
-        DatabaseInspector di = new DatabaseInspector();
-        Schema schema = di.getDatabaseByName("veslanje");
-        Table table = di.getTableByName(schema,"klub_takmicenje");
-        System.out.println(di.getForeignKeys(schema,table));
-    }
+//    public static void main(String[] args) {
+//        DatabaseInspector di = new DatabaseInspector();
+//        Schema schema = di.getDatabaseByName("veslanje");
+//        Table table = di.getTableByName(schema,"klub_takmicenje");
+//        System.out.println(di.getForeignKeys(schema,table));
+//    }
 
 }
