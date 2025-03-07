@@ -103,12 +103,11 @@ public class PanelBrowser implements Initializable {
                         if(newValue){
                             System.out.println("Triggering tableListener for the first time");
                             Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-                            //TODO: CREATE A getTableNames method to not load whole tables initially
-                            List<Table> tables = DatabaseInspector.getInstance().getTables(schema);
+                            List<String> tableNames = DatabaseInspector.getInstance().getTableNames(schema);
                             tableBranch.getChildren().remove(tableDummyNode);
-                            for(Table table: tables){
+                            for(String tableName: tableNames){
 
-                                TreeItem<String> tableNode = new TreeItem<>(table.getName(),new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
+                                TreeItem<String> tableNode = new TreeItem<>(tableName,new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
                                 TreeItem<String> columnBranch = new TreeItem<>("Columns",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
                                 TreeItem<String> columnDummy = new TreeItem<>("Column Dummy");
                                 columnBranch.getChildren().add(columnDummy);
@@ -116,7 +115,7 @@ public class PanelBrowser implements Initializable {
                                 ChangeListener<Boolean> columnListener = new ChangeListener<Boolean>() {
                                     @Override
                                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                                        System.out.println("Triggering column listener for the first time");
+                                        Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
                                         for(Column column : table.getColumns()){
                                             TreeItem<String> columnNode = new TreeItem<>(column.getName());
                                             columnBranch.getChildren().add(columnNode);
