@@ -11,7 +11,7 @@ import javafx.scene.control.ComboBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class panelSchemaCreation implements Initializable {
+public class PanelSchemaCreation implements Initializable {
 
     @FXML
     public ComboBox<Charset> cbCharset;
