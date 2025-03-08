@@ -38,26 +38,20 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.TreeView?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
-<?import org.fxmisc.richtext.CodeArea?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+
 <!--        fx:controller="com.abelovagrupa.dbeeadmin.view.PanelMain"-->
+
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
@@ -103,7 +97,7 @@
         <items>
           <Button fx:id="btnConnection" mnemonicParsing="false" onAction="#openConnectionSettings">
             <graphic>
-              <FontIcon iconLiteral="fas-plug" iconSize="16" styleClass="font-icon"/>
+              <FontIcon iconLiteral="fas-plug" iconSize="16" styleClass="font-icon" />
             </graphic>
                <tooltip>
                   <Tooltip text="Connection" />
@@ -111,16 +105,25 @@
           </Button>
           <Button layoutX="10.0" layoutY="12.0" mnemonicParsing="false" onAction="#newSchemaTab">
             <graphic>
-              <FontIcon fx:id="btnNewDatabase" iconLiteral="fas-database" iconSize="16" styleClass="font-icon"/>
+              <FontIcon fx:id="btnNewDatabase" iconLiteral="fas-database" iconSize="16" styleClass="font-icon" />
             </graphic>
                <tooltip>
                   <Tooltip text="New Database" />
                </tooltip>
           </Button>
             <Separator orientation="VERTICAL" prefHeight="12.0" />
+            <Button mnemonicParsing="false" fx:id="btnNewTable" onAction="#newTableTab">
+               <graphic>
+                  <FontIcon iconLiteral="fas-table" iconSize="16" styleClass="font-icon" />
+               </graphic>
+               <tooltip>
+                  <Tooltip text="New Table" />
+               </tooltip>
+            </Button>
+            <Separator orientation="VERTICAL" prefHeight="12.0" />
             <Button layoutX="74.0" layoutY="12.0" mnemonicParsing="false">
               <graphic>
-                <FontIcon iconLiteral="fas-file-import" iconSize="16" styleClass="font-icon"/>
+                <FontIcon iconLiteral="fas-file-import" iconSize="16" styleClass="font-icon" />
               </graphic>
                <tooltip>
                   <Tooltip text="Import" />
@@ -128,16 +131,16 @@
             </Button>
             <Button layoutX="162.0" layoutY="12.0" mnemonicParsing="false">
               <graphic>
-                <FontIcon iconLiteral="fas-file-export" iconSize="16" styleClass="font-icon"/>
+                <FontIcon iconLiteral="fas-file-export" iconSize="16" styleClass="font-icon" />
               </graphic>
                <tooltip>
                   <Tooltip text="Export" />
                </tooltip>
             </Button>
             <Separator orientation="VERTICAL" prefHeight="12.0" />
-          <Button layoutX="162.0" layoutY="12.0" mnemonicParsing="false" fx:id="btnNewScript" onAction="#newScriptTab">
+          <Button fx:id="btnNewScript" layoutX="162.0" layoutY="12.0" mnemonicParsing="false" onAction="#newScriptTab">
             <graphic>
-              <FontIcon  iconLiteral="fas-scroll" iconSize="16" styleClass="font-icon" />
+              <FontIcon iconLiteral="fas-scroll" iconSize="16" styleClass="font-icon" />
             </graphic>
                <tooltip>
                   <Tooltip text="New Script" />
@@ -145,12 +148,12 @@
           </Button>
         </items>
       </ToolBar>
-    <SplitPane dividerPositions="0.16, 0.9" focusTraversable="true" VBox.vgrow="ALWAYS" fx:id="rightPane">
+    <SplitPane fx:id="rightPane" dividerPositions="0.16" focusTraversable="true" VBox.vgrow="ALWAYS">
       <items>
 
         <HBox prefWidth="250.0">
           <children>
-            <SplitPane dividerPositions="0.7" orientation="VERTICAL" prefHeight="200.0" prefWidth="225.0" HBox.hgrow="ALWAYS" fx:id="leftPane">
+            <SplitPane fx:id="leftPane" orientation="VERTICAL" prefHeight="200.0" prefWidth="225.0" HBox.hgrow="ALWAYS">
               <items>
 <!--                PLACE FOR BROWSER-->
 <!--                PLACE FOR INFO-->
@@ -159,7 +162,7 @@
           </children>
         </HBox>
 
-        <SplitPane dividerPositions="0.7" orientation="VERTICAL" fx:id="centerPane">
+        <SplitPane fx:id="centerPane" orientation="VERTICAL">
           <items>
 <!--              PLACE FOR EDITOR-->
 <!--              PLACE FOR RESULTS-->
