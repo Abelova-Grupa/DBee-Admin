@@ -24,7 +24,7 @@ class DatabaseInspectorTest {
     static void getConnection(){
         System.out.println("Preparing...");
         databaseConnection = DatabaseConnection.getInstance();
-        databaseInspector = new DatabaseInspector(databaseConnection);
+        databaseInspector = DatabaseInspector.getInstance();
     }
 
     @Test
