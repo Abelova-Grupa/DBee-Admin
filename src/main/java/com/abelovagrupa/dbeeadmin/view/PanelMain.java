@@ -44,6 +44,9 @@ public class PanelMain implements Initializable {
     @FXML
     Button btnNewScript;
 
+    @FXML
+    Button btnNewTable;
+
     // TODO: Fix format issues with HelpPanel(Vbox)
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -186,6 +189,33 @@ public class PanelMain implements Initializable {
 
     // Event handling methods
 
+    public void newTableTab() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelTableCreation.fxml"));
+
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.setTitle("DBee Admin - New Table");
+        stage.setScene(scene);
+
+        stage.setOnShown(event -> {
+            // Get the screen's bounds (width and height)
+            double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
+            double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
+
+            // Get the stage width and height
+            double stageWidth = stage.getWidth();
+            double stageHeight = stage.getHeight();
+
+            // Calculate the center position
+            stage.setX((screenWidth - stageWidth) / 2);
+            stage.setY((screenHeight - stageHeight) / 2);
+        });
+        ;
+        stage.show();
+    }
+
     public void newSchemaTab(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelSchemaCreation.fxml"));
 
@@ -193,7 +223,7 @@ public class PanelMain implements Initializable {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.setTitle("DBee Admin - Connection Settings");
+        stage.setTitle("DBee Admin - New Schema");
         stage.setScene(scene);
 
         stage.setOnShown(event -> {
