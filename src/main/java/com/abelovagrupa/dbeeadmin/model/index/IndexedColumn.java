@@ -70,7 +70,7 @@ public class IndexedColumn {
                 ", orderNumber=" + orderNumber +
                 ", order=" + order +
                 ", length=" + length +
-                ", index=" + index +
+//                ", index=" + index +
                 '}';
     }
 

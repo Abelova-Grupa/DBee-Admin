@@ -465,16 +465,12 @@ public class DatabaseInspector {
         List<Index> indexes = new LinkedList<>();
         String query = "SELECT \n" +
                 "    INDEX_NAME, \n" +
-                "    COLUMN_NAME, \n" +
-                "    SEQ_IN_INDEX, \n" +
                 "    NON_UNIQUE, \n" +
                 "    INDEX_TYPE,\n" +
-                "    IS_VISIBLE,\n" +
-                "    COLLATION\n" +
+                "    IS_VISIBLE\n" +
                 "FROM INFORMATION_SCHEMA.STATISTICS\n" +
                 "WHERE TABLE_SCHEMA = ? \n" +
                 "AND TABLE_NAME = ?;";
-
 
         //INDEX_NAME,NON_UNIQUE,IS_VISIBLE,INDEX_TYPE
         try(PreparedStatement indexStmt = connection.prepareStatement(query);){
@@ -509,11 +505,12 @@ public class DatabaseInspector {
                     columnsStmt.setString(1,schema.getName());
                     columnsStmt.setString(2,table.getName());
                     columnsStmt.setString(3,index.getName());
-                    ResultSet columnRs = indexStmt.executeQuery();
+                    ResultSet columnRs = columnsStmt.executeQuery();
 
                     while(columnRs.next()){
                         IndexedColumn indexedColumn = new IndexedColumn();
-                        indexedColumn.setColumn(getColumnByName(table,columnRs.getString("COLUMN_NAME")));
+                        String columnName = columnRs.getString("COLUMN_NAME");
+                        indexedColumn.setColumn(getColumnByName(table,columnName));
                         indexedColumn.setIndex(index);
                         indexedColumn.setOrderNumber(columnRs.getInt("SEQ_IN_INDEX"));
                         Optional<String> order = Optional.ofNullable(columnRs.getString("COLLATION"));
@@ -527,10 +524,10 @@ public class DatabaseInspector {
 
 
                 }catch(SQLException ex){
-                throw new RuntimeException(ex);
-            }
+                    throw new RuntimeException(ex);
+                }
 
-
+                indexes.add(index);
             }
 
 
