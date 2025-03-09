@@ -12,11 +12,12 @@ public class Index {
     private String parser;
     private boolean visible;
     private List<IndexedColumn> indexedColumns;
+    private boolean unique;
 
     public Index() {
     }
 
-    public Index(String name, IndexType type, IndexStorageType storageType, int keyBlockSize, String parser, boolean visible, List<IndexedColumn> indexedColumns) {
+    public Index(String name, IndexType type, IndexStorageType storageType, int keyBlockSize, String parser, boolean visible, List<IndexedColumn> indexedColumns, boolean unique) {
         this.name = name;
         this.type = type;
         this.storageType = storageType;
@@ -24,6 +25,7 @@ public class Index {
         this.parser = parser;
         this.visible = visible;
         this.indexedColumns = indexedColumns;
+        this.unique = unique;
     }
 
     public String getName() {
@@ -82,6 +84,14 @@ public class Index {
         this.indexedColumns = indexedColumns;
     }
 
+    public boolean isUnique() {
+        return unique;
+    }
+
+    public void setUnique(boolean unique) {
+        this.unique = unique;
+    }
+
     @Override
     public String toString() {
         return "Index{" +
@@ -92,6 +102,7 @@ public class Index {
                 ", parser='" + parser + '\'' +
                 ", visible=" + visible +
                 ", indexedColumns=" + indexedColumns +
+                ", unique=" + unique +
                 '}';
     }
 
@@ -100,18 +111,19 @@ public class Index {
         if (this == o) return true;
         if (!(o instanceof Index index)) return false;
 
-        return getKeyBlockSize() == index.getKeyBlockSize() && isVisible() == index.isVisible() && getName().equals(index.getName()) && getType() == index.getType() && getStorageType() == index.getStorageType() && Objects.equals(getParser(), index.getParser()) && getIndexedColumns().equals(index.getIndexedColumns());
+        return getKeyBlockSize() == index.getKeyBlockSize() && isVisible() == index.isVisible() && isUnique() == index.isUnique() && Objects.equals(getName(), index.getName()) && getType() == index.getType() && getStorageType() == index.getStorageType() && Objects.equals(getParser(), index.getParser()) && Objects.equals(getIndexedColumns(), index.getIndexedColumns());
     }
 
     @Override
     public int hashCode() {
-        int result = getName().hashCode();
-        result = 31 * result + getType().hashCode();
+        int result = Objects.hashCode(getName());
+        result = 31 * result + Objects.hashCode(getType());
         result = 31 * result + Objects.hashCode(getStorageType());
         result = 31 * result + getKeyBlockSize();
         result = 31 * result + Objects.hashCode(getParser());
         result = 31 * result + Boolean.hashCode(isVisible());
-        result = 31 * result + getIndexedColumns().hashCode();
+        result = 31 * result + Objects.hashCode(getIndexedColumns());
+        result = 31 * result + Boolean.hashCode(isUnique());
         return result;
     }
 }
