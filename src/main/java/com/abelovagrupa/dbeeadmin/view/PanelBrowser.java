@@ -68,6 +68,7 @@ public class PanelBrowser implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // TODO: WRITE COMMENTS FROM THIS METHOD
         try {
             schemaControllers = new LinkedList<>();
             List<String> schemaNames = DatabaseInspector.getInstance().getDatabaseNames();
@@ -75,6 +76,7 @@ public class PanelBrowser implements Initializable {
                 // Loading each schema treeView
                 FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelSchemaTree.fxml"));
                 TreeView<String> schemaView = loader.load();
+                schemaView.setFixedCellSize(24);
                 schemaControllers.add(loader.getController());
 
                 TreeItem<String> schemaNode = new TreeItem<>(schemaName,new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database.png").toExternalForm())));
@@ -109,7 +111,6 @@ public class PanelBrowser implements Initializable {
                             for(String tableName: tableNames){
 
                                 TreeItem<String> tableNode = new TreeItem<>(tableName,new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
-
                                 TreeItem<String> columnBranch = new TreeItem<>("Columns",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
                                 TreeItem<String> columnDummy = new TreeItem<>("Column Dummy");
                                 columnBranch.getChildren().add(columnDummy);
@@ -183,31 +184,41 @@ public class PanelBrowser implements Initializable {
                 };
 
                 tableBranch.expandedProperty().addListener(tableBranchListener);
-
+                // TODO: REFACTOR
                 schemaView.setOnMouseClicked(event -> {
-                    Optional<TreeItem<String>> selectedItem = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
+                    TreeItem<String> selectedItem = schemaView.getSelectionModel().getSelectedItem();
                     Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-                    if(selectedItem.isPresent()){
-                        Optional<Table> selectedTable = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.get().getValue())).findFirst();
-                        if(selectedTable.isPresent()){
-                            if(getTreeItemDepth(selectedItem.get()) == 3 && (isChildOf(selectedItem.get(),tableBranch))){
-                                infoController.getTableName().setText(selectedItem.get().getValue());
-                                infoController.getAttributeContainer().getChildren().clear();
-                                infoController.setAttributes(new LinkedList<>());
+                        // Table selected
+                        Optional<Table> selectedTable = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
+                        if(getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem,tableBranch))){
+                            infoController.getColumnInfoPanel().setVisible(false);
+                            infoController.getTableInfoPanel().setVisible(true);
+                            infoController.getTableName().setText(selectedItem.getValue());
+                            infoController.getAttributeContainer().getChildren().clear();
+                            infoController.setAttributes(new LinkedList<>());
 
-                                for(Column column : selectedTable.get().getColumns()){
-                                    Label attributeName = new Label(column.getName());
-                                    Label attributeType = new Label(column.getType().toString());
-                                    BorderPane attributePane = new BorderPane();
-                                    attributePane.setLeft(attributeName);
-                                    attributePane.setRight(attributeType);
-                                    infoController.addAttributePane(attributePane);
-                                }
+                            for(Column column : selectedTable.get().getColumns()){
+                                Label attributeName = new Label(column.getName());
+                                Label attributeType = new Label(column.getType().toString());
+                                BorderPane attributePane = new BorderPane();
+                                attributePane.setLeft(attributeName);
+                                attributePane.setRight(attributeType);
+                                infoController.addAttributePane(attributePane);
                             }
                         }
-                    }
-                });
 
+
+                        if(selectedItem.getParent().getValue().equals("Columns") && getTreeItemDepth(selectedItem) == 5){
+                            Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
+                            Optional<Column> selectedColumn = table.getColumns().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
+                            if(selectedColumn.isPresent()){
+                                infoController.getTableInfoPanel().setVisible(false);
+                                infoController.getColumnName().setText(selectedColumn.get().getName());
+                                infoController.getColumnType().setText(selectedColumn.get().getType().toString());
+                                infoController.getColumnInfoPanel().setVisible(true);
+                            }
+                        }
+                });
                 vboxBrowser.getChildren().add(schemaView);
             }
 
