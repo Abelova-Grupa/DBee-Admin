@@ -6,7 +6,9 @@ import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.Action;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexStorageType;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
+import com.abelovagrupa.dbeeadmin.model.index.Order;
 import com.abelovagrupa.dbeeadmin.model.schema.Charset;
 import com.abelovagrupa.dbeeadmin.model.schema.Collation;
 import com.abelovagrupa.dbeeadmin.model.table.DBEngine;
@@ -15,6 +17,7 @@ import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 
 import java.sql.*;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -424,10 +427,6 @@ public class DatabaseInspector {
         return foreignKeys;
     }
 
-    public List<Index> getIndexes(Table table) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
     public List<IndexedColumn> getIndexedColumns(Table table) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -457,6 +456,85 @@ public class DatabaseInspector {
         }
 
         return databaseSize;
+    }
+
+    public List<Index> getIndexes(Schema schema, Table table){
+        if(schema == null) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+
+        List<Index> indexes = new LinkedList<>();
+        String query = "SELECT \n" +
+                "    INDEX_NAME, \n" +
+                "    NON_UNIQUE, \n" +
+                "    INDEX_TYPE,\n" +
+                "    IS_VISIBLE\n" +
+                "FROM INFORMATION_SCHEMA.STATISTICS\n" +
+                "WHERE TABLE_SCHEMA = ? \n" +
+                "AND TABLE_NAME = ?;";
+
+        //INDEX_NAME,NON_UNIQUE,IS_VISIBLE,INDEX_TYPE
+        try(PreparedStatement indexStmt = connection.prepareStatement(query);){
+            indexStmt.setString(1,schema.getName());
+            indexStmt.setString(2,table.getName());
+            ResultSet indexRs = indexStmt.executeQuery();
+            List<String> indexNames = new LinkedList<>();
+            while(indexRs.next()){
+                Index index = new Index();
+                String indexName = indexRs.getString("INDEX_NAME");
+                if(indexNames.contains(indexName)){
+                    continue;
+                }else{
+                    indexNames.add(indexName);
+                }
+                index.setName(indexName);
+                index.setUnique(indexRs.getInt("NON_UNIQUE") == 0);
+                index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));
+                Optional<String> storageType = Optional.ofNullable(indexRs.getString("INDEX_TYPE"));
+                if(storageType.isPresent()){
+                    index.setStorageType(IndexStorageType.valueOf(storageType.get().toUpperCase()));
+                }
+                index.setIndexedColumns(new LinkedList<>());
+                String columnQuery = "SELECT \n" +
+                        "    COLUMN_NAME, \n" +
+                        "    SEQ_IN_INDEX, \n" +
+                        "    COLLATION\n" +
+                        "FROM INFORMATION_SCHEMA.STATISTICS\n" +
+                        "WHERE TABLE_SCHEMA = ? \n" +
+                        "AND TABLE_NAME = ? AND INDEX_NAME = ?;";
+                try(PreparedStatement columnsStmt = connection.prepareStatement(columnQuery)){
+                    columnsStmt.setString(1,schema.getName());
+                    columnsStmt.setString(2,table.getName());
+                    columnsStmt.setString(3,index.getName());
+                    ResultSet columnRs = columnsStmt.executeQuery();
+
+                    while(columnRs.next()){
+                        IndexedColumn indexedColumn = new IndexedColumn();
+                        String columnName = columnRs.getString("COLUMN_NAME");
+                        indexedColumn.setColumn(getColumnByName(table,columnName));
+                        indexedColumn.setIndex(index);
+                        indexedColumn.setOrderNumber(columnRs.getInt("SEQ_IN_INDEX"));
+                        Optional<String> order = Optional.ofNullable(columnRs.getString("COLLATION"));
+                        if(order.isPresent()){
+                            if(order.get().equals("A")) indexedColumn.setOrder(Order.ASC);
+                            else if (order.get().equals("D")) indexedColumn.setOrder(Order.DESC);
+                        }
+                        index.getIndexedColumns().add(indexedColumn);
+
+                    }
+
+
+                }catch(SQLException ex){
+                    throw new RuntimeException(ex);
+                }
+
+                indexes.add(index);
+            }
+
+
+        }catch(SQLException ex){
+            throw new RuntimeException(ex);
+        }
+        return indexes;
     }
 
 //    public static void main(String[] args) {

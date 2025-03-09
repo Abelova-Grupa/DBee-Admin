@@ -4,6 +4,7 @@ import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.application.Platform;
@@ -98,11 +99,10 @@ public class PanelBrowser implements Initializable {
                     Platform.runLater(() -> schemaView.setPrefHeight(schemaView.getExpandedItemCount() * 24));
                 });
 
-                ChangeListener<Boolean> tableListener = new ChangeListener<>() {
+                ChangeListener<Boolean> tableBranchListener = new ChangeListener<>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                         if(newValue){
-                            System.out.println("Triggering tableListener for the first time");
                             Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
                             List<String> tableNames = DatabaseInspector.getInstance().getTableNames(schema);
                             tableBranch.getChildren().remove(tableDummyNode);
@@ -114,7 +114,7 @@ public class PanelBrowser implements Initializable {
                                 TreeItem<String> columnDummy = new TreeItem<>("Column Dummy");
                                 columnBranch.getChildren().add(columnDummy);
 
-                                ChangeListener<Boolean> columnListener = new ChangeListener<Boolean>() {
+                                ChangeListener<Boolean> columnBranchListener = new ChangeListener<Boolean>() {
                                     @Override
                                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                                         if(newValue){
@@ -128,9 +128,28 @@ public class PanelBrowser implements Initializable {
                                         }
                                     }
                                 };
-                                columnBranch.expandedProperty().addListener(columnListener);
+                                columnBranch.expandedProperty().addListener(columnBranchListener);
 
                                 TreeItem<String> indexBranch = new TreeItem<>("Indexes",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/indexes.png").toExternalForm())));
+                                TreeItem<String> indexDummy = new TreeItem<>("Index dummy");
+                                indexBranch.getChildren().add(indexDummy);
+
+                                ChangeListener<Boolean> indexBranchListener = new ChangeListener<Boolean>() {
+                                    @Override
+                                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                                        if(newValue){
+                                            indexBranch.getChildren().remove(indexDummy);
+                                            Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
+                                            List<Index> indexes = DatabaseInspector.getInstance().getIndexes(schema,table);
+                                            for(Index index : indexes){
+                                                TreeItem<String> indexNode = new TreeItem<>(index.getName());
+                                                indexBranch.getChildren().add(indexNode);
+                                            }
+                                             indexBranch.expandedProperty().removeListener(this);
+                                        }
+                                    }
+                                };
+                                indexBranch.expandedProperty().addListener(indexBranchListener);
 
                                 TreeItem<String> foreignKeyBranch = new TreeItem<>("Foreign Keys",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/foreignkeys.png").toExternalForm())));
                                 TreeItem<String> foreignKeyDummy = new TreeItem<>("ForeignKeyDummy");
@@ -163,7 +182,7 @@ public class PanelBrowser implements Initializable {
                     }
                 };
 
-                tableBranch.expandedProperty().addListener(tableListener);
+                tableBranch.expandedProperty().addListener(tableBranchListener);
 
                 schemaView.setOnMouseClicked(event -> {
                     Optional<TreeItem<String>> selectedItem = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
