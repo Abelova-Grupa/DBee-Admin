@@ -10,20 +10,18 @@
 
 <!--        -->
 
-
 <VBox prefHeight="200.0" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelInfo">
    <children>
       <StackPane prefHeight="150.0" prefWidth="200.0">
          <children>
-            <AnchorPane prefHeight="217.0" prefWidth="200.0" />
-            <AnchorPane prefHeight="216.0" prefWidth="200.0">
+            <AnchorPane id="tableInfoPanel" fx:id="tableInfoPanel" prefHeight="216.0" prefWidth="200.0" visible="false">
                <children>
                   <Label layoutX="21.0" layoutY="21.0" prefHeight="27.0" prefWidth="49.0" text="Table: ">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label layoutX="70.0" layoutY="22.0" text="Table" textFill="#0ae465" fx:id="tableName">
+                  <Label fx:id="tableName" layoutX="70.0" layoutY="22.0" text="Table" textFill="#0ae465">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -33,11 +31,37 @@
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <VBox layoutX="22.0" layoutY="70.0" prefHeight="131.0" prefWidth="146.0" fx:id="attributeContainer">
+                  <VBox fx:id="attributeContainer" layoutX="22.0" layoutY="70.0" prefHeight="131.0" prefWidth="146.0">
 
                   </VBox>
                </children>
             </AnchorPane>
+            <AnchorPane id="columnInfoPanel" fx:id="columnInfoPanel" prefHeight="217.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="18.0" layoutY="27.0" prefHeight="25.0" prefWidth="65.0" text="Column: ">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="columnLabel" layoutX="83.0" layoutY="27.0" text="Label" textFill="#0ae465">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="18.0" layoutY="62.0" prefHeight="25.0" prefWidth="77.0" text="Definition:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <BorderPane layoutX="18.0" layoutY="87.0" prefHeight="27.0" prefWidth="161.0">
+                     <left>
+                        <Label fx:id="columnName" prefHeight="17.0" prefWidth="77.0" text="Name" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <Label fx:id="columnType" prefHeight="17.0" prefWidth="55.0" text="Type" BorderPane.alignment="CENTER" />
+                     </right>
+                  </BorderPane>
+               </children></AnchorPane>
          </children>
       </StackPane>
    </children>
