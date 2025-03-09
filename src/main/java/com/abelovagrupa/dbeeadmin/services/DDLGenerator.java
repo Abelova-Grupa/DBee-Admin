@@ -8,6 +8,8 @@ import com.abelovagrupa.dbeeadmin.model.index.IndexType;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.view.PanelEditor;
+import com.abelovagrupa.dbeeadmin.view.PanelScript;
 
 import java.sql.Connection;
 import java.sql.SQLException;
