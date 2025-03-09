@@ -196,7 +196,7 @@ public class PanelMain implements Initializable {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.setTitle("DBee Admin - Connection Settings");
+        stage.setTitle("DBee Admin - New Table");
         stage.setScene(scene);
 
         stage.setOnShown(event -> {
@@ -223,7 +223,7 @@ public class PanelMain implements Initializable {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.setTitle("DBee Admin - Connection Settings");
+        stage.setTitle("DBee Admin - New Schema");
         stage.setScene(scene);
 
         stage.setOnShown(event -> {
