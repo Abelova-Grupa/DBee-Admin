@@ -221,8 +221,9 @@ public class DatabaseInspector {
             stmt.setString(2, table.getSchema().getName());
 
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
                     String columnName = rs.getString("COLUMN_NAME");
+                    if(!columnName.equals(name)) continue;
                     String dataType = rs.getString("DATA_TYPE");
                     boolean isNotNull = rs.getString("IS_NULLABLE").equals("NO");
                     String columnKey = rs.getString("COLUMN_KEY");
@@ -427,10 +428,6 @@ public class DatabaseInspector {
         return foreignKeys;
     }
 
-    public List<IndexedColumn> getIndexedColumns(Table table) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
     public List<Trigger> getTriggers(Table table) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -536,6 +533,44 @@ public class DatabaseInspector {
         }
         return indexes;
     }
+
+    public List<IndexedColumn> getIndexedColumns(Schema schema, Table table, Index index) {
+        List<IndexedColumn> indexedColumns = new LinkedList<>();
+        String columnQuery = "SELECT \n" +
+                "    COLUMN_NAME, \n" +
+                "    SEQ_IN_INDEX, \n" +
+                "    COLLATION\n" +
+                "FROM INFORMATION_SCHEMA.STATISTICS\n" +
+                "WHERE TABLE_SCHEMA = ? \n" +
+                "AND TABLE_NAME = ? AND INDEX_NAME = ?;";
+        try(PreparedStatement columnsStmt = connection.prepareStatement(columnQuery)){
+            columnsStmt.setString(1,schema.getName());
+            columnsStmt.setString(2,table.getName());
+            columnsStmt.setString(3,index.getName());
+            ResultSet columnRs = columnsStmt.executeQuery();
+
+            while(columnRs.next()){
+                IndexedColumn indexedColumn = new IndexedColumn();
+                String columnName = columnRs.getString("COLUMN_NAME");
+                indexedColumn.setColumn(getColumnByName(table,columnName));
+//                indexedColumn.setIndex(index);
+                indexedColumn.setOrderNumber(columnRs.getInt("SEQ_IN_INDEX"));
+                Optional<String> order = Optional.ofNullable(columnRs.getString("COLLATION"));
+                if(order.isPresent()){
+                    if(order.get().equals("A")) indexedColumn.setOrder(Order.ASC);
+                    else if (order.get().equals("D")) indexedColumn.setOrder(Order.DESC);
+                }
+                indexedColumns.add(indexedColumn);
+            }
+
+
+        }catch(SQLException ex){
+            throw new RuntimeException(ex);
+        }
+        return indexedColumns;
+    }
+
+
 
 //    public static void main(String[] args) {
 //        DatabaseInspector di = new DatabaseInspector();
