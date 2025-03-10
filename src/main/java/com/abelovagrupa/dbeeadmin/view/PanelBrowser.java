@@ -91,6 +91,7 @@ public class PanelBrowser implements Initializable {
                 schemaView.setFixedCellSize(24);
                 schemaControllers.add(loader.getController());
 
+
                 TreeItem<String> schemaNode = new TreeItem<>(schemaName,new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database.png").toExternalForm())));
                 schemaView.setRoot(schemaNode);
                 TreeItem<String> tableBranch = new TreeItem<>("Tables",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));

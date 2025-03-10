@@ -20,6 +20,12 @@ public class PanelInfo {
     AnchorPane columnInfoPanel;
 
     @FXML
+    AnchorPane clearInfoPanel;
+
+    @FXML
+    AnchorPane foreignKeyInfoPanel;
+
+    @FXML
     Label tableName;
 
     List<BorderPane> attributes = new LinkedList<>();
@@ -50,6 +56,15 @@ public class PanelInfo {
 
     @FXML
     VBox indexColumnContainer;
+
+    @FXML
+    VBox keyContainer;
+
+    @FXML
+    Label refTable;
+
+    @FXML
+    Label foreignKeyName;
 
     public PanelMain getMainController() {
         return mainController;
@@ -166,5 +181,45 @@ public class PanelInfo {
 
     public void setIndexColumnContainer(VBox indexColumnContainer) {
         this.indexColumnContainer = indexColumnContainer;
+    }
+
+    public VBox getKeyContainer() {
+        return keyContainer;
+    }
+
+    public void setKeyContainer(VBox keyContainer) {
+        this.keyContainer = keyContainer;
+    }
+
+    public AnchorPane getClearInfoPanel() {
+        return clearInfoPanel;
+    }
+
+    public void setClearInfoPanel(AnchorPane clearInfoPanel) {
+        this.clearInfoPanel = clearInfoPanel;
+    }
+
+    public AnchorPane getForeignKeyInfoPanel() {
+        return foreignKeyInfoPanel;
+    }
+
+    public void setForeignKeyInfoPanel(AnchorPane foreignKeyInfoPanel) {
+        this.foreignKeyInfoPanel = foreignKeyInfoPanel;
+    }
+
+    public Label getRefTable() {
+        return refTable;
+    }
+
+    public void setRefTable(Label refTable) {
+        this.refTable = refTable;
+    }
+
+    public Label getForeignKeyName() {
+        return foreignKeyName;
+    }
+
+    public void setForeignKeyName(Label foreignKeyName) {
+        this.foreignKeyName = foreignKeyName;
     }
 }
