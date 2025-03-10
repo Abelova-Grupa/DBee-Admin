@@ -262,8 +262,40 @@ public class PanelBrowser implements Initializable {
                         }
 
                         if(selectedItem.getParent().getValue().equals("Foreign Keys")){
-                            infoController.getColumnInfoPanel().setVisible(false);
-                            infoController.getIndexInfoPanel().setVisible(false);
+
+                            Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
+                            List<ForeignKey> foreignKeys = DatabaseInspector.getInstance().getForeignKeys(schema,table);
+                            Optional<ForeignKey> selectedForeignKey = foreignKeys.stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
+                            if(selectedForeignKey.isPresent()){
+                                infoController.getKeyContainer().getChildren().clear();
+                                infoController.getColumnInfoPanel().setVisible(false);
+                                infoController.getIndexInfoPanel().setVisible(false);
+                                infoController.getForeignKeyInfoPanel().setVisible(true);
+                                infoController.getForeignKeyName().setText(selectedForeignKey.get().getName());
+                                infoController.getRefTable().setText(selectedForeignKey.get().getReferencedTable().getName());
+                                for(int i = 0; i < selectedForeignKey.get().getReferencingColumns().size(); i++){
+                                    // Not sure if i sorted both column lists will check later
+                                    String referencingColumnName = selectedForeignKey.get().
+                                            getReferencingColumns().get(i).getName();
+                                    String referencedColumnName = selectedForeignKey.get().
+                                            getReferencedColumns().get(i).getName();
+                                    BorderPane keyRow = new BorderPane();
+                                    keyRow.setLeft(new Label("Target"));
+                                    keyRow.setRight(new Label("(" +referencingColumnName+ " -> "+referencedColumnName+")"));
+                                    infoController.getKeyContainer().getChildren().add(keyRow);
+                                }
+                                BorderPane onUpdateRow = new BorderPane();
+                                onUpdateRow.setLeft(new Label("On Update"));
+                                onUpdateRow.setRight(new Label(selectedForeignKey.get().getOnUpdateAction().toString()));
+                                infoController.getKeyContainer().getChildren().add(onUpdateRow);
+
+                                BorderPane onDeleteRow = new BorderPane();
+                                onDeleteRow.setLeft(new Label("On Delete"));
+                                onDeleteRow.setRight(new Label(selectedForeignKey.get().getOnDeleteAction().toString()));
+                                infoController.getKeyContainer().getChildren().add(onDeleteRow);
+
+                            }
+
                         }
                 });
                 vboxBrowser.getChildren().add(schemaView);
