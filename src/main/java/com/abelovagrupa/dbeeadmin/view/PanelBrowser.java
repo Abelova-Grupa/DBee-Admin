@@ -17,6 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -39,9 +40,11 @@ public class PanelBrowser implements Initializable {
 
     private PanelInfo infoController;
 
-
     @FXML
     VBox vboxBrowser;
+
+    @FXML
+    TextField searchObjects;
 
     public List<PanelSchemaTree> getSchemaControllers() {
         return schemaControllers;
@@ -65,6 +68,14 @@ public class PanelBrowser implements Initializable {
 
     public void setInfoController(PanelInfo infoController) {
         this.infoController = infoController;
+    }
+
+    public TextField getSearchObjects() {
+        return searchObjects;
+    }
+
+    public void setSearchObjects(TextField searchObjects) {
+        this.searchObjects = searchObjects;
     }
 
     @Override
@@ -248,9 +259,20 @@ public class PanelBrowser implements Initializable {
                             }
 
                         }
+
+                        if(selectedItem.getParent().getValue().equals("Foreign Keys")){
+                            infoController.getColumnInfoPanel().setVisible(false);
+                            infoController.getIndexInfoPanel().setVisible(false);
+                        }
                 });
                 vboxBrowser.getChildren().add(schemaView);
             }
+
+            searchObjects.focusedProperty().addListener((observable,oldValue,newValue) -> {
+                if(newValue){
+                    searchObjects.setText("");
+                }else searchObjects.setText("Search Objects");
+            });
 
         } catch (IOException e) {
             throw new RuntimeException(e);
