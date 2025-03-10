@@ -335,7 +335,7 @@ public class DatabaseInspector {
         return schema;
 
     }
-
+    // TODO: getForeignKeyByName method
     public List<ForeignKey> getForeignKeys(Schema schema, Table table) {
         if(schema == null) throw new IllegalArgumentException("Schema is not set");
         if(table == null) throw new IllegalArgumentException("Table is not set");
@@ -570,7 +570,7 @@ public class DatabaseInspector {
         return indexedColumns;
     }
 
-
+    // TODO: getIndexByName method
 
 //    public static void main(String[] args) {
 //        DatabaseInspector di = new DatabaseInspector();

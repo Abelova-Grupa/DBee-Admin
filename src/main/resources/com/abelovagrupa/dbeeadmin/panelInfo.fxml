@@ -62,7 +62,7 @@
                      </right>
                   </BorderPane>
                </children></AnchorPane>
-            <AnchorPane fx:id="indexInfoPanel" prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane fx:id="indexInfoPanel" prefHeight="200.0" prefWidth="200.0" visible="false">
                <children>
                   <Label layoutX="14.0" layoutY="8.0" prefHeight="28.0" prefWidth="58.0" text="Index:">
                      <font>
@@ -87,6 +87,28 @@
                   <Label fx:id="visibleName" layoutX="100.0" layoutY="110.0" prefHeight="18.0" prefWidth="78.0" text="VisibleName" />
                   <Label layoutX="36.0" layoutY="136.0" prefHeight="18.0" prefWidth="69.0" text="Columns:" />
                   <VBox fx:id="indexColumnContainer" layoutX="100.0" layoutY="136.0" prefHeight="18.0" prefWidth="58.0" />
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="clearInfoPanel" prefHeight="200.0" prefWidth="200.0" />
+            <AnchorPane fx:id="foreignKeyInfoPanel" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="6.0" layoutY="23.0" text="Foreign Key:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="foreignKeyName" layoutX="107.0" layoutY="22.0" prefHeight="23.0" prefWidth="88.0" text="Label" textFill="#0ae465">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="6.0" layoutY="53.0" text="Definition:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="refTable" alignment="CENTER" layoutX="91.0" layoutY="76.0" prefHeight="18.0" prefWidth="88.0" text="refTable" />
+                  <VBox fx:id="keyContainer" layoutX="17.0" layoutY="94.0" prefHeight="52.0" prefWidth="163.0" />
                </children>
             </AnchorPane>
          </children>

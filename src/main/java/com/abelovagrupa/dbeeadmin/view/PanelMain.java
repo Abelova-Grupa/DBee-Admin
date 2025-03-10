@@ -183,6 +183,10 @@ public class PanelMain implements Initializable {
         for(PanelSchemaTree schemaTree: browserController.getSchemaControllers()){
             schemaTree.setBrowserController(browserController);
         }
+        browserController.getInfoController().getClearInfoPanel().setVisible(true);
+        browserController.getInfoController().getForeignKeyInfoPanel().setVisible(false);
+        browserController.getInfoController().getIndexInfoPanel().setVisible(false);
+        browserController.getInfoController().getColumnInfoPanel().setVisible(false);
 
     }
 
