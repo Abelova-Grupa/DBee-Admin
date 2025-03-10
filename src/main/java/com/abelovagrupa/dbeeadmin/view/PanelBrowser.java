@@ -5,6 +5,7 @@ import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.application.Platform;
@@ -192,6 +193,7 @@ public class PanelBrowser implements Initializable {
                         Optional<Table> selectedTable = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
                         if(getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem,tableBranch))){
                             infoController.getColumnInfoPanel().setVisible(false);
+                            infoController.getIndexInfoPanel().setVisible(false);
                             infoController.getTableInfoPanel().setVisible(true);
                             infoController.getTableName().setText(selectedItem.getValue());
                             infoController.getAttributeContainer().getChildren().clear();
@@ -207,16 +209,44 @@ public class PanelBrowser implements Initializable {
                             }
                         }
 
-
                         if(selectedItem.getParent().getValue().equals("Columns") && getTreeItemDepth(selectedItem) == 5){
+                            // TODO: make it efficient, for now it works
                             Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
                             Optional<Column> selectedColumn = table.getColumns().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
                             if(selectedColumn.isPresent()){
                                 infoController.getTableInfoPanel().setVisible(false);
+                                infoController.getIndexInfoPanel().setVisible(false);
                                 infoController.getColumnName().setText(selectedColumn.get().getName());
                                 infoController.getColumnType().setText(selectedColumn.get().getType().toString());
                                 infoController.getColumnInfoPanel().setVisible(true);
                             }
+                        }
+
+                        if(selectedItem.getParent().getValue().equals("Indexes") && getTreeItemDepth(selectedItem) == 5){
+                            // TODO: make it efficient, for now it works
+                            String indexName = selectedItem.getValue();
+                            Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
+                            List<Index> indexes = DatabaseInspector.getInstance().getIndexes(schema,table);
+                            Optional<Index> selectedIndex = indexes.stream().filter(s -> s.getName().equals(indexName)).findFirst();
+                            if(selectedIndex.isPresent()){
+                                List<IndexedColumn> indexedColumns = selectedIndex.get().getIndexedColumns();
+                                infoController.getTableInfoPanel().setVisible(false);
+                                infoController.getColumnInfoPanel().setVisible(false);
+                                infoController.getIndexInfoPanel().setVisible(true);
+                                infoController.getIndexColumnContainer().getChildren().clear();
+                                infoController.getIndexName().setText(selectedIndex.get().getName());
+                                infoController.getVisibleName().setText(selectedIndex.get().isVisible()+"");
+                                infoController.getUniqueName().setText(selectedIndex.get().isUnique()+"");
+                                infoController.getTypeName().setText(selectedIndex.get().getStorageType()+"");
+
+                                for(IndexedColumn indexColumn : indexedColumns){
+                                    BorderPane columnField = new BorderPane();
+                                    columnField.setCenter(new Label(indexColumn.getColumn().getName()));
+                                    infoController.getIndexColumnContainer().getChildren().add(columnField);
+                                }
+
+                            }
+
                         }
                 });
                 vboxBrowser.getChildren().add(schemaView);

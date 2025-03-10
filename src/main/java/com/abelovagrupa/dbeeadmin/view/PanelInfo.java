@@ -33,6 +33,24 @@ public class PanelInfo {
     @FXML
     Label columnType;
 
+    @FXML
+    Label visibleName;
+
+    @FXML
+    Label uniqueName;
+
+    @FXML
+    Label indexName;
+
+    @FXML
+    AnchorPane indexInfoPanel;
+
+    @FXML
+    Label typeName;
+
+    @FXML
+    VBox indexColumnContainer;
+
     public PanelMain getMainController() {
         return mainController;
     }
@@ -100,5 +118,53 @@ public class PanelInfo {
 
     public void setColumnType(Label columnType) {
         this.columnType = columnType;
+    }
+
+    public Label getVisibleName() {
+        return visibleName;
+    }
+
+    public void setVisibleName(Label visibleName) {
+        this.visibleName = visibleName;
+    }
+
+    public Label getUniqueName() {
+        return uniqueName;
+    }
+
+    public void setUniqueName(Label uniqueName) {
+        this.uniqueName = uniqueName;
+    }
+
+    public Label getIndexName() {
+        return indexName;
+    }
+
+    public void setIndexName(Label indexName) {
+        this.indexName = indexName;
+    }
+
+    public AnchorPane getIndexInfoPanel() {
+        return indexInfoPanel;
+    }
+
+    public void setIndexInfoPanel(AnchorPane indexInfoPanel) {
+        this.indexInfoPanel = indexInfoPanel;
+    }
+
+    public Label getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(Label typeName) {
+        this.typeName = typeName;
+    }
+
+    public VBox getIndexColumnContainer() {
+        return indexColumnContainer;
+    }
+
+    public void setIndexColumnContainer(VBox indexColumnContainer) {
+        this.indexColumnContainer = indexColumnContainer;
     }
 }
