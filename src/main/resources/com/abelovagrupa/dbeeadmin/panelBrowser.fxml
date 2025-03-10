@@ -36,7 +36,7 @@
                             </Button>
                         </right>
                         <bottom>
-                            <TextField promptText="Find " text="Search Objects" BorderPane.alignment="CENTER">
+                            <TextField promptText="Find " text="Search Objects" BorderPane.alignment="CENTER" fx:id="searchObjects">
                                 <BorderPane.margin>
                                     <Insets bottom="5.0" top="5.0" />
                                 </BorderPane.margin></TextField>
