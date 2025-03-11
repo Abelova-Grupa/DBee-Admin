@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.fxmisc.richtext.CodeArea?>
+
+<DialogPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1">
+    <expandableContent>
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="320.0" />
+    </expandableContent>
+   <content>
+      <VBox prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <ScrollPane fx:id="scrollContent" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+               <content>
+                  <CodeArea fx:id="codeArea" prefHeight="180.0" />
+               </content></ScrollPane>
+         </children>
+      </VBox>
+   </content>
+   <buttonTypes>
+      <ButtonType fx:constant="APPLY" />
+      <ButtonType fx:constant="CANCEL" />
+   </buttonTypes>
+   <header>
+      <Label fx:id="lblTitle" text="SQL Preview">
+         <font>
+            <Font name="System Bold" size="25.0" />
+         </font>
+         <padding>
+            <Insets left="12.0" top="6.0" />
+         </padding>
+      </Label>
+   </header>
+</DialogPane>

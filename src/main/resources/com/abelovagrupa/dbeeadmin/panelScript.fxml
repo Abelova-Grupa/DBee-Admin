@@ -8,7 +8,7 @@
 
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import org.fxmisc.richtext.CodeArea?>
-<Tab xmlns="http://javafx.com/javafx"
+<Tab xmlns="http://javafx.com/javafx/23"
      xmlns:fx="http://javafx.com/fxml"
      fx:controller="com.abelovagrupa.dbeeadmin.view.PanelScript"
      text="SQL Script">
