@@ -343,7 +343,7 @@ public class DatabaseInspector {
         List<ForeignKey> foreignKeys = new LinkedList<>();
         String query = "SELECT CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME \n" +
                 "FROM information_schema.KEY_COLUMN_USAGE\n" +
-                "WHERE TABLE_SCHEMA=? AND TABLE_NAME=?;";
+                "WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND REFERENCED_TABLE_SCHEMA IS NOT NULL;";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
 
