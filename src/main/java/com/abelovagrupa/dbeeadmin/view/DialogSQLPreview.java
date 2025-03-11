@@ -9,7 +9,13 @@ import java.io.IOException;
 
 public class DialogSQLPreview extends Dialog<String> {
     @FXML
-    private ScrollPane scrollContent;
+    ScrollPane scrollContent;
+
+    @FXML
+    Label lblTitle;
+
+    @FXML
+    TextArea taEditor;
 
     public DialogSQLPreview(String sql) {
         // Load FXML and initialize the dialog
@@ -23,6 +29,14 @@ public class DialogSQLPreview extends Dialog<String> {
             throw new RuntimeException("Failed to load FXML", e);
         }
 
+        /*
+        * I am still unsure why is it necessary to set following components in controller even though they are
+        * declared in fxml
+        */
+
+
+        this.getDialogPane().setHeader(lblTitle);
+
         // Set the dialog's content to the root of the FXML
         this.getDialogPane().setContent(scrollContent);
 
@@ -32,19 +46,19 @@ public class DialogSQLPreview extends Dialog<String> {
         // Set up the result converter (this determines what the dialog returns)
         this.setResultConverter(buttonType -> {
             if (buttonType == ButtonType.APPLY) {
-                return "SQL Preview Applied"; // Replace with whatever result you need
+                return "SQL Preview Finished";
             }
             return null;
         });
 
-        // Set the title of the dialog
         this.setTitle("SQL Preview");
+        this.setSqlPreviewContent(sql);
+        this.getDialogPane().setMinWidth(500);
+
     }
 
-    // Method to set the content for the ScrollPane, i.e., SQL preview data
     public void setSqlPreviewContent(String sqlContent) {
-        Label label = new Label(sqlContent);
-        scrollContent.setContent(label);  // Set the SQL preview content into the ScrollPane
+        taEditor.setText(sqlContent);
     }
 
 }
