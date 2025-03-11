@@ -13,7 +13,7 @@
 
 <!--      -->
 
-<HBox prefHeight="100.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelBrowser">
+    <HBox prefHeight="100.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelBrowser">
         <children>
             <BorderPane prefHeight="133.0" prefWidth="248.0" HBox.hgrow="ALWAYS">
                 <top>

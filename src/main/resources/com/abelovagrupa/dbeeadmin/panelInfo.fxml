@@ -11,7 +11,7 @@
 <!--        -->
 
 
-<VBox prefHeight="200.0" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelInfo">
+<VBox prefHeight="200.0" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelInfo">
    <children>
       <StackPane prefHeight="150.0" prefWidth="200.0">
          <children>
