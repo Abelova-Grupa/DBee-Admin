@@ -37,9 +37,19 @@ public class PanelScript implements Initializable {
     @FXML
     CodeArea codeArea;
 
-    private static final String[] SQL_KEYWORDS = {
-            "SELECT", "FROM", "WHERE", "INSERT", "INTO", "VALUES", "UPDATE", "SET", "DELETE", "CREATE", "TABLE",
-            "ALTER", "DROP", "JOIN", "ON", "AND", "OR", "NOT", "NULL", "ORDER", "BY", "GROUP", "HAVING", "LIMIT"
+    public static final String[] SQL_KEYWORDS = {
+        "SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP", "HAVING", "ORDER",
+        "BY", "JOIN", "INNER", "LEFT", "RIGHT", "FULL", "OUTER", "ON", "AND", "OR", "NOT",
+        "NULL", "IS", "BETWEEN", "LIKE", "IN", "EXISTS", "DISTINCT", "AS", "CREATE",
+        "TABLE", "DROP", "ALTER", "ADD", "COLUMN", "CONSTRAINT", "PRIMARY", "KEY", "FOREIGN",
+        "REFERENCES", "CHECK", "DEFAULT", "INDEX", "VIEW", "TRIGGER", "PROCEDURE",
+        "FUNCTION", "TRANSACTION", "COMMIT", "ROLLBACK", "SAVEPOINT", "GRANT", "REVOKE",
+        "USER", "DATABASE", "USE", "EXPLAIN", "DESCRIBE", "SHOW", "LIMIT", "OFFSET", "FETCH",
+        "WITH", "INNER JOIN", "OUTER JOIN", "CROSS JOIN", "UNION", "INTERSECT", "EXCEPT",
+        "CASE", "WHEN", "THEN", "ELSE", "END", "IF", "LOOP", "WHILE", "RETURN",
+        "SET", "VALUES", "COLUMN_NAME", "DATABASE_NAME", "SCHEMA", "ISNULL", "COALESCE",
+        "CAST", "CONVERT", "TRIM", "SUBSTRING", "LEN", "ROUND", "AVG", "COUNT",
+        "SUM", "MAX", "MIN", "LIMIT", "OFFSET"
     };
 
     /*
