@@ -14,7 +14,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class PanelMain implements Initializable {
@@ -184,6 +183,10 @@ public class PanelMain implements Initializable {
         for(PanelSchemaTree schemaTree: browserController.getSchemaControllers()){
             schemaTree.setBrowserController(browserController);
         }
+        browserController.getInfoController().getClearInfoPanel().setVisible(true);
+        browserController.getInfoController().getForeignKeyInfoPanel().setVisible(false);
+        browserController.getInfoController().getIndexInfoPanel().setVisible(false);
+        browserController.getInfoController().getColumnInfoPanel().setVisible(false);
 
     }
 

@@ -5,6 +5,7 @@ import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.application.Platform;
@@ -16,6 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -38,9 +40,11 @@ public class PanelBrowser implements Initializable {
 
     private PanelInfo infoController;
 
-
     @FXML
     VBox vboxBrowser;
+
+    @FXML
+    TextField searchObjects;
 
     public List<PanelSchemaTree> getSchemaControllers() {
         return schemaControllers;
@@ -66,8 +70,17 @@ public class PanelBrowser implements Initializable {
         this.infoController = infoController;
     }
 
+    public TextField getSearchObjects() {
+        return searchObjects;
+    }
+
+    public void setSearchObjects(TextField searchObjects) {
+        this.searchObjects = searchObjects;
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // TODO: WRITE COMMENTS FROM THIS METHOD
         try {
             schemaControllers = new LinkedList<>();
             List<String> schemaNames = DatabaseInspector.getInstance().getDatabaseNames();
@@ -75,7 +88,9 @@ public class PanelBrowser implements Initializable {
                 // Loading each schema treeView
                 FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelSchemaTree.fxml"));
                 TreeView<String> schemaView = loader.load();
+                schemaView.setFixedCellSize(24);
                 schemaControllers.add(loader.getController());
+
 
                 TreeItem<String> schemaNode = new TreeItem<>(schemaName,new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database.png").toExternalForm())));
                 schemaView.setRoot(schemaNode);
@@ -109,7 +124,6 @@ public class PanelBrowser implements Initializable {
                             for(String tableName: tableNames){
 
                                 TreeItem<String> tableNode = new TreeItem<>(tableName,new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
-
                                 TreeItem<String> columnBranch = new TreeItem<>("Columns",new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
                                 TreeItem<String> columnDummy = new TreeItem<>("Column Dummy");
                                 columnBranch.getChildren().add(columnDummy);
@@ -183,33 +197,115 @@ public class PanelBrowser implements Initializable {
                 };
 
                 tableBranch.expandedProperty().addListener(tableBranchListener);
-
+                // TODO: REFACTOR
                 schemaView.setOnMouseClicked(event -> {
-                    Optional<TreeItem<String>> selectedItem = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
+                    TreeItem<String> selectedItem = schemaView.getSelectionModel().getSelectedItem();
                     Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-                    if(selectedItem.isPresent()){
-                        Optional<Table> selectedTable = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.get().getValue())).findFirst();
-                        if(selectedTable.isPresent()){
-                            if(getTreeItemDepth(selectedItem.get()) == 3 && (isChildOf(selectedItem.get(),tableBranch))){
-                                infoController.getTableName().setText(selectedItem.get().getValue());
-                                infoController.getAttributeContainer().getChildren().clear();
-                                infoController.setAttributes(new LinkedList<>());
+                        // Table selected
+                        Optional<Table> selectedTable = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
+                        if(getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem,tableBranch))){
+                            infoController.getColumnInfoPanel().setVisible(false);
+                            infoController.getIndexInfoPanel().setVisible(false);
+                            infoController.getTableInfoPanel().setVisible(true);
+                            infoController.getTableName().setText(selectedItem.getValue());
+                            infoController.getAttributeContainer().getChildren().clear();
+                            infoController.setAttributes(new LinkedList<>());
 
-                                for(Column column : selectedTable.get().getColumns()){
-                                    Label attributeName = new Label(column.getName());
-                                    Label attributeType = new Label(column.getType().toString());
-                                    BorderPane attributePane = new BorderPane();
-                                    attributePane.setLeft(attributeName);
-                                    attributePane.setRight(attributeType);
-                                    infoController.addAttributePane(attributePane);
-                                }
+                            for(Column column : selectedTable.get().getColumns()){
+                                Label attributeName = new Label(column.getName());
+                                Label attributeType = new Label(column.getType().toString());
+                                BorderPane attributePane = new BorderPane();
+                                attributePane.setLeft(attributeName);
+                                attributePane.setRight(attributeType);
+                                infoController.addAttributePane(attributePane);
                             }
                         }
-                    }
-                });
 
+                        if(selectedItem.getParent().getValue().equals("Columns") && getTreeItemDepth(selectedItem) == 5){
+                            // TODO: make it efficient, for now it works
+                            Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
+                            Optional<Column> selectedColumn = table.getColumns().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
+                            if(selectedColumn.isPresent()){
+                                infoController.getTableInfoPanel().setVisible(false);
+                                infoController.getIndexInfoPanel().setVisible(false);
+                                infoController.getColumnName().setText(selectedColumn.get().getName());
+                                infoController.getColumnType().setText(selectedColumn.get().getType().toString());
+                                infoController.getColumnInfoPanel().setVisible(true);
+                            }
+                        }
+
+                        if(selectedItem.getParent().getValue().equals("Indexes") && getTreeItemDepth(selectedItem) == 5){
+                            // TODO: make it efficient, for now it works
+                            String indexName = selectedItem.getValue();
+                            Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
+                            List<Index> indexes = DatabaseInspector.getInstance().getIndexes(schema,table);
+                            Optional<Index> selectedIndex = indexes.stream().filter(s -> s.getName().equals(indexName)).findFirst();
+                            if(selectedIndex.isPresent()){
+                                List<IndexedColumn> indexedColumns = selectedIndex.get().getIndexedColumns();
+                                infoController.getTableInfoPanel().setVisible(false);
+                                infoController.getColumnInfoPanel().setVisible(false);
+                                infoController.getIndexInfoPanel().setVisible(true);
+                                infoController.getIndexColumnContainer().getChildren().clear();
+                                infoController.getIndexName().setText(selectedIndex.get().getName());
+                                infoController.getVisibleName().setText(selectedIndex.get().isVisible()+"");
+                                infoController.getUniqueName().setText(selectedIndex.get().isUnique()+"");
+                                infoController.getTypeName().setText(selectedIndex.get().getStorageType()+"");
+
+                                for(IndexedColumn indexColumn : indexedColumns){
+                                    BorderPane columnField = new BorderPane();
+                                    columnField.setCenter(new Label(indexColumn.getColumn().getName()));
+                                    infoController.getIndexColumnContainer().getChildren().add(columnField);
+                                }
+
+                            }
+
+                        }
+
+                        if(selectedItem.getParent().getValue().equals("Foreign Keys")){
+
+                            Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
+                            List<ForeignKey> foreignKeys = DatabaseInspector.getInstance().getForeignKeys(schema,table);
+                            Optional<ForeignKey> selectedForeignKey = foreignKeys.stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
+                            if(selectedForeignKey.isPresent()){
+                                infoController.getKeyContainer().getChildren().clear();
+                                infoController.getColumnInfoPanel().setVisible(false);
+                                infoController.getIndexInfoPanel().setVisible(false);
+                                infoController.getForeignKeyInfoPanel().setVisible(true);
+                                infoController.getForeignKeyName().setText(selectedForeignKey.get().getName());
+                                infoController.getRefTable().setText(selectedForeignKey.get().getReferencedTable().getName());
+                                for(int i = 0; i < selectedForeignKey.get().getReferencingColumns().size(); i++){
+                                    // Not sure if i sorted both column lists will check later
+                                    String referencingColumnName = selectedForeignKey.get().
+                                            getReferencingColumns().get(i).getName();
+                                    String referencedColumnName = selectedForeignKey.get().
+                                            getReferencedColumns().get(i).getName();
+                                    BorderPane keyRow = new BorderPane();
+                                    keyRow.setLeft(new Label("Target"));
+                                    keyRow.setRight(new Label("(" +referencingColumnName+ " -> "+referencedColumnName+")"));
+                                    infoController.getKeyContainer().getChildren().add(keyRow);
+                                }
+                                BorderPane onUpdateRow = new BorderPane();
+                                onUpdateRow.setLeft(new Label("On Update"));
+                                onUpdateRow.setRight(new Label(selectedForeignKey.get().getOnUpdateAction().toString()));
+                                infoController.getKeyContainer().getChildren().add(onUpdateRow);
+
+                                BorderPane onDeleteRow = new BorderPane();
+                                onDeleteRow.setLeft(new Label("On Delete"));
+                                onDeleteRow.setRight(new Label(selectedForeignKey.get().getOnDeleteAction().toString()));
+                                infoController.getKeyContainer().getChildren().add(onDeleteRow);
+
+                            }
+
+                        }
+                });
                 vboxBrowser.getChildren().add(schemaView);
             }
+
+            searchObjects.focusedProperty().addListener((observable,oldValue,newValue) -> {
+                if(newValue){
+                    searchObjects.setText("");
+                }else searchObjects.setText("Search Objects");
+            });
 
         } catch (IOException e) {
             throw new RuntimeException(e);
