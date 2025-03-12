@@ -1,14 +1,22 @@
 package com.abelovagrupa.dbeeadmin.view;
 
+import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.schema.Charset;
 import com.abelovagrupa.dbeeadmin.model.schema.Collation;
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
+import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 
 import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class PanelSchemaCreation implements Initializable {
@@ -18,6 +26,13 @@ public class PanelSchemaCreation implements Initializable {
 
     @FXML
     public ComboBox<Collation> cbCollation;
+
+    @FXML
+    public Button btnPreview;
+
+    @FXML
+    public Button btnPersist;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

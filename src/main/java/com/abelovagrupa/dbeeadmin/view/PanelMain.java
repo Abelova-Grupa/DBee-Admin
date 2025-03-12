@@ -215,7 +215,8 @@ public class PanelMain implements Initializable {
             stage.setX((screenWidth - stageWidth) / 2);
             stage.setY((screenHeight - stageHeight) / 2);
         });
-        ;
+        scene.getStylesheets().add(Main.class.getResource("styles.css").toExternalForm());
+
         stage.show();
     }
 
@@ -242,7 +243,8 @@ public class PanelMain implements Initializable {
             stage.setX((screenWidth - stageWidth) / 2);
             stage.setY((screenHeight - stageHeight) / 2);
         });
-        ;
+        scene.getStylesheets().add(Main.class.getResource("styles.css").toExternalForm());
+
         stage.show();
     }
 
@@ -268,7 +270,8 @@ public class PanelMain implements Initializable {
             stage.setX((screenWidth - stageWidth) / 2);
             stage.setY((screenHeight - stageHeight) / 2);
         });
-        ;
+        scene.getStylesheets().add(Main.class.getResource("styles.css").toExternalForm());
+
         stage.show();
     }
 
