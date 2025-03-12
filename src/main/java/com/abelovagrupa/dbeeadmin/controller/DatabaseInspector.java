@@ -487,43 +487,8 @@ public class DatabaseInspector {
                 index.setUnique(indexRs.getInt("NON_UNIQUE") == 0);
                 index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));
                 Optional<String> storageType = Optional.ofNullable(indexRs.getString("INDEX_TYPE"));
-                if(storageType.isPresent()){
-                    index.setStorageType(IndexStorageType.valueOf(storageType.get().toUpperCase()));
-                }
-                index.setIndexedColumns(new LinkedList<>());
-                String columnQuery = "SELECT \n" +
-                        "    COLUMN_NAME, \n" +
-                        "    SEQ_IN_INDEX, \n" +
-                        "    COLLATION\n" +
-                        "FROM INFORMATION_SCHEMA.STATISTICS\n" +
-                        "WHERE TABLE_SCHEMA = ? \n" +
-                        "AND TABLE_NAME = ? AND INDEX_NAME = ?;";
-                try(PreparedStatement columnsStmt = connection.prepareStatement(columnQuery)){
-                    columnsStmt.setString(1,schema.getName());
-                    columnsStmt.setString(2,table.getName());
-                    columnsStmt.setString(3,index.getName());
-                    ResultSet columnRs = columnsStmt.executeQuery();
-
-                    while(columnRs.next()){
-                        IndexedColumn indexedColumn = new IndexedColumn();
-                        String columnName = columnRs.getString("COLUMN_NAME");
-                        indexedColumn.setColumn(getColumnByName(table,columnName));
-                        indexedColumn.setIndex(index);
-                        indexedColumn.setOrderNumber(columnRs.getInt("SEQ_IN_INDEX"));
-                        Optional<String> order = Optional.ofNullable(columnRs.getString("COLLATION"));
-                        if(order.isPresent()){
-                            if(order.get().equals("A")) indexedColumn.setOrder(Order.ASC);
-                            else if (order.get().equals("D")) indexedColumn.setOrder(Order.DESC);
-                        }
-                        index.getIndexedColumns().add(indexedColumn);
-
-                    }
-
-
-                }catch(SQLException ex){
-                    throw new RuntimeException(ex);
-                }
-
+                storageType.ifPresent(s -> index.setStorageType(IndexStorageType.valueOf(s.toUpperCase())));
+                index.setIndexedColumns(getIndexedColumns(schema,table,index));
                 indexes.add(index);
             }
 
@@ -532,6 +497,43 @@ public class DatabaseInspector {
             throw new RuntimeException(ex);
         }
         return indexes;
+    }
+
+    public Index getIndexByName(Schema schema,Table table, String indexName){
+        if(schema == null) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+        if(indexName == null) throw new IllegalArgumentException("Index name is not set");
+
+        Index index = new Index();
+        String query = "SELECT \n" +
+                "    INDEX_NAME, \n" +
+                "    NON_UNIQUE, \n" +
+                "    INDEX_TYPE,\n" +
+                "    IS_VISIBLE\n" +
+                "FROM INFORMATION_SCHEMA.STATISTICS\n" +
+                "WHERE TABLE_SCHEMA = ? \n" +
+                "AND TABLE_NAME = ? AND INDEX_NAME=?;";
+        try(PreparedStatement indexStmt = connection.prepareStatement(query)){
+            indexStmt.setString(1,schema.getName());
+            indexStmt.setString(2,table.getName());
+            indexStmt.setString(3,indexName);
+
+            ResultSet indexRs = indexStmt.executeQuery();
+            if(indexRs.next()){
+                index.setName(indexName);
+                index.setName(indexName);
+                index.setUnique(indexRs.getInt("NON_UNIQUE") == 0);
+                index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));
+                Optional<String> storageType = Optional.ofNullable(indexRs.getString("INDEX_TYPE"));
+                storageType.ifPresent(s -> index.setStorageType(IndexStorageType.valueOf(s.toUpperCase())));
+                index.setIndexedColumns(getIndexedColumns(schema,table,index));
+            }
+
+        }catch(SQLException ex){
+            throw new RuntimeException(ex);
+        }
+
+        return index;
     }
 
     public List<IndexedColumn> getIndexedColumns(Schema schema, Table table, Index index) {
