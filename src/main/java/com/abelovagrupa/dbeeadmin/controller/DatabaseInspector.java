@@ -375,49 +375,8 @@ public class DatabaseInspector {
                     newForeignKey.setReferencingTable(referencingTable);
                     newForeignKey.setReferencedSchema(referencedSchema);
                     newForeignKey.setReferencedTable(referencedTable);
-
-                    String columnQuery = "SELECT COLUMN_NAME, REFERENCED_COLUMN_NAME\n" +
-                            "FROM information_schema.KEY_COLUMN_USAGE\n" +
-                            "WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND CONSTRAINT_NAME=?;";
-                    PreparedStatement ps = connection.prepareStatement(columnQuery);
-                    ps.setString(1,schemaName);
-                    ps.setString(2,tableName);
-                    ps.setString(3,keyName);
-
-                    ResultSet columnsRs = ps.executeQuery();
-
-                    newForeignKey.setReferencingColumns(new LinkedList<>());
-                    newForeignKey.setReferencedColumns(new LinkedList<>());
-
-                    while(columnsRs.next()){
-                        Optional<String> referencingColumn = Optional.ofNullable(columnsRs.getString("COLUMN_NAME"));
-                        Optional<String> referencedColumn = Optional.ofNullable(columnsRs.getString("REFERENCED_COLUMN_NAME"));
-
-                        if(referencingColumn.isPresent()){
-                            newForeignKey.getReferencingColumns()
-                                    .add(getColumnByName(referencingTable,referencingColumn.get()));
-                        }
-                        if(referencedColumn.isPresent()){
-                            newForeignKey.getReferencedColumns()
-                                    .add(getColumnByName(referencedTable,referencedColumn.get()));
-                        }
-
-                    }
-
-                    String actionQuery = "SELECT UPDATE_RULE, DELETE_RULE\n" +
-                            "FROM information_schema.REFERENTIAL_CONSTRAINTS\n" +
-                            "WHERE CONSTRAINT_NAME=?;";
-
-                    PreparedStatement actionStmt = connection.prepareStatement(actionQuery);
-                    actionStmt.setString(1,keyName);
-
-                    ResultSet actionRs = actionStmt.executeQuery();
-                    if(actionRs.next()){
-                        String onUpdate = actionRs.getString("UPDATE_RULE").replace(" ","_");
-                        newForeignKey.setOnUpdateAction(Action.valueOf(onUpdate));
-                        String onDelete = actionRs.getString("DELETE_RULE").replace(" ","_");
-                        newForeignKey.setOnDeleteAction(Action.valueOf(onDelete));
-                    }
+                    setColumnsOfForeignKey(schemaName,tableName,newForeignKey);
+                    setForeignKeyActions(schemaName,tableName,newForeignKey);
 
                     foreignKeys.add(newForeignKey);
                 }
@@ -426,6 +385,121 @@ public class DatabaseInspector {
             System.err.println(e.getMessage());
         }
         return foreignKeys;
+    }
+
+    public ForeignKey getForeignKeyByName(Schema schema, Table table, String foreignKeyName){
+        if(schema == null) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+        if(foreignKeyName == null) throw new IllegalArgumentException("Foreign key is not set");
+
+        ForeignKey foreignKey = new ForeignKey();
+        String query = "SELECT CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME \n" +
+                "FROM information_schema.KEY_COLUMN_USAGE\n" +
+                "WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND REFERENCED_TABLE_SCHEMA IS NOT NULL AND CONSTRAINT_NAME=?;";
+        try(PreparedStatement fkStmt = connection.prepareStatement(query)){
+            fkStmt.setString(1,schema.getName());
+            fkStmt.setString(2, table.getName());
+            fkStmt.setString(3,foreignKeyName);
+
+            ResultSet fkRs = fkStmt.executeQuery();
+            if(fkRs.next()){
+                String keyName = fkRs.getString("CONSTRAINT_NAME");
+                String schemaName = fkRs.getString("TABLE_SCHEMA");
+                String tableName = fkRs.getString("TABLE_NAME");
+                Optional<String> referencedSchemaName = Optional.ofNullable(fkRs.getString("REFERENCED_TABLE_SCHEMA"));
+                Optional<String> referencedTableName = Optional.ofNullable(fkRs.getString("REFERENCED_TABLE_NAME"));
+
+                Schema referencingSchema = getDatabaseByName(schemaName);
+                Table referencingTable = getTableByName(referencingSchema,tableName);
+
+                Schema referencedSchema = getDatabaseByName(referencedSchemaName.orElse(null));
+                Table referencedTable = null;
+
+                if(referencedTableName.isPresent()){
+                    referencedTable = getTableByName(referencedSchema,referencedTableName.get());
+                }
+
+                //Mapping attributes into foreignKey object
+                foreignKey.setName(keyName);
+                foreignKey.setReferencingSchema(referencingSchema);
+                foreignKey.setReferencingTable(referencingTable);
+                foreignKey.setReferencedSchema(referencedSchema);
+                foreignKey.setReferencedTable(referencedTable);
+                setColumnsOfForeignKey(schemaName,tableName,foreignKey);
+                setForeignKeyActions(schemaName,tableName,foreignKey);
+            }
+
+
+        }catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+
+        return foreignKey;
+    }
+    // TODO: Remind yourself english grammar
+    /**
+     * Retrieves (maps) foreign key columns from result set to object attributes.
+     * @param schemaName Name of foreign key schema
+     * @param tableName Name of foreign key table.
+     * @param foreignKey Object who's action attributes are set
+     */
+    public void setColumnsOfForeignKey(String schemaName, String tableName, ForeignKey foreignKey){
+        String columnQuery = "SELECT COLUMN_NAME, REFERENCED_COLUMN_NAME\n" +
+                "FROM information_schema.KEY_COLUMN_USAGE\n" +
+                "WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND CONSTRAINT_NAME=?;";
+        try(PreparedStatement ps = connection.prepareStatement(columnQuery)){
+            ps.setString(1,schemaName);
+            ps.setString(2,tableName);
+            ps.setString(3,foreignKey.getName());
+
+            ResultSet columnsRs = ps.executeQuery();
+
+            foreignKey.setReferencingColumns(new LinkedList<>());
+            foreignKey.setReferencedColumns(new LinkedList<>());
+
+            while(columnsRs.next()){
+                Optional<String> referencingColumn = Optional.ofNullable(columnsRs.getString("COLUMN_NAME"));
+                Optional<String> referencedColumn = Optional.ofNullable(columnsRs.getString("REFERENCED_COLUMN_NAME"));
+
+                referencingColumn.ifPresent(s -> foreignKey.getReferencingColumns()
+                        .add(getColumnByName(foreignKey.getReferencingTable(), s)));
+
+                referencedColumn.ifPresent(s -> foreignKey.getReferencedColumns()
+                        .add(getColumnByName(foreignKey.getReferencedTable(), s)));
+
+            }
+        }catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+
+    }
+    // TODO: Remind yourself english grammar
+    /**
+     * Retrieves (maps) foreign key actions from result set to object attributes.
+     * @param schemaName Name of foreign key schema
+     * @param tableName Name of foreign key table.
+     * @param foreignKey Object who's action attributes are set
+     */
+    public void setForeignKeyActions(String schemaName, String tableName, ForeignKey foreignKey){
+        String actionQuery = "SELECT UPDATE_RULE, DELETE_RULE\n" +
+                "FROM information_schema.REFERENTIAL_CONSTRAINTS\n" +
+                "WHERE CONSTRAINT_SCHEMA=? AND TABLE_NAME=? AND CONSTRAINT_NAME=?;";
+
+        try(PreparedStatement actionStmt = connection.prepareStatement(actionQuery)){
+            actionStmt.setString(1,schemaName);
+            actionStmt.setString(2,tableName);
+            actionStmt.setString(3,foreignKey.getName());
+            ResultSet actionRs = actionStmt.executeQuery();
+            if(actionRs.next()){
+                String onUpdate = actionRs.getString("UPDATE_RULE").replace(" ","_");
+                foreignKey.setOnUpdateAction(Action.valueOf(onUpdate));
+                String onDelete = actionRs.getString("DELETE_RULE").replace(" ","_");
+                foreignKey.setOnDeleteAction(Action.valueOf(onDelete));
+            }
+        }catch(SQLException ex){
+            throw new RuntimeException(ex);
+        }
+
     }
 
     public List<Trigger> getTriggers(Table table) {
@@ -572,7 +646,6 @@ public class DatabaseInspector {
         return indexedColumns;
     }
 
-    // TODO: getIndexByName method
 
 //    public static void main(String[] args) {
 //        DatabaseInspector di = new DatabaseInspector();
