@@ -228,13 +228,14 @@ public class PanelBrowser implements Initializable {
 
                             if(selectedItem.getParent().getValue().equals("Columns") && getTreeItemDepth(selectedItem) == 5){
                                 // TODO: make it efficient, for now it works
+                                String columnName = selectedItem.getValue();
                                 Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
-                                Optional<Column> selectedColumn = table.getColumns().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
-                                if(selectedColumn.isPresent()){
+                                Column selectedColumn = DatabaseInspector.getInstance().getColumnByName(table,columnName);
+                                if(selectedColumn != null){
                                     infoController.getTableInfoPanel().setVisible(false);
                                     infoController.getIndexInfoPanel().setVisible(false);
-                                    infoController.getColumnName().setText(selectedColumn.get().getName());
-                                    infoController.getColumnType().setText(selectedColumn.get().getType().toString());
+                                    infoController.getColumnName().setText(selectedColumn.getName());
+                                    infoController.getColumnType().setText(selectedColumn.getType().toString());
                                     infoController.getColumnInfoPanel().setVisible(true);
                                 }
                             }
@@ -243,18 +244,17 @@ public class PanelBrowser implements Initializable {
                                 // TODO: make it efficient, for now it works
                                 String indexName = selectedItem.getValue();
                                 Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
-                                List<Index> indexes = DatabaseInspector.getInstance().getIndexes(schema,table);
-                                Optional<Index> selectedIndex = indexes.stream().filter(s -> s.getName().equals(indexName)).findFirst();
-                                if(selectedIndex.isPresent()){
-                                    List<IndexedColumn> indexedColumns = selectedIndex.get().getIndexedColumns();
+                                Index selectedIndex = DatabaseInspector.getInstance().getIndexByName(schema,table,indexName);
+                                if(selectedIndex != null){
+                                    List<IndexedColumn> indexedColumns = selectedIndex.getIndexedColumns();
                                     infoController.getTableInfoPanel().setVisible(false);
                                     infoController.getColumnInfoPanel().setVisible(false);
                                     infoController.getIndexInfoPanel().setVisible(true);
                                     infoController.getIndexColumnContainer().getChildren().clear();
-                                    infoController.getIndexName().setText(selectedIndex.get().getName());
-                                    infoController.getVisibleName().setText(selectedIndex.get().isVisible()+"");
-                                    infoController.getUniqueName().setText(selectedIndex.get().isUnique()+"");
-                                    infoController.getTypeName().setText(selectedIndex.get().getStorageType()+"");
+                                    infoController.getIndexName().setText(selectedIndex.getName());
+                                    infoController.getVisibleName().setText(selectedIndex.isVisible()+"");
+                                    infoController.getUniqueName().setText(selectedIndex.isUnique()+"");
+                                    infoController.getTypeName().setText(selectedIndex.getStorageType()+"");
 
                                     for(IndexedColumn indexColumn : indexedColumns){
                                         BorderPane columnField = new BorderPane();
@@ -267,22 +267,21 @@ public class PanelBrowser implements Initializable {
                             }
 
                             if(selectedItem.getParent().getValue().equals("Foreign Keys")){
-
+                                String foreignKeyName = selectedItem.getValue();
                                 Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
-                                List<ForeignKey> foreignKeys = DatabaseInspector.getInstance().getForeignKeys(schema,table);
-                                Optional<ForeignKey> selectedForeignKey = foreignKeys.stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
-                                if(selectedForeignKey.isPresent()){
+                                ForeignKey selectedForeignKey = DatabaseInspector.getInstance().getForeignKeyByName(schema,table,foreignKeyName);
+                                if(selectedForeignKey != null){
                                     infoController.getKeyContainer().getChildren().clear();
                                     infoController.getColumnInfoPanel().setVisible(false);
                                     infoController.getIndexInfoPanel().setVisible(false);
                                     infoController.getForeignKeyInfoPanel().setVisible(true);
-                                    infoController.getForeignKeyName().setText(selectedForeignKey.get().getName());
-                                    infoController.getRefTable().setText(selectedForeignKey.get().getReferencedTable().getName());
-                                    for(int i = 0; i < selectedForeignKey.get().getReferencingColumns().size(); i++){
+                                    infoController.getForeignKeyName().setText(selectedForeignKey.getName());
+                                    infoController.getRefTable().setText(selectedForeignKey.getReferencedTable().getName());
+                                    for(int i = 0; i < selectedForeignKey.getReferencingColumns().size(); i++){
                                         // Not sure if i sorted both column lists will check later
-                                        String referencingColumnName = selectedForeignKey.get().
+                                        String referencingColumnName = selectedForeignKey.
                                                 getReferencingColumns().get(i).getName();
-                                        String referencedColumnName = selectedForeignKey.get().
+                                        String referencedColumnName = selectedForeignKey.
                                                 getReferencedColumns().get(i).getName();
                                         BorderPane keyRow = new BorderPane();
                                         keyRow.setLeft(new Label("Target"));
@@ -291,12 +290,12 @@ public class PanelBrowser implements Initializable {
                                     }
                                     BorderPane onUpdateRow = new BorderPane();
                                     onUpdateRow.setLeft(new Label("On Update"));
-                                    onUpdateRow.setRight(new Label(selectedForeignKey.get().getOnUpdateAction().toString()));
+                                    onUpdateRow.setRight(new Label(selectedForeignKey.getOnUpdateAction().toString()));
                                     infoController.getKeyContainer().getChildren().add(onUpdateRow);
 
                                     BorderPane onDeleteRow = new BorderPane();
                                     onDeleteRow.setLeft(new Label("On Delete"));
-                                    onDeleteRow.setRight(new Label(selectedForeignKey.get().getOnDeleteAction().toString()));
+                                    onDeleteRow.setRight(new Label(selectedForeignKey.getOnDeleteAction().toString()));
                                     infoController.getKeyContainer().getChildren().add(onDeleteRow);
 
                                 }
