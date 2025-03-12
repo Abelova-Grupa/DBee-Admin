@@ -199,104 +199,110 @@ public class PanelBrowser implements Initializable {
                 tableBranch.expandedProperty().addListener(tableBranchListener);
                 // TODO: REFACTOR
                 schemaView.setOnMouseClicked(event -> {
-                    TreeItem<String> selectedItem = schemaView.getSelectionModel().getSelectedItem();
+                    Optional<TreeItem<String>> selectedItemOptional = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
                     Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
                         // Table selected
-                        Optional<Table> selectedTable = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
-                        if(getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem,tableBranch))){
-                            infoController.getColumnInfoPanel().setVisible(false);
-                            infoController.getIndexInfoPanel().setVisible(false);
-                            infoController.getTableInfoPanel().setVisible(true);
-                            infoController.getTableName().setText(selectedItem.getValue());
-                            infoController.getAttributeContainer().getChildren().clear();
-                            infoController.setAttributes(new LinkedList<>());
+                        if(selectedItemOptional.isPresent()){
+                            TreeItem<String> selectedItem = selectedItemOptional.get();
+                            Optional<Table> selectedTableOptional = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
+                            if(selectedTableOptional.isPresent()){
+                                Table selectedTable = selectedTableOptional.get();
+                                if(getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem,tableBranch))){
+                                    infoController.getColumnInfoPanel().setVisible(false);
+                                    infoController.getIndexInfoPanel().setVisible(false);
+                                    infoController.getTableInfoPanel().setVisible(true);
+                                    infoController.getTableName().setText(selectedItem.getValue());
+                                    infoController.getAttributeContainer().getChildren().clear();
+                                    infoController.setAttributes(new LinkedList<>());
 
-                            for(Column column : selectedTable.get().getColumns()){
-                                Label attributeName = new Label(column.getName());
-                                Label attributeType = new Label(column.getType().toString());
-                                BorderPane attributePane = new BorderPane();
-                                attributePane.setLeft(attributeName);
-                                attributePane.setRight(attributeType);
-                                infoController.addAttributePane(attributePane);
+                                    for(Column column : selectedTable.getColumns()){
+                                        Label attributeName = new Label(column.getName());
+                                        Label attributeType = new Label(column.getType().toString());
+                                        BorderPane attributePane = new BorderPane();
+                                        attributePane.setLeft(attributeName);
+                                        attributePane.setRight(attributeType);
+                                        infoController.addAttributePane(attributePane);
+                                    }
+                                }
                             }
-                        }
 
-                        if(selectedItem.getParent().getValue().equals("Columns") && getTreeItemDepth(selectedItem) == 5){
-                            // TODO: make it efficient, for now it works
-                            Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
-                            Optional<Column> selectedColumn = table.getColumns().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
-                            if(selectedColumn.isPresent()){
-                                infoController.getTableInfoPanel().setVisible(false);
-                                infoController.getIndexInfoPanel().setVisible(false);
-                                infoController.getColumnName().setText(selectedColumn.get().getName());
-                                infoController.getColumnType().setText(selectedColumn.get().getType().toString());
-                                infoController.getColumnInfoPanel().setVisible(true);
+                            if(selectedItem.getParent().getValue().equals("Columns") && getTreeItemDepth(selectedItem) == 5){
+                                // TODO: make it efficient, for now it works
+                                String columnName = selectedItem.getValue();
+                                Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
+                                Column selectedColumn = DatabaseInspector.getInstance().getColumnByName(table,columnName);
+                                if(selectedColumn != null){
+                                    infoController.getTableInfoPanel().setVisible(false);
+                                    infoController.getIndexInfoPanel().setVisible(false);
+                                    infoController.getColumnName().setText(selectedColumn.getName());
+                                    infoController.getColumnType().setText(selectedColumn.getType().toString());
+                                    infoController.getColumnInfoPanel().setVisible(true);
+                                }
                             }
-                        }
 
-                        if(selectedItem.getParent().getValue().equals("Indexes") && getTreeItemDepth(selectedItem) == 5){
-                            // TODO: make it efficient, for now it works
-                            String indexName = selectedItem.getValue();
-                            Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
-                            List<Index> indexes = DatabaseInspector.getInstance().getIndexes(schema,table);
-                            Optional<Index> selectedIndex = indexes.stream().filter(s -> s.getName().equals(indexName)).findFirst();
-                            if(selectedIndex.isPresent()){
-                                List<IndexedColumn> indexedColumns = selectedIndex.get().getIndexedColumns();
-                                infoController.getTableInfoPanel().setVisible(false);
-                                infoController.getColumnInfoPanel().setVisible(false);
-                                infoController.getIndexInfoPanel().setVisible(true);
-                                infoController.getIndexColumnContainer().getChildren().clear();
-                                infoController.getIndexName().setText(selectedIndex.get().getName());
-                                infoController.getVisibleName().setText(selectedIndex.get().isVisible()+"");
-                                infoController.getUniqueName().setText(selectedIndex.get().isUnique()+"");
-                                infoController.getTypeName().setText(selectedIndex.get().getStorageType()+"");
+                            if(selectedItem.getParent().getValue().equals("Indexes") && getTreeItemDepth(selectedItem) == 5){
+                                // TODO: make it efficient, for now it works
+                                String indexName = selectedItem.getValue();
+                                Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
+                                Index selectedIndex = DatabaseInspector.getInstance().getIndexByName(schema,table,indexName);
+                                if(selectedIndex != null){
+                                    List<IndexedColumn> indexedColumns = selectedIndex.getIndexedColumns();
+                                    infoController.getTableInfoPanel().setVisible(false);
+                                    infoController.getColumnInfoPanel().setVisible(false);
+                                    infoController.getIndexInfoPanel().setVisible(true);
+                                    infoController.getIndexColumnContainer().getChildren().clear();
+                                    infoController.getIndexName().setText(selectedIndex.getName());
+                                    infoController.getVisibleName().setText(selectedIndex.isVisible()+"");
+                                    infoController.getUniqueName().setText(selectedIndex.isUnique()+"");
+                                    infoController.getTypeName().setText(selectedIndex.getStorageType()+"");
 
-                                for(IndexedColumn indexColumn : indexedColumns){
-                                    BorderPane columnField = new BorderPane();
-                                    columnField.setCenter(new Label(indexColumn.getColumn().getName()));
-                                    infoController.getIndexColumnContainer().getChildren().add(columnField);
+                                    for(IndexedColumn indexColumn : indexedColumns){
+                                        BorderPane columnField = new BorderPane();
+                                        columnField.setCenter(new Label(indexColumn.getColumn().getName()));
+                                        infoController.getIndexColumnContainer().getChildren().add(columnField);
+                                    }
+
                                 }
 
                             }
 
-                        }
+                            if(selectedItem.getParent().getValue().equals("Foreign Keys")){
+                                String foreignKeyName = selectedItem.getValue();
+                                Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
+                                ForeignKey selectedForeignKey = DatabaseInspector.getInstance().getForeignKeyByName(schema,table,foreignKeyName);
+                                if(selectedForeignKey != null){
+                                    infoController.getKeyContainer().getChildren().clear();
+                                    infoController.getColumnInfoPanel().setVisible(false);
+                                    infoController.getIndexInfoPanel().setVisible(false);
+                                    infoController.getForeignKeyInfoPanel().setVisible(true);
+                                    infoController.getForeignKeyName().setText(selectedForeignKey.getName());
+                                    infoController.getRefTable().setText(selectedForeignKey.getReferencedTable().getName());
+                                    for(int i = 0; i < selectedForeignKey.getReferencingColumns().size(); i++){
+                                        // Not sure if i sorted both column lists will check later
+                                        String referencingColumnName = selectedForeignKey.
+                                                getReferencingColumns().get(i).getName();
+                                        String referencedColumnName = selectedForeignKey.
+                                                getReferencedColumns().get(i).getName();
+                                        BorderPane keyRow = new BorderPane();
+                                        keyRow.setLeft(new Label("Target"));
+                                        keyRow.setRight(new Label("(" +referencingColumnName+ " -> "+referencedColumnName+")"));
+                                        infoController.getKeyContainer().getChildren().add(keyRow);
+                                    }
+                                    BorderPane onUpdateRow = new BorderPane();
+                                    onUpdateRow.setLeft(new Label("On Update"));
+                                    onUpdateRow.setRight(new Label(selectedForeignKey.getOnUpdateAction().toString()));
+                                    infoController.getKeyContainer().getChildren().add(onUpdateRow);
 
-                        if(selectedItem.getParent().getValue().equals("Foreign Keys")){
+                                    BorderPane onDeleteRow = new BorderPane();
+                                    onDeleteRow.setLeft(new Label("On Delete"));
+                                    onDeleteRow.setRight(new Label(selectedForeignKey.getOnDeleteAction().toString()));
+                                    infoController.getKeyContainer().getChildren().add(onDeleteRow);
 
-                            Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
-                            List<ForeignKey> foreignKeys = DatabaseInspector.getInstance().getForeignKeys(schema,table);
-                            Optional<ForeignKey> selectedForeignKey = foreignKeys.stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
-                            if(selectedForeignKey.isPresent()){
-                                infoController.getKeyContainer().getChildren().clear();
-                                infoController.getColumnInfoPanel().setVisible(false);
-                                infoController.getIndexInfoPanel().setVisible(false);
-                                infoController.getForeignKeyInfoPanel().setVisible(true);
-                                infoController.getForeignKeyName().setText(selectedForeignKey.get().getName());
-                                infoController.getRefTable().setText(selectedForeignKey.get().getReferencedTable().getName());
-                                for(int i = 0; i < selectedForeignKey.get().getReferencingColumns().size(); i++){
-                                    // Not sure if i sorted both column lists will check later
-                                    String referencingColumnName = selectedForeignKey.get().
-                                            getReferencingColumns().get(i).getName();
-                                    String referencedColumnName = selectedForeignKey.get().
-                                            getReferencedColumns().get(i).getName();
-                                    BorderPane keyRow = new BorderPane();
-                                    keyRow.setLeft(new Label("Target"));
-                                    keyRow.setRight(new Label("(" +referencingColumnName+ " -> "+referencedColumnName+")"));
-                                    infoController.getKeyContainer().getChildren().add(keyRow);
                                 }
-                                BorderPane onUpdateRow = new BorderPane();
-                                onUpdateRow.setLeft(new Label("On Update"));
-                                onUpdateRow.setRight(new Label(selectedForeignKey.get().getOnUpdateAction().toString()));
-                                infoController.getKeyContainer().getChildren().add(onUpdateRow);
-
-                                BorderPane onDeleteRow = new BorderPane();
-                                onDeleteRow.setLeft(new Label("On Delete"));
-                                onDeleteRow.setRight(new Label(selectedForeignKey.get().getOnDeleteAction().toString()));
-                                infoController.getKeyContainer().getChildren().add(onDeleteRow);
 
                             }
-
                         }
+
                 });
                 vboxBrowser.getChildren().add(schemaView);
             }
