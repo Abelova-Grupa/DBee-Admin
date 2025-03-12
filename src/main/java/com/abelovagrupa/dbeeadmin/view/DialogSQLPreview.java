@@ -56,6 +56,9 @@ public class DialogSQLPreview extends Dialog<Boolean> {
             if (buttonType == ButtonType.APPLY) {
                 return true;
             }
+            if(buttonType == ButtonType.CANCEL) {
+                return false;
+            }
             return null;
         });
 

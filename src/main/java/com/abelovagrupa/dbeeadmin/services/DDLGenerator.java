@@ -8,8 +8,7 @@ import com.abelovagrupa.dbeeadmin.model.index.IndexType;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
-import com.abelovagrupa.dbeeadmin.view.PanelEditor;
-import com.abelovagrupa.dbeeadmin.view.PanelScript;
+import com.abelovagrupa.dbeeadmin.view.DialogSQLPreview;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -31,7 +30,7 @@ public class DDLGenerator {
      * @throws SQLException on SQL error
      * @throws IllegalArgumentException if schema name, collation or charset are not set
      */
-    public static void createDatabase(Schema schema) throws SQLException {
+    public static void createDatabase(Schema schema, boolean preview) throws SQLException {
 
         // Validate
         if(schema.getName() == null) throw new IllegalArgumentException("Undefined schema name.");
@@ -43,10 +42,22 @@ public class DDLGenerator {
             "CHARACTER SET " + schema.getCharset().name() + "\n" +
             "COLLATE " + schema.getCollation().name() + ";";
 
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        // If preview is selected (user gets to decide whether sql should be executed)
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
 
+    }
+
+    // Extracted method
+    private static void executeUpdate(String query) {
+        try {
+            Connection conn = DatabaseConnection.getInstance().getConnection();
+            Statement st = conn.createStatement();
+            st.executeUpdate(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -57,7 +68,7 @@ public class DDLGenerator {
      * @throws SQLException on SQL error.
      * @throws IllegalArgumentException if schema does not have a name, schema and at least one column set.
      */
-    public static void createTable(Table table) throws SQLException {
+    public static void createTable(Table table, boolean preview) throws SQLException {
 
         // Validate
         if(table.getSchema() == null) throw new IllegalArgumentException("Schema is not set.");
@@ -82,11 +93,11 @@ public class DDLGenerator {
         queryBuilder.setLength(queryBuilder.length() - 2); // Cut trailing comma and enter
         queryBuilder.append("\n);");
         String query = queryBuilder.toString();
-        System.out.println(query);
+//        System.out.println(query);
 
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
 
     }
 
@@ -147,7 +158,7 @@ public class DDLGenerator {
      * @param schema Schema to be dropped
      * @throws SQLException
      */
-    public static void dropDatabase(Schema schema) throws SQLException {
+    public static void dropDatabase(Schema schema, boolean preview) throws SQLException {
 
         // Validate
         if(schema.getName().isEmpty() || schema.getName() == null)
@@ -157,9 +168,9 @@ public class DDLGenerator {
         String query = "DROP DATABASE IF EXISTS " + schema.getName();
 
         // Execute
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
     /**
@@ -167,7 +178,7 @@ public class DDLGenerator {
      * @param table Table to be dropped.
      * @throws SQLException
      */
-    public static void dropTable(Table table) throws SQLException {
+    public static void dropTable(Table table, boolean preview) throws SQLException {
 
         // Validate
         if(table.getName().isEmpty() || table.getName() == null)
@@ -181,9 +192,9 @@ public class DDLGenerator {
         String query = "DROP TABLE IF EXISTS " + table.getSchema().getName() + "." + table.getName();
 
         // Execute
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
     /**
@@ -191,7 +202,7 @@ public class DDLGenerator {
      * @param schema Database to be truncated.
      * @throws SQLException
      */
-    public static void truncateDatabase(Schema schema) throws SQLException {
+    public static void truncateDatabase(Schema schema, boolean preview) throws SQLException {
         /* MySQL doesn't have a single command to truncate the whole schema?? Wtf? */
         throw new UnsupportedOperationException("Not yet implemented...");
     }
@@ -201,7 +212,7 @@ public class DDLGenerator {
      * @param table Table to be truncated, schema must be set.
      * @throws SQLException
      */
-    public static void truncateTable(Table table) throws SQLException {
+    public static void truncateTable(Table table, boolean preview) throws SQLException {
 
         // Validate
         if(table.getName().isEmpty() || table.getName() == null)
@@ -211,9 +222,9 @@ public class DDLGenerator {
         String query = "TRUNCATE TABLE " + table.getName();
 
         // Execute
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
 
     }
 
@@ -223,7 +234,7 @@ public class DDLGenerator {
      * @param column Column to be added.
      * @throws SQLException
      */
-    public static void addColumn(Table table, Column column) throws SQLException {
+    public static void addColumn(Table table, Column column, boolean preview) throws SQLException {
 
         // Validate
         if(column.getName().isEmpty() || column.getName() == null)
@@ -245,9 +256,9 @@ public class DDLGenerator {
         queryBuilder.setLength(queryBuilder.length() - 1);
 
         String query = queryBuilder.toString();
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
     /**
@@ -256,7 +267,7 @@ public class DDLGenerator {
      * @param column Column to be dropped.
      * @throws SQLException
      */
-    public static void dropColumn(Table table, Column column) throws SQLException {
+    public static void dropColumn(Table table, Column column, boolean preview) throws SQLException {
 
         // Validate
         if(column.getName().isEmpty() || column.getName() == null)
@@ -276,9 +287,9 @@ public class DDLGenerator {
         queryBuilder.append(column.getName());
 
         String query = queryBuilder.toString();
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
     /**
@@ -288,7 +299,7 @@ public class DDLGenerator {
      * @param newName New name for the column.
      * @throws SQLException
      */
-    public static void renameColumn(Table table, Column column, String newName) throws SQLException {
+    public static void renameColumn(Table table, Column column, String newName, boolean preview) throws SQLException {
 
         // Validate
         if(column.getName().isEmpty() || column.getName() == null)
@@ -310,9 +321,9 @@ public class DDLGenerator {
         queryBuilder.append(newName);
 
         String query = queryBuilder.toString();
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
     /**
@@ -322,7 +333,7 @@ public class DDLGenerator {
      * @param column Column with new parameters, but with <b>old name</b>.
      * @throws SQLException
      */
-    public static void modifyColumn(Table table, Column column) throws SQLException {
+    public static void modifyColumn(Table table, Column column, boolean preview) throws SQLException {
 
         // Validate
         if(column.getName().isEmpty() || column.getName() == null)
@@ -344,12 +355,12 @@ public class DDLGenerator {
         queryBuilder.setLength(queryBuilder.length() - 1);
 
         String query = queryBuilder.toString();
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
-    public static void addForeignKey(Schema schema, Table table, ForeignKey foreignKey)throws SQLException{
+    public static void addForeignKey(Schema schema, Table table, ForeignKey foreignKey, boolean preview) throws SQLException{
         if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
         if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
         if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
@@ -380,13 +391,13 @@ public class DDLGenerator {
         queryBuilder.append(";");
 
         String query = queryBuilder.toString();
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
 
     }
 
-    public static void renameForeignKey(Schema schema, Table table, ForeignKey foreignKey, String newName) throws SQLException{
+    public static void renameForeignKey(Schema schema, Table table, ForeignKey foreignKey, String newName, boolean preview) throws SQLException{
         if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
         if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
         if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
@@ -421,10 +432,10 @@ public class DDLGenerator {
 
         query = newQueryBuilder.toString();
         st.addBatch(query);
-        st.executeBatch();
+        st.executeBatch(); // E jebiga, ne mogu ovde da izvucem jer je radjeno kao batch
     }
 
-    public static void dropForeignKey(Schema schema, Table table, ForeignKey foreignKey) throws SQLException {
+    public static void dropForeignKey(Schema schema, Table table, ForeignKey foreignKey, boolean preview) throws SQLException {
         if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
         if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
         if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
@@ -436,7 +447,9 @@ public class DDLGenerator {
         String query = queryBuilder.toString();
         Connection conn = DatabaseConnection.getInstance().getConnection();
         Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
 
     }
 
@@ -446,11 +459,11 @@ public class DDLGenerator {
         if(oldForeignKey == null || oldForeignKey.getName() == null || oldForeignKey.getName().isEmpty()) throw new IllegalArgumentException("Old foreign key is not set");
         if(newForeignKey == null || newForeignKey.getName() == null || newForeignKey.getName().isEmpty()) throw new IllegalArgumentException("New foreign key is not set");
 
-        dropForeignKey(schema,table,oldForeignKey);
-        addForeignKey(schema,table,newForeignKey);
+        dropForeignKey(schema,table,oldForeignKey, false);
+        addForeignKey(schema,table,newForeignKey, false);
     }
 
-    public static void addIndex(Schema schema, Table table, Index index) throws SQLException {
+    public static void addIndex(Schema schema, Table table, Index index, boolean preview) throws SQLException {
         if(schema == null ) throw new IllegalArgumentException("Schema is not set");
         if(table == null) throw new IllegalArgumentException("Table is not set");
         if(index == null) throw new IllegalArgumentException("Index is not set");
@@ -484,13 +497,13 @@ public class DDLGenerator {
         queryBuilder.append(index.isVisible() ? "VISIBLE; " : "INVISIBLE; ");
 
         String query = queryBuilder.toString();
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
 
     }
 
-    public static void renameIndex(Schema schema, Table table, Index index, String newName) throws SQLException {
+    public static void renameIndex(Schema schema, Table table, Index index, String newName, boolean preview) throws SQLException {
         if(schema == null ) throw new IllegalArgumentException("Schema is not set");
         if(table == null) throw new IllegalArgumentException("Table is not set");
         if(index == null) throw new IllegalArgumentException("Index is not set");
@@ -500,12 +513,12 @@ public class DDLGenerator {
         queryBuilder.append("RENAME INDEX ").append(index.getName()).append(" TO ").append(newName).append(";");
 
         String query = queryBuilder.toString();
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
-    public static void dropIndex(Schema schema, Table table, Index index) throws SQLException {
+    public static void dropIndex(Schema schema, Table table, Index index, boolean preview) throws SQLException {
         if(schema == null ) throw new IllegalArgumentException("Schema is not set");
         if(table == null) throw new IllegalArgumentException("Table is not set");
         if(index == null) throw new IllegalArgumentException("Index is not set");
@@ -515,9 +528,9 @@ public class DDLGenerator {
         queryBuilder.append("DROP INDEX ").append(index.getName());
 
         String query = queryBuilder.toString();
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        Statement st = conn.createStatement();
-        st.executeUpdate(query);
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
     public static void modifyIndex(Schema schema, Table table, Index oldIndex, Index newIndex) throws SQLException {
@@ -526,8 +539,8 @@ public class DDLGenerator {
         if(oldIndex == null) throw new IllegalArgumentException("Index is not set");
         if(newIndex == null) throw new IllegalArgumentException("Index is not set");
 
-        dropIndex(schema,table,oldIndex);
-        addIndex(schema,table,newIndex);
+        dropIndex(schema,table,oldIndex, false);
+        addIndex(schema,table,newIndex, false);
     }
 
     }
