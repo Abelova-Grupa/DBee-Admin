@@ -66,6 +66,9 @@ public class PanelInfo {
     @FXML
     Label foreignKeyName;
 
+    @FXML
+    Label columnLabel;
+
     public PanelMain getMainController() {
         return mainController;
     }
@@ -221,5 +224,13 @@ public class PanelInfo {
 
     public void setForeignKeyName(Label foreignKeyName) {
         this.foreignKeyName = foreignKeyName;
+    }
+
+    public Label getColumnLabel() {
+        return columnLabel;
+    }
+
+    public void setColumnLabel(Label columnLabel) {
+        this.columnLabel = columnLabel;
     }
 }

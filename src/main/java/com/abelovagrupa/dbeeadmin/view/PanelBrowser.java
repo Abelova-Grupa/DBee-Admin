@@ -243,6 +243,7 @@ public class PanelBrowser implements Initializable {
                                 Table table = DatabaseInspector.getInstance().getTableByName(schema,selectedItem.getParent().getParent().getValue());
                                 Column selectedColumn = DatabaseInspector.getInstance().getColumnByName(table,columnName);
                                 if(selectedColumn != null){
+                                    infoController.getColumnLabel().setText(columnName);
                                     infoController.getTableInfoPanel().setVisible(false);
                                     infoController.getIndexInfoPanel().setVisible(false);
                                     infoController.getColumnName().setText(selectedColumn.getName());
