@@ -221,6 +221,7 @@ public class PanelBrowser implements Initializable {
                                 if(getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem,tableBranch))){
                                     infoController.getColumnInfoPanel().setVisible(false);
                                     infoController.getIndexInfoPanel().setVisible(false);
+                                    infoController.getForeignKeyInfoPanel().setVisible(false);
                                     infoController.getTableInfoPanel().setVisible(true);
                                     infoController.getTableName().setText(selectedItem.getValue());
                                     infoController.getAttributeContainer().getChildren().clear();
@@ -246,6 +247,7 @@ public class PanelBrowser implements Initializable {
                                     infoController.getColumnLabel().setText(columnName);
                                     infoController.getTableInfoPanel().setVisible(false);
                                     infoController.getIndexInfoPanel().setVisible(false);
+                                    infoController.getForeignKeyInfoPanel().setVisible(false);
                                     infoController.getColumnName().setText(selectedColumn.getName());
                                     infoController.getColumnType().setText(selectedColumn.getType().toString());
                                     infoController.getColumnInfoPanel().setVisible(true);
@@ -261,6 +263,7 @@ public class PanelBrowser implements Initializable {
                                     List<IndexedColumn> indexedColumns = selectedIndex.getIndexedColumns();
                                     infoController.getTableInfoPanel().setVisible(false);
                                     infoController.getColumnInfoPanel().setVisible(false);
+                                    infoController.getForeignKeyInfoPanel().setVisible(false);
                                     infoController.getIndexInfoPanel().setVisible(true);
                                     infoController.getIndexColumnContainer().getChildren().clear();
                                     infoController.getIndexName().setText(selectedIndex.getName());
@@ -286,6 +289,7 @@ public class PanelBrowser implements Initializable {
                                     infoController.getKeyContainer().getChildren().clear();
                                     infoController.getColumnInfoPanel().setVisible(false);
                                     infoController.getIndexInfoPanel().setVisible(false);
+                                    infoController.getTableInfoPanel().setVisible(false);
                                     infoController.getForeignKeyInfoPanel().setVisible(true);
                                     infoController.getForeignKeyName().setText(selectedForeignKey.getName());
                                     infoController.getRefTable().setText(selectedForeignKey.getReferencedTable().getName());
