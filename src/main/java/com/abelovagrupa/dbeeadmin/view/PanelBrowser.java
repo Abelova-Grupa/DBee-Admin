@@ -15,14 +15,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.PieChart;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -34,9 +31,13 @@ import java.util.ResourceBundle;
 
 public class PanelBrowser implements Initializable {
 
+    private final int TREE_CELL_HEIGHT = 30;
+
     private PanelMain mainController;
 
     private List<PanelSchemaTree> schemaControllers;
+
+    private List<TreeView<String>> schemaViews;
 
     private PanelInfo infoController;
 
@@ -45,6 +46,12 @@ public class PanelBrowser implements Initializable {
 
     @FXML
     TextField searchObjects;
+
+    @FXML
+    ScrollPane browserScrollPane;
+
+    @FXML
+    BorderPane browserHeader;
 
     public List<PanelSchemaTree> getSchemaControllers() {
         return schemaControllers;
@@ -83,12 +90,13 @@ public class PanelBrowser implements Initializable {
         // TODO: WRITE COMMENTS FROM THIS METHOD
         try {
             schemaControllers = new LinkedList<>();
+            schemaViews = new LinkedList<>();
             List<String> schemaNames = DatabaseInspector.getInstance().getDatabaseNames();
             for(String schemaName : schemaNames){
                 // Loading each schema treeView
                 FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelSchemaTree.fxml"));
                 TreeView<String> schemaView = loader.load();
-                schemaView.setFixedCellSize(24);
+                schemaView.setFixedCellSize(TREE_CELL_HEIGHT);
                 schemaControllers.add(loader.getController());
 
 
@@ -105,14 +113,17 @@ public class PanelBrowser implements Initializable {
                 tableBranch.getChildren().add(tableDummyNode);
 
                 schemaNode.getChildren().addAll(tableBranch,viewBranch,procedureBranch,functionBranch);
-                schemaView.setPrefHeight(24);
+                schemaView.setPrefHeight(TREE_CELL_HEIGHT);
+                schemaView.setFixedCellSize(TREE_CELL_HEIGHT);
                 schemaView.getRoot().addEventHandler(TreeItem.branchExpandedEvent(), event -> {
-                    Platform.runLater(() -> schemaView.setPrefHeight(schemaView.getExpandedItemCount() * 24));
+                    Platform.runLater(() -> schemaView.setPrefHeight(schemaView.getExpandedItemCount() * TREE_CELL_HEIGHT));
                 });
 
                 schemaView.getRoot().addEventHandler(TreeItem.branchCollapsedEvent(), event -> {
-                    Platform.runLater(() -> schemaView.setPrefHeight(schemaView.getExpandedItemCount() * 24));
+                    Platform.runLater(() -> schemaView.setPrefHeight(schemaView.getExpandedItemCount() * TREE_CELL_HEIGHT));
                 });
+
+                schemaViews.add(schemaView);
 
                 ChangeListener<Boolean> tableBranchListener = new ChangeListener<>() {
                     @Override
@@ -302,9 +313,12 @@ public class PanelBrowser implements Initializable {
 
                             }
                         }
-
                 });
                 vboxBrowser.getChildren().add(schemaView);
+            }
+
+            for(var child : vboxBrowser.getChildren()){
+                VBox.setVgrow(child, Priority.NEVER);
             }
 
             searchObjects.focusedProperty().addListener((observable,oldValue,newValue) -> {
@@ -349,4 +363,29 @@ public class PanelBrowser implements Initializable {
         return depth;
     }
 
+    public double getBrowserHeight() {
+        double browserHeight = 0;
+        for(TreeView<String> schemaView : schemaViews){
+            browserHeight += TREE_CELL_HEIGHT;
+            if(schemaView.getRoot().isExpanded()){
+                for(TreeItem<String> schemaItem : schemaView.getRoot().getChildren()){
+                    browserHeight += getItemHeight(schemaItem);
+                }
+            }
+        }
+        return browserHeight;
+    }
+
+    public double getItemHeight(TreeItem<String> treeItem){
+        double itemHeight = 0;
+        itemHeight += TREE_CELL_HEIGHT;
+
+        if(treeItem.isExpanded()){
+            for(TreeItem<String> child : treeItem.getChildren()){
+                itemHeight += getItemHeight(child);
+            }
+        }
+
+        return itemHeight;
+    }
 }

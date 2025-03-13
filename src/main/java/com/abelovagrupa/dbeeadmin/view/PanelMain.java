@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -26,6 +27,8 @@ public class PanelMain implements Initializable {
 
     @FXML
     SplitPane rightPane;
+
+    HBox browserPane;
 
     PanelBrowser browserController;
 
@@ -104,7 +107,11 @@ public class PanelMain implements Initializable {
             Parent root = fxmlLoader.load();
             setBrowserController(fxmlLoader.getController());
             leftPane.getItems().add(root);
+            browserPane = (HBox) root;
+            browserPane.setMinHeight(browserController.getBrowserHeight() + 50);
             browserController.setMainController(this);
+            browserController.browserScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            browserController.browserScrollPane.setFitToHeight(true);
 
 
         }catch(IOException e){
