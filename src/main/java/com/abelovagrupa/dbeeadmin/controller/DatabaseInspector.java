@@ -55,7 +55,6 @@ public class DatabaseInspector {
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
-            System.out.println("List of Databases:");
             while (rs.next()) {
                 databaseNames.add(rs.getString("SCHEMA_NAME"));
             }
