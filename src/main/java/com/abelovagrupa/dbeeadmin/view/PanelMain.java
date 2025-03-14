@@ -1,18 +1,20 @@
 package com.abelovagrupa.dbeeadmin.view;
+
 import com.abelovagrupa.dbeeadmin.Main;
-import com.abelovagrupa.dbeeadmin.services.FileExporter;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -52,12 +54,12 @@ public class PanelMain implements Initializable {
     // TODO: Fix format issues with HelpPanel(Vbox)
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-            loadBrowser();
-            loadInfo();
-            loadEditor();
-            loadResults();
-            loadHelp();
-            linkControllers();
+        loadBrowser();
+        loadInfo();
+        loadEditor();
+        loadResults();
+        loadHelp();
+        linkControllers();
     }
 
     public PanelBrowser getBrowserController() {
@@ -100,9 +102,9 @@ public class PanelMain implements Initializable {
         this.helpController = helpController;
     }
 
-    public void loadBrowser(){
+    public void loadBrowser() {
 
-        try{
+        try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelBrowser.fxml"));
             Parent root = fxmlLoader.load();
             setBrowserController(fxmlLoader.getController());
@@ -111,59 +113,60 @@ public class PanelMain implements Initializable {
             browserPane.setMinHeight(browserController.getBrowserHeight() + 50);
             browserController.setMainController(this);
             browserController.browserScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-            browserController.browserScrollPane.setFitToHeight(true);
+//            browserController.browserScrollPane.setFitToHeight(true);
 
 
-        }catch(IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    public void loadInfo(){
-        try{
+    public void loadInfo() {
+        try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelInfo.fxml"));
             Parent root = fxmlLoader.load();
             setInfoController(fxmlLoader.getController());
             leftPane.getItems().add(root);
             infoController.setMainController(this);
 
-        }catch(IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Each load method first loads the fxml file with its root component and then extracts its controller
      * Sets the reference to main controller in the created controller
      */
-    public void loadEditor(){
-        try{
+    public void loadEditor() {
+        try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelEditor.fxml"));
             Parent root = fxmlLoader.load();
             setEditorController(fxmlLoader.getController());
             centerPane.getItems().add(root);
             editorController.setMainController(this);
 
-        }catch(IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void loadResults(){
-        try{
+    public void loadResults() {
+        try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelResults.fxml"));
             Parent root = fxmlLoader.load();
             setResultsController(fxmlLoader.getController());
             centerPane.getItems().add(root);
             resultsController.setMainController(this);
 
-        }catch(IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void loadHelp(){
-        try{
+    public void loadHelp() {
+        try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelHelp.fxml"));
             Parent root = fxmlLoader.load();
             setHelpController(fxmlLoader.getController());
@@ -171,7 +174,7 @@ public class PanelMain implements Initializable {
             helpController.setMainController(this);
             rightPane.setDividerPositions(0.15, 0.9);
 
-        }catch(IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -187,7 +190,7 @@ public class PanelMain implements Initializable {
         editorController.getScriptController().setResultsController(resultsController);
 
         browserController.setInfoController(infoController);
-        for(PanelSchemaTree schemaTree: browserController.getSchemaControllers()){
+        for (PanelSchemaTree schemaTree : browserController.getSchemaControllers()) {
             schemaTree.setBrowserController(browserController);
         }
         browserController.getInfoController().getClearInfoPanel().setVisible(true);
@@ -282,7 +285,7 @@ public class PanelMain implements Initializable {
         stage.show();
     }
 
-    public void newScriptTab(){
+    public void newScriptTab() {
         editorController.setResultsController(resultsController);
         editorController.createNewScript();
     }
