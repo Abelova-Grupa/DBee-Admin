@@ -4,6 +4,7 @@ import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.view.PanelMain;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -23,9 +24,10 @@ public class Main extends Application {
             return;
         }
 
-        //Manually setting up the controller
-        PanelMain mainController = new PanelMain();
+        //Manually setting up the controller BUT FIRST LOAD THE FXML!
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("main.fxml"));
+        PanelMain mainController = new PanelMain();
+
         fxmlLoader.setController(mainController);
         Parent root = fxmlLoader.load();
 
@@ -35,8 +37,8 @@ public class Main extends Application {
         stage.setTitle("DBee Admin");
         stage.setScene(scene);
         stage.setMaximized(true);
-        stage.show();
-
+//        stage.show();
+        Platform.runLater(stage::show);
     }
 
     public static void main(String[] args) {

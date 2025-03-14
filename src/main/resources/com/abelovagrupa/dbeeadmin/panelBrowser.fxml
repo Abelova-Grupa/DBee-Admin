@@ -45,7 +45,8 @@
                 </BorderPane>
             </top>
             <center>
-                <ScrollPane fx:id="browserScrollPane" fitToWidth="true" fitToHeight="true">
+                <!-- fitToHeight NIKAKO jer onda 'stiska' sve elemente da se uklope! -->
+                <ScrollPane fx:id="browserScrollPane" fitToWidth="true">
                     <VBox fx:id="vboxBrowser" BorderPane.alignment="CENTER">
                         <children>
 
