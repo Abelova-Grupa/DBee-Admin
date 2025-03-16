@@ -17,6 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -333,6 +334,20 @@ public class PanelBrowser implements Initializable {
                 if (newValue) {
                     searchObjects.setText("");
                 } else searchObjects.setText("Search Objects");
+            });
+
+            searchObjects.setOnKeyPressed(s -> {
+                if(!s.getCode().equals(KeyCode.ENTER)) return;
+
+                if(!(searchObjects.getText().isEmpty() || searchObjects.getText().equals("Search Objects"))){
+                    for(TreeView<String> schemaView : schemaViews){
+                        schemaView.setVisible(schemaView.getRoot().getValue().startsWith(searchObjects.getText()));
+                    }
+                }else {
+                    for(TreeView<String> schemaView : schemaViews){
+                        schemaView.setVisible(true);
+                    }
+                }
             });
 
         } catch (IOException e) {
