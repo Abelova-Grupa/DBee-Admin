@@ -76,6 +76,16 @@ public class DDLGenerator {
         if(table.getColumns() == null || table.getColumns().isEmpty())
             throw new IllegalArgumentException("Table must have at least one column.");
 
+        // Check for primary key
+        boolean hasprimaryKey = false;
+        for(Column c : table.getColumns()) {
+            if (c.isPrimaryKey()) {
+                hasprimaryKey = true;
+                break;
+            }
+        }
+        if(!hasprimaryKey) throw new IllegalArgumentException("Table must contain a primary key.");
+
 
         // Create query builder (because we don't want a new string in each iteration of a for loop)
         StringBuilder queryBuilder = new StringBuilder();
@@ -141,11 +151,11 @@ public class DDLGenerator {
         if(c.isZeroFill()) sql.append("ZEROFILL ");
         if(c.getDefaultValue() != null) {
             sql.append("DEFAULT ");
-            sql.append(c.getDefaultValue());
+            sql.append(c.getDefaultValue()).append(" ");
         }
         if(c.getGenerationExpression() != null) {
             sql.append("GENERATED ALWAYS AS ");
-            sql.append(c.getGenerationExpression());
+            sql.append(c.getGenerationExpression()).append(" ");
         }
         sql.setLength(sql.length() - 1); // Cut trailing space
         sql.append(",\n");

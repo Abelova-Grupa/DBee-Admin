@@ -42,4 +42,8 @@ public class PanelSchemaCreation implements Initializable {
         cbCharset.setItems(charsetObservableList);
         cbCollation.setItems(collationObservableList);
     }
+
+    private void generate() {
+
+    }
 }

@@ -34,7 +34,7 @@ public class PanelColumnTab implements Initializable {
         cbDataTypes.setItems(datatypes);
     }
 
-    public Column getColumnString(Table table) {
+    public Column getColumn(Table table) {
         return new Column.ColumnBuilder(txtName.getText(), cbDataTypes.getValue(), table)
             .setPrimaryKey(cbPrimary.isSelected())
             .setSize(txtSize.getText().isEmpty() ? null : Integer.parseInt(txtSize.getText()))
