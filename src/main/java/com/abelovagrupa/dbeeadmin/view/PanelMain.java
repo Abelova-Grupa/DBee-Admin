@@ -205,7 +205,9 @@ public class PanelMain implements Initializable {
 
     public void newTableTab() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelTableCreation.fxml"));
-
+        Tab tableTab = fxmlLoader.load();
+        editorController.editorTabs.getTabs().add(tableTab);
+        editorController.editorTabs.getSelectionModel().select(tableTab);
 //        Scene scene = new Scene(fxmlLoader.load());
 //        Stage stage = new Stage();
 //        stage.initModality(Modality.APPLICATION_MODAL);
