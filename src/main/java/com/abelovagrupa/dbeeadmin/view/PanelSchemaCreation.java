@@ -47,4 +47,8 @@ public class PanelSchemaCreation implements Initializable {
         cbCollation.setItems(collationObservableList);
         createDBImage.setImage(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/create-database.png").toExternalForm()));
     }
+
+    private void generate() {
+
+    }
 }
