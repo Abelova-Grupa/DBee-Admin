@@ -9,44 +9,47 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Tab?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTableCreation">
-   <children>
-      <HBox alignment="CENTER_LEFT" spacing="6.0">
-         <children>
-            <Label text="Table name:" />
-            <TextField prefHeight="26.0" prefWidth="204.0" />
-            <Label text="Engine:" />
-            <ComboBox fx:id="cbEngines" prefWidth="150.0" />
-         </children>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-         <padding>
-            <Insets bottom="12.0" left="6.0" top="12.0" />
-         </padding>
-      </HBox>
-      <ToolBar prefHeight="26.0" prefWidth="200.0">
-        <items>
-          <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
-        </items>
-      </ToolBar>
-      <ScrollPane fx:id="scrollColumns" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
-         <content>
-            <VBox fx:id="scrollContent" prefHeight="132.0" />
-         </content>
-      </ScrollPane>
-      <HBox alignment="CENTER_LEFT" spacing="6.0">
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-         <padding>
-            <Insets bottom="12.0" left="6.0" top="12.0" />
-         </padding>
-         <children>
-            <Button fx:id="btnSave" mnemonicParsing="false" text="Persist" />
-            <Button fx:id="btnSendDDL" mnemonicParsing="false" text="Send DDL To Editor" />
-         </children>
-      </HBox>
-   </children>
-</VBox>
+<Tab xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTableCreation">
+   <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
+      <children>
+         <HBox alignment="CENTER_LEFT" spacing="6.0">
+            <children>
+               <Label text="Table name:" />
+               <TextField prefHeight="26.0" prefWidth="204.0" />
+               <Label text="Engine:" />
+               <ComboBox fx:id="cbEngines" prefWidth="150.0" />
+            </children>
+            <opaqueInsets>
+               <Insets />
+            </opaqueInsets>
+            <padding>
+               <Insets bottom="12.0" left="6.0" top="12.0" />
+            </padding>
+         </HBox>
+         <ToolBar prefHeight="26.0" prefWidth="200.0">
+           <items>
+             <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
+           </items>
+         </ToolBar>
+         <ScrollPane fx:id="scrollColumns" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
+            <content>
+               <VBox fx:id="scrollContent" prefHeight="132.0" />
+            </content>
+         </ScrollPane>
+         <HBox alignment="CENTER_LEFT" spacing="6.0">
+            <opaqueInsets>
+               <Insets />
+            </opaqueInsets>
+            <padding>
+               <Insets bottom="12.0" left="6.0" top="12.0" />
+            </padding>
+            <children>
+               <Button fx:id="btnSave" mnemonicParsing="false" text="Persist" />
+               <Button fx:id="btnSendDDL" mnemonicParsing="false" text="Send DDL To Editor" />
+            </children>
+         </HBox>
+      </children>
+   </VBox>
+</Tab>
