@@ -13,6 +13,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -33,6 +35,8 @@ public class PanelSchemaCreation implements Initializable {
     @FXML
     public Button btnPersist;
 
+    @FXML
+    public ImageView createDBImage;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -41,5 +45,6 @@ public class PanelSchemaCreation implements Initializable {
 
         cbCharset.setItems(charsetObservableList);
         cbCollation.setItems(collationObservableList);
+        createDBImage.setImage(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/create-database.png").toExternalForm()));
     }
 }

@@ -2,24 +2,25 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<!--TODO: Fix margin-->
 <Tab text="New Schema" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelSchemaCreation">
       <VBox prefHeight="200.0"  spacing="6.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity">
          <children>
             <HBox alignment="CENTER_LEFT" spacing="6.0">
                <VBox.margin>
-                  <Insets top="20" left="100"/>
+                  <Insets top="20" left="20"/>
                </VBox.margin>
                <children>
-                  <Label text="Name:" />
+                  <ImageView fx:id="createDBImage" fitHeight="64.0" fitWidth="64.0" />
+                  <Label  text="Name:" />
                   <TextField prefHeight="26.0" prefWidth="380.0" />
                </children>
             </HBox>
             <HBox alignment="CENTER_LEFT" spacing="6.0">
                <VBox.margin>
-                  <Insets  left="100"/>
+                  <Insets  left="90"/>
                </VBox.margin>
                <children>
                   <Label text="Charset:" />
@@ -30,7 +31,7 @@
             </HBox>
             <HBox spacing="6.0">
                <VBox.margin>
-                  <Insets  left="100"/>
+                  <Insets top="10" left="90"/>
                </VBox.margin>
                <children>
                   <Button fx:id="btnPreview" mnemonicParsing="false" text="Preview SQL" />
