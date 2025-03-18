@@ -15,7 +15,7 @@
                <children>
                   <ImageView fx:id="createDBImage" fitHeight="64.0" fitWidth="64.0" />
                   <Label  text="Name:" />
-                  <TextField prefHeight="26.0" prefWidth="380.0" />
+                  <TextField fx:id="schemaNameTxtField" prefHeight="26.0" prefWidth="380.0" />
                </children>
             </HBox>
             <HBox alignment="CENTER_LEFT" spacing="6.0">
@@ -35,7 +35,7 @@
                </VBox.margin>
                <children>
                   <Button fx:id="btnPreview" mnemonicParsing="false" text="Preview SQL" />
-                  <Button fx:id="btnPersist" mnemonicParsing="false" text="Create" />
+                  <Button fx:id="btnPersist" mnemonicParsing="false" text="Create" onAction="#generate"/>
                </children>
             </HBox>
          </children>
