@@ -17,23 +17,23 @@
                 <children>
                     <ToolBar prefHeight="40.0" prefWidth="200.0">
                         <items>
-                            <Button mnemonicParsing="false" onAction="#runScript">
+                            <Button mnemonicParsing="false" prefWidth="38" onAction="#runScript">
                                 <graphic>
                                     <FontIcon iconLiteral="fas-angle-double-right:16" styleClass="font-icon"/>
                                 </graphic>
                                 <tooltip>
-                                    <Tooltip text="Execute Script" />
+                                    <Tooltip text="Execute Script (F7)" />
                                 </tooltip>
                             </Button>
-                            <Button mnemonicParsing="false">
+                            <Button mnemonicParsing="false" prefWidth="38" onAction="#runLine">
                                 <graphic>
                                     <FontIcon iconLiteral="fas-angle-right:16" styleClass="font-icon"/>
                                 </graphic>
                                 <tooltip>
-                                    <Tooltip text="Execute Line" />
+                                    <Tooltip text="Execute Line (F5)" />
                                 </tooltip>
                             </Button>
-                            <Button mnemonicParsing="false">
+                            <Button mnemonicParsing="false" disable="true" prefWidth="38">
                                 <graphic>
                                     <FontIcon iconLiteral="fas-file-import:16" styleClass="font-icon"/>
                                 </graphic>
@@ -41,7 +41,7 @@
                                     <Tooltip text="Import" />
                                 </tooltip>
                             </Button>
-                            <Button mnemonicParsing="false" onAction="#exportSQL">
+                            <Button mnemonicParsing="false" onAction="#exportSQL" prefWidth="38">
                                 <graphic>
                                     <FontIcon iconLiteral="fas-file-export:16" styleClass="font-icon"/>
                                 </graphic>

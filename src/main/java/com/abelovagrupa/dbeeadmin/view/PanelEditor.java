@@ -65,6 +65,9 @@ public class PanelEditor implements Initializable {
         }
     }
 
+    /**
+     * Creates a blank script tab.
+     */
     public void createNewScript(){
         try {
             // Each time the method is called a new controller is created i tried making all scripts share
@@ -81,12 +84,30 @@ public class PanelEditor implements Initializable {
         }
     }
 
+    /**
+     * Creates a new script tab with sql.
+     * @param sql SQL code to be displayed in new tab.
+     */
+    public void createNewScript(String sql){
 
+        if(sql == null) return;
 
+        try {
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelScript.fxml"));
+            Tab scriptTab = loader.load();
+            PanelScript newScriptController = loader.getController();
+            newScriptController.setEditorController(this);
+            newScriptController.setResultsController(resultsController);
+            editorTabs.getTabs().add(scriptTab);
+            editorTabs.getSelectionModel().select(scriptTab);
 
+            // Set SQL
 
+            newScriptController.codeArea.appendText(sql);
 
-
-
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

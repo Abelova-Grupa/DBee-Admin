@@ -52,7 +52,11 @@ public class PanelTableCreation implements Initializable {
 
     public void createTable() {
 
-        if(txtTableName.getText().isEmpty()) AlertManager.showErrorDialog(null, null, "Table name must not be empty.");
+        if(txtTableName.getText().isEmpty())
+        {
+            AlertManager.showErrorDialog(null, null, "Table name must not be empty.");
+            return;
+        }
 
         // TODO: Import schema from programstate instead of this.
         Schema tempSchema = new Schema.SchemaBuilder(txtTableName.getText().split("\\.")[0], null, null).build();

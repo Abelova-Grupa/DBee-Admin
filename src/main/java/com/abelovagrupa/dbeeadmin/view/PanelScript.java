@@ -1,6 +1,6 @@
 package com.abelovagrupa.dbeeadmin.view;
 
-import com.abelovagrupa.dbeeadmin.services.FileExporter;
+import com.abelovagrupa.dbeeadmin.services.FileProcessor;
 import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
 import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.beans.property.SimpleStringProperty;
@@ -184,7 +184,7 @@ public class PanelScript implements Initializable {
     }
 
     public void exportSQL() {
-        FileExporter.exportSQL(codeArea.getText());
+        FileProcessor.exportSQL(codeArea.getText());
     }
 
 }
