@@ -22,7 +22,7 @@
                                     <FontIcon iconLiteral="fas-angle-double-right:16" styleClass="font-icon"/>
                                 </graphic>
                                 <tooltip>
-                                    <Tooltip text="Execute Script" />
+                                    <Tooltip text="Execute Script (F7)" />
                                 </tooltip>
                             </Button>
                             <Button mnemonicParsing="false">
@@ -30,10 +30,10 @@
                                     <FontIcon iconLiteral="fas-angle-right:16" styleClass="font-icon"/>
                                 </graphic>
                                 <tooltip>
-                                    <Tooltip text="Execute Line" />
+                                    <Tooltip text="Execute Line (F5)" />
                                 </tooltip>
                             </Button>
-                            <Button mnemonicParsing="false">
+                            <Button mnemonicParsing="false" disable="true">
                                 <graphic>
                                     <FontIcon iconLiteral="fas-file-import:16" styleClass="font-icon"/>
                                 </graphic>

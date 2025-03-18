@@ -1,6 +1,7 @@
 package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.Main;
+import com.abelovagrupa.dbeeadmin.services.FileProcessor;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -293,8 +294,13 @@ public class PanelMain implements Initializable {
     }
 
     public void newScriptTab() {
-        editorController.setResultsController(resultsController);
+        editorController.setResultsController(resultsController); // Why?
         editorController.createNewScript();
+    }
+
+    public void importSQLToNewTab() {
+        editorController.setResultsController(resultsController);
+        editorController.createNewScript(FileProcessor.importSQL());
     }
 
 
