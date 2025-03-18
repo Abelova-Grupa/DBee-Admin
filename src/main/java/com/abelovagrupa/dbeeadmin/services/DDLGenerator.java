@@ -6,6 +6,8 @@ import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexType;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
+import com.abelovagrupa.dbeeadmin.model.schema.Charset;
+import com.abelovagrupa.dbeeadmin.model.schema.Collation;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.view.DialogSQLPreview;
@@ -38,13 +40,20 @@ public class DDLGenerator {
         if(schema.getCharset() == null) throw new IllegalArgumentException("Undefined schema character set.");
 
         // Create query
-        String query = "CREATE DATABASE " + schema.getName() + "\n" +
-            "CHARACTER SET " + schema.getCharset().name() + "\n" +
-            "COLLATE " + schema.getCollation().name() + ";";
+        String query = "CREATE DATABASE " + schema.getName() + "\n";
+        if(!schema.getCharset().equals(Charset.DEFAULT)){
+            query += " CHARACTER SET " + schema.getCharset().name() + "\n";
+            if(!schema.getCollation().equals(Collation.DEFAULT)){
+                query += "COLLATE " + schema.getCollation().name() + ";";
+            }
+        }
+        query += ";";
+        // Bad implementation
+        String finalQuery = query;
 
         // If preview is selected (user gets to decide whether sql should be executed)
         if(preview)
-            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(finalQuery);});
         else executeUpdate(query);
 
     }
