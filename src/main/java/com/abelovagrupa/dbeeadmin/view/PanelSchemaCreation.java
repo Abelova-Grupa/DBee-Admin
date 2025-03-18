@@ -7,6 +7,8 @@ import com.abelovagrupa.dbeeadmin.model.schema.Collation;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -43,10 +45,29 @@ public class PanelSchemaCreation implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ObservableList<Charset> charsetObservableList = FXCollections.observableArrayList(Charset.values());
-        ObservableList<Collation> collationObservableList = FXCollections.observableArrayList(Collation.values());
+//        ObservableList<Collation> collationObservableList = FXCollections.observableArrayList(Collation.values());
 
         cbCharset.setItems(charsetObservableList);
-        cbCollation.setItems(collationObservableList);
+        cbCollation.setDisable(true);
+        cbCharset.valueProperty().addListener(new ChangeListener<Charset>() {
+            @Override
+            public void changed(ObservableValue<? extends Charset> observableValue, Charset oldValue, Charset newValue) {
+                if(newValue != oldValue){
+                    cbCollation.setDisable(false);
+                    switch (newValue){
+                        case DEFAULT -> {
+                            cbCollation.getItems().clear();
+                            cbCollation.getItems().add(Collation.DEFAULT);
+                        }
+                        case ARMSCII8 -> {
+                            cbCollation.getItems().clear();
+                            cbCollation.getItems().addAll(Collation.ARMSCII8_BIN,Collation.ARMSCII8_GENERAL_CI);
+                        }
+                    }
+                }
+            }
+        });
+//       cbCollation.setItems(collationObservableList);
         createDBImage.setImage(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/create-database.png").toExternalForm()));
     }
 
