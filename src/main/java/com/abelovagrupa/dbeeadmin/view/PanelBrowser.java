@@ -18,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -40,6 +41,8 @@ public class PanelBrowser implements Initializable {
     private List<TreeView<String>> schemaViews;
 
     private PanelInfo infoController;
+
+    private String selectedSchemaName;
 
     @FXML
     VBox vboxBrowser;
@@ -210,6 +213,14 @@ public class PanelBrowser implements Initializable {
                 tableBranch.expandedProperty().addListener(tableBranchListener);
                 // TODO: REFACTOR
                 schemaView.setOnMouseClicked(event -> {
+
+                    // Selecting up active schema
+                    if(event.getButton().equals(MouseButton.PRIMARY)){
+                        if(event.getClickCount() == 2){
+                            selectedSchemaName = schemaView.getRoot().getValue();
+                        }
+                    }
+
                     Optional<TreeItem<String>> selectedItemOptional = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
                     Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
                     // Table selected
