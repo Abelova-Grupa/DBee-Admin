@@ -2,6 +2,7 @@ package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.services.FileProcessor;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -301,6 +302,33 @@ public class PanelMain implements Initializable {
     public void importSQLToNewTab() {
         editorController.setResultsController(resultsController);
         editorController.createNewScript(FileProcessor.importSQL());
+    }
+
+    public void dumpDatabase() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelDump.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.setTitle("DBee Admin - Dump Database");
+        stage.setScene(scene);
+
+        stage.setOnShown(event -> {
+            // Get the screen's bounds (width and height)
+            double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
+            double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
+
+            // Get the stage width and height
+            double stageWidth = stage.getWidth();
+            double stageHeight = stage.getHeight();
+
+            // Calculate the center position
+            stage.setX((screenWidth - stageWidth) / 2);
+            stage.setY((screenHeight - stageHeight) / 2);
+        });
+        scene.getStylesheets().add(Main.class.getResource("styles.css").toExternalForm());
+
+        Platform.runLater(stage::show);
     }
 
 
