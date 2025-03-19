@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<!--TODO: Table textFields shouldn't repeat in each tab-->
 <Tab text="New Table" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTableCreation">
    <TabPane side="BOTTOM">
       <tabs>
@@ -64,7 +65,7 @@
                         <Label text="Table name:" />
                         <TextField prefHeight="26.0" prefWidth="204.0" />
                         <Label text="Engine:" />
-                        <ComboBox fx:id="cbEngines" prefWidth="150.0" />
+                        <ComboBox fx:id="cbEnginesIndexes" prefWidth="150.0" />
                      </children>
                      <opaqueInsets>
                         <Insets />
@@ -78,9 +79,9 @@
                         <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
                      </items>
                   </ToolBar>
-                  <ScrollPane fx:id="scrollColumns" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
+                  <ScrollPane fx:id="scrollIndexes" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
                      <content>
-                        <VBox fx:id="scrollContent" prefHeight="132.0" />
+                        <VBox fx:id="scrollContentIndexes" prefHeight="132.0" />
                      </content>
                   </ScrollPane>
                   <HBox alignment="CENTER_LEFT" spacing="6.0">
@@ -91,8 +92,8 @@
                         <Insets bottom="12.0" left="6.0" top="12.0" />
                      </padding>
                      <children>
-                        <Button fx:id="btnSave" mnemonicParsing="false" text="Persist" />
-                        <Button fx:id="btnSendDDL" mnemonicParsing="false" text="Send DDL To Editor" />
+                        <Button fx:id="btnSaveIndexes" mnemonicParsing="false" text="Persist" />
+                        <Button fx:id="btnSendDDLIndexes" mnemonicParsing="false" text="Send DDL To Editor" />
                      </children>
                   </HBox>
                </children>
@@ -106,7 +107,7 @@
                         <Label text="Table name:" />
                         <TextField prefHeight="26.0" prefWidth="204.0" />
                         <Label text="Engine:" />
-                        <ComboBox fx:id="cbEngines" prefWidth="150.0" />
+                        <ComboBox fx:id="cbEnginesForeignKeys" prefWidth="150.0" />
                      </children>
                      <opaqueInsets>
                         <Insets />
@@ -120,9 +121,9 @@
                         <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
                      </items>
                   </ToolBar>
-                  <ScrollPane fx:id="scrollColumns" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
+                  <ScrollPane fx:id="scrollForeignKeys" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
                      <content>
-                        <VBox fx:id="scrollContent" prefHeight="132.0" />
+                        <VBox fx:id="scrollContentForeignKeys" prefHeight="132.0" />
                      </content>
                   </ScrollPane>
                   <HBox alignment="CENTER_LEFT" spacing="6.0">
@@ -133,8 +134,8 @@
                         <Insets bottom="12.0" left="6.0" top="12.0" />
                      </padding>
                      <children>
-                        <Button fx:id="btnSave" mnemonicParsing="false" text="Persist" />
-                        <Button fx:id="btnSendDDL" mnemonicParsing="false" text="Send DDL To Editor" />
+                        <Button fx:id="btnSaveForeignKeys" mnemonicParsing="false" text="Persist" />
+                        <Button fx:id="btnSendDDLForeignKeys" mnemonicParsing="false" text="Send DDL To Editor" />
                      </children>
                   </HBox>
                </children>
@@ -148,7 +149,7 @@
                         <Label text="Table name:" />
                         <TextField prefHeight="26.0" prefWidth="204.0" />
                         <Label text="Engine:" />
-                        <ComboBox fx:id="cbEngines" prefWidth="150.0" />
+                        <ComboBox fx:id="cbEnginesTrigger" prefWidth="150.0" />
                      </children>
                      <opaqueInsets>
                         <Insets />
@@ -162,9 +163,9 @@
                         <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
                      </items>
                   </ToolBar>
-                  <ScrollPane fx:id="scrollColumns" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
+                  <ScrollPane fx:id="scrollTriggers" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
                      <content>
-                        <VBox fx:id="scrollContent" prefHeight="132.0" />
+                        <VBox fx:id="scrollContentTriggers" prefHeight="132.0" />
                      </content>
                   </ScrollPane>
                   <HBox alignment="CENTER_LEFT" spacing="6.0">
@@ -175,8 +176,8 @@
                         <Insets bottom="12.0" left="6.0" top="12.0" />
                      </padding>
                      <children>
-                        <Button fx:id="btnSave" mnemonicParsing="false" text="Persist" />
-                        <Button fx:id="btnSendDDL" mnemonicParsing="false" text="Send DDL To Editor" />
+                        <Button fx:id="btnSaveTrigger" mnemonicParsing="false" text="Persist" />
+                        <Button fx:id="btnSendDDLTrigger" mnemonicParsing="false" text="Send DDL To Editor" />
                      </children>
                   </HBox>
                </children>
