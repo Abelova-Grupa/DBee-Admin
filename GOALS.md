@@ -11,7 +11,7 @@ This document contains a list of objectives that must be accomplished in order t
 - [ ] Database connector
 
 ### Visual schema operations
-- [ ] Schema creation
+- [x] Schema creation
   
 ### Visual table operations
 
