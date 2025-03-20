@@ -45,9 +45,10 @@ public class PanelTableCreation implements Initializable {
     public void addColumn() throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
         HBox column = loader.load();
-        columnControllers.add(loader.getController());
+        PanelColumnTab controller = loader.getController();
+        controller.setParent(scrollContent);
+        columnControllers.add(controller);
         scrollContent.getChildren().add(column);
-
     }
 
     public void createTable() {
@@ -63,6 +64,7 @@ public class PanelTableCreation implements Initializable {
         Table tempTable = new Table.TableBuilder(null, txtTableName.getText().split("\\.")[1], tempSchema, null).build();
         List<Column> columns = new LinkedList<>();
         for (PanelColumnTab c : columnControllers) {
+            if(c.isDeleted()) continue;
             columns.add(c.getColumn(tempTable));
         }
         tempTable.setColumns(columns);

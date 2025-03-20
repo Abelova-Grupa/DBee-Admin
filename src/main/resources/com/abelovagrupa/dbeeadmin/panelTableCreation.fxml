@@ -22,7 +22,7 @@
             <HBox alignment="CENTER_LEFT" spacing="6.0" BorderPane.alignment="TOP_CENTER">
                <children>
                   <Label text="Table name:" />
-                  <TextField prefHeight="26.0" prefWidth="204.0" />
+                  <TextField fx:id="txtTableName" prefHeight="26.0" prefWidth="204.0" />
                   <Label text="Engine:" />
                   <ComboBox fx:id="cbEngines" prefWidth="150.0" />
                </children>
@@ -108,7 +108,7 @@
          <bottom>
             <HBox alignment="CENTER_RIGHT">
                <children>
-                  <Button text="Apply">
+                  <Button text="Apply" onAction="#createTable">
                      <HBox.margin>
                         <Insets right="10" top="10" bottom="10"/>
                      </HBox.margin>

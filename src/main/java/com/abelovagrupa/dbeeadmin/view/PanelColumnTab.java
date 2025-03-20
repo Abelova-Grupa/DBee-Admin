@@ -5,10 +5,12 @@ import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.Parent;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
@@ -26,7 +28,12 @@ public class PanelColumnTab implements Initializable {
     public CheckBox cbUnique;
     public TextField txtDefault;
     public TextField txtComment;
-    public FontIcon btnDelete;
+    public Button btnDelete;
+    public HBox columnContainer;
+
+    private boolean deleted = false;
+
+    VBox parent;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -35,6 +42,9 @@ public class PanelColumnTab implements Initializable {
     }
 
     public Column getColumn(Table table) {
+
+        if(this.deleted) return null;
+
         return new Column.ColumnBuilder(txtName.getText(), cbDataTypes.getValue(), table)
             .setPrimaryKey(cbPrimary.isSelected())
             .setSize(txtSize.getText().isEmpty() ? null : Integer.parseInt(txtSize.getText()))
@@ -47,5 +57,18 @@ public class PanelColumnTab implements Initializable {
             .build();
     }
 
+    // Maybe there is a way to extract a superclass, will worry about optimization later.
+    public void setParent(VBox parent)
+    {
+        this.parent = parent;
+    }
 
+    public Boolean isDeleted() {
+        return deleted;
+    }
+
+    public void handleDelete(ActionEvent actionEvent) {
+        parent.getChildren().remove(columnContainer);
+        this.deleted = true;
+    }
 }
