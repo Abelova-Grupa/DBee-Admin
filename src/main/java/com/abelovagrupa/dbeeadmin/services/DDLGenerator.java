@@ -563,19 +563,24 @@ public class DDLGenerator {
         addIndex(schema,table,newIndex, false);
     }
 
-    public static void createTrigger(Schema schema, Table table, Trigger trigger) throws SQLException {
+    public static void createTrigger(Schema schema, Table table, Trigger trigger, boolean preview) throws SQLException {
         if(schema == null ) throw new IllegalArgumentException("Schema is not set");
         if(table == null) throw new IllegalArgumentException("Table is not set");
         if(trigger == null) throw new IllegalArgumentException("Trigger is not set");
 
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("CREATE TRIGGER ");
-        queryBuilder.append(trigger.getName()+" ");
-        queryBuilder.append(trigger.getTiming()+" ");
-        queryBuilder.append(trigger.getEvent()+" ON ");
+        StringBuilder queryBuilder = new StringBuilder("CREATE TRIGGER ");
+        queryBuilder.append(trigger.getName()).append(" ");
+        queryBuilder.append(trigger.getTiming()).append(" ");
+        queryBuilder.append(trigger.getEvent()).append(" ON ");
         queryBuilder.append(trigger.getTable().getName());
         queryBuilder.append(" FOR EACH ROW ");
         queryBuilder.append(trigger.getStatement());
+        queryBuilder.append(";");
+        String query = queryBuilder.toString();
+
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
     public static void dropTrigger(Trigger trigger,boolean preview) throws SQLException {
