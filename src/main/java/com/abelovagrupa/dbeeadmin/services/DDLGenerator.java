@@ -10,6 +10,7 @@ import com.abelovagrupa.dbeeadmin.model.schema.Charset;
 import com.abelovagrupa.dbeeadmin.model.schema.Collation;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import com.abelovagrupa.dbeeadmin.view.DialogSQLPreview;
 
 import java.sql.Connection;
@@ -562,4 +563,29 @@ public class DDLGenerator {
         addIndex(schema,table,newIndex, false);
     }
 
+    public static void createTrigger(Schema schema, Table table, Trigger trigger) throws SQLException {
+        if(schema == null ) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+        if(trigger == null) throw new IllegalArgumentException("Trigger is not set");
+
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("CREATE TRIGGER ");
+        queryBuilder.append(trigger.getName()+" ");
+        queryBuilder.append(trigger.getTiming()+" ");
+        queryBuilder.append(trigger.getEvent()+" ON ");
+        queryBuilder.append(trigger.getTable().getName());
+        queryBuilder.append(" FOR EACH ROW ");
+        queryBuilder.append(trigger.getStatement());
     }
+
+    public static void dropTrigger(Trigger trigger,boolean preview) throws SQLException {
+        if (trigger == null) throw new IllegalArgumentException("Trigger is not set");
+
+        String query = "DROP TRIGGER IF EXISTS " + trigger.getTable().getSchema().getName() + "." + trigger.getName();
+
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
+    }
+
+}
