@@ -14,6 +14,8 @@ import com.abelovagrupa.dbeeadmin.model.schema.Collation;
 import com.abelovagrupa.dbeeadmin.model.table.DBEngine;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.model.trigger.Event;
+import com.abelovagrupa.dbeeadmin.model.trigger.Timing;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 
 import java.sql.*;
@@ -645,6 +647,81 @@ public class DatabaseInspector {
         return indexedColumns;
     }
 
+    public List<Trigger> getTriggers(Schema schema) {
+        List<Trigger> triggers = new LinkedList<>();
+        String query = "SELECT TRIGGER_NAME, EVENT_MANIPULATION,ACTION_TIMING, EVENT_OBJECT_TABLE, ACTION_STATEMENT " +
+                "FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ?;";
+
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, schema.getName());
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Trigger trigger = new Trigger();
+                trigger.setName(rs.getString("TRIGGER_NAME"));
+                trigger.setEvent(Event.valueOf(rs.getString("EVENT_MANIPULATION").toUpperCase()));
+                trigger.setTiming(Timing.valueOf(rs.getString("ACTION_TIMING").toUpperCase()));
+                String tableName = rs.getString("EVENT_OBJECT_TABLE");
+                Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
+                trigger.setTable(table);
+                trigger.setStatement(rs.getString("ACTION_STATEMENT"));
+
+                triggers.add(trigger);
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error retrieving triggers: " + ex.getMessage());
+        }
+        return triggers;
+    }
+
+    public Trigger getTriggerByName(Schema schema, String name) {
+        Trigger trigger = new Trigger();
+
+        String query = "SELECT TRIGGER_NAME, EVENT_MANIPULATION, ACTION_TIMING, " +
+                "EVENT_OBJECT_TABLE, ACTION_STATEMENT, CREATED, " +
+                "DEFINER " +
+                "FROM INFORMATION_SCHEMA.TRIGGERS " +
+                "WHERE TRIGGER_NAME = ? AND TRIGGER_SCHEMA = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, name);
+            ps.setString(2, schema.getName());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    trigger.setName(rs.getString("TRIGGER_NAME"));
+
+                    String eventType = rs.getString("EVENT_MANIPULATION");
+                    String timingType = rs.getString("ACTION_TIMING");
+
+                    if (eventType != null) {
+                        trigger.setEvent(Event.valueOf(eventType.toUpperCase()));
+                    }
+                    if (timingType != null) {
+                        trigger.setTiming(Timing.valueOf(timingType.toUpperCase()));
+                    }
+
+
+                    Table table = DatabaseInspector.getInstance().getTableByName(schema, rs.getString("EVENT_OBJECT_TABLE"));
+                    if (table != null) {
+                        trigger.setTable(table);
+                    }
+
+                    trigger.setStatement(rs.getString("ACTION_STATEMENT"));
+
+                    if (rs.getTimestamp("CREATED") != null) {
+                        trigger.setCreatedAt(rs.getTimestamp("CREATED").toLocalDateTime());
+                    }
+
+                    trigger.setDefiner(rs.getString("DEFINER"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving trigger: " + e.getMessage());
+        }
+
+        return trigger;
+    }
 
 //    public static void main(String[] args) {
 //        DatabaseInspector di = new DatabaseInspector();
