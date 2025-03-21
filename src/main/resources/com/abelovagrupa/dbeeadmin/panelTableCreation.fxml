@@ -17,7 +17,7 @@
 
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
-g<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
 <Tab text="New Table" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTableCreation">
    <content>
@@ -66,11 +66,6 @@ g<?import javafx.scene.control.TableView?>
                   <Tab text="Indexes">
                      <VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
                         <children>
-                           <ToolBar prefHeight="26.0" prefWidth="200.0">
-                              <items>
-                                 <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
-                              </items>
-                           </ToolBar>
                            <GridPane>
                               <columnConstraints>
                                  <ColumnConstraints percentWidth="40"/>
@@ -107,11 +102,6 @@ g<?import javafx.scene.control.TableView?>
                   <Tab text="Foreign Keys">
                      <VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
                         <children>
-                           <ToolBar prefHeight="26.0" prefWidth="200.0">
-                              <items>
-                                 <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
-                              </items>
-                           </ToolBar>
                            <GridPane>
                               <columnConstraints>
                                  <ColumnConstraints percentWidth="40"/>
@@ -142,11 +132,6 @@ g<?import javafx.scene.control.TableView?>
                   <Tab text="Triggers">
                      <VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
                         <children>
-                           <ToolBar prefHeight="26.0" prefWidth="200.0">
-                              <items>
-                                 <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
-                              </items>
-                           </ToolBar>
                            <ScrollPane fx:id="scrollTriggers" hbarPolicy="NEVER" pannable="true" prefHeight="500.0">
                               <content>
                                  <VBox fx:id="scrollContentTriggers" prefHeight="132.0" />
