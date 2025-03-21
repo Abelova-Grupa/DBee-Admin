@@ -15,6 +15,12 @@
 <!--TODO: Table textFields shouldn't repeat in each tab-->
 <?import javafx.scene.layout.BorderPane?>
 
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
 <Tab text="New Table" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTableCreation">
    <content>
       <BorderPane>
@@ -46,11 +52,25 @@
                             <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
                           </items>
                         </ToolBar>
-                        <ScrollPane fx:id="scrollColumns" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
-                           <content>
-                              <VBox fx:id="scrollContent" prefHeight="132.0" />
-                           </content>
-                        </ScrollPane>
+                        <TableView fx:id="columnTable" GridPane.columnIndex="0">
+                           <columns>
+<!--                              TODO: Think of better variable names-->
+                              <TableColumn fx:id="columnNameColumn" text="Column Name" />
+                              <TableColumn fx:id="columnDataTypeColumn" text="Datatype" />
+                              <TableColumn fx:id="columnPKColumn" text="PK"/>
+                              <TableColumn fx:id="columnNNColumn" text="NN"/>
+                              <TableColumn fx:id="columnUQColumn" text="UQ"/>
+                              <TableColumn fx:id="columnZFColumn" text="ZF"/>
+                              <TableColumn fx:id="columnAIColumn" text="AI"/>
+                              <TableColumn fx:id="columnGColumn" text="G"/>
+                              <TableColumn fx:id="columnDefaultColumn" text="Default / Expression"/>
+                           </columns>
+                        </TableView>
+<!--                        <ScrollPane fx:id="scrollColumns" hbarPolicy="NEVER" pannable="true" prefHeight="500.0">-->
+<!--                           <content>-->
+<!--                              <VBox fx:id="scrollContent" prefHeight="132.0" />-->
+<!--                           </content>-->
+<!--                        </ScrollPane>-->
                      </children>
                   </VBox>
                   </Tab>
@@ -62,11 +82,36 @@
                                  <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
                               </items>
                            </ToolBar>
-                           <ScrollPane fx:id="scrollIndexes" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
-                              <content>
-                                 <VBox fx:id="scrollContentIndexes" prefHeight="132.0" />
-                              </content>
-                           </ScrollPane>
+                           <GridPane>
+                              <columnConstraints>
+                                 <ColumnConstraints percentWidth="40"/>
+                                 <ColumnConstraints percentWidth="40"/>
+                                 <ColumnConstraints percentWidth="20"/>
+                              </columnConstraints>
+
+                              <TableView fx:id="indexTable" GridPane.columnIndex="0">
+                                 <columns>
+                                    <TableColumn fx:id="indexNameColumn" text="Index Name" />
+                                    <TableColumn fx:id="referencedTableColumnIX" text="Type" />
+                                 </columns>
+                              </TableView>
+
+                              <TableView fx:id="indexColumnTable" GridPane.columnIndex="1">
+                                 <columns>
+<!--                                    TODO: Think of a better name for columns-->
+                                    <TableColumn fx:id="indexedColumnsCheckColumn"/>
+                                    <TableColumn fx:id="indexedColumnsNameColumn" text="Column" />
+                                    <TableColumn fx:id="indexedColumnsNoColumn" text="#" />
+                                    <TableColumn fx:id="indexedColumnOrderColumn" text="Order"/>
+                                    <TableColumn fx:id="indexedColumnOrderLength" text="Length"/>
+                                 </columns>
+                              </TableView>
+                              <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">
+                                 <content>
+                                 </content>
+                              </ScrollPane>
+                           </GridPane>
+
                         </children>
                      </VBox>
                   </Tab>
@@ -78,11 +123,30 @@
                                  <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
                               </items>
                            </ToolBar>
-                           <ScrollPane fx:id="scrollForeignKeys" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
-                              <content>
-                                 <VBox fx:id="scrollContentForeignKeys" prefHeight="132.0" />
-                              </content>
-                           </ScrollPane>
+                           <GridPane>
+                              <columnConstraints>
+                                 <ColumnConstraints percentWidth="40"/>
+                                 <ColumnConstraints percentWidth="40"/>
+                                 <ColumnConstraints percentWidth="20"/>
+                              </columnConstraints>
+
+                              <TableView fx:id="foreignKeyColumnsTable" GridPane.columnIndex="0">
+                                 <columns>
+                                    <TableColumn fx:id="foreignKeyNameColumn" text="Foreign Key Name" />
+                                    <TableColumn fx:id="referencedTableColumnFK" text="Referenced Table" />
+                                 </columns>
+                              </TableView>
+                              <TableView fx:id="foreignKeyTable" GridPane.columnIndex="1">
+                                 <columns>
+                                    <TableColumn fx:id="foreignKeyColumn" text="Column" />
+                                    <TableColumn fx:id="referencedColumnFK" text="Referenced Column" />
+                                 </columns>
+                              </TableView>
+                              <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">
+                                 <content>
+                                 </content>
+                              </ScrollPane>
+                           </GridPane>
                         </children>
                      </VBox>
                   </Tab>
@@ -94,7 +158,7 @@
                                  <Button mnemonicParsing="false" onAction="#addColumn" text="New" />
                               </items>
                            </ToolBar>
-                           <ScrollPane fx:id="scrollTriggers" hbarPolicy="NEVER" pannable="true" prefHeight="300.0">
+                           <ScrollPane fx:id="scrollTriggers" hbarPolicy="NEVER" pannable="true" prefHeight="500.0">
                               <content>
                                  <VBox fx:id="scrollContentTriggers" prefHeight="132.0" />
                               </content>

@@ -223,7 +223,7 @@ public class PanelBrowser implements Initializable {
 
                     Optional<TreeItem<String>> selectedItemOptional = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
                     Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-                    // Table selected
+
                     if (selectedItemOptional.isPresent()) {
                         TreeItem<String> selectedItem = selectedItemOptional.get();
                         Optional<Table> selectedTableOptional = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
