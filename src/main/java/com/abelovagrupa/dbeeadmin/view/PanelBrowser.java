@@ -8,6 +8,7 @@ import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -40,7 +41,7 @@ public class PanelBrowser implements Initializable {
 
     private List<TreeView<String>> schemaViews;
 
-//    private PanelInfo infoController;
+    private PanelInfoNew infoController;
 
     private String selectedSchemaName;
 
@@ -72,13 +73,13 @@ public class PanelBrowser implements Initializable {
         this.mainController = mainController;
     }
 
-//    public PanelInfo getInfoController() {
-//        return infoController;
-//    }
-//
-//    public void setInfoController(PanelInfo infoController) {
-//        this.infoController = infoController;
-//    }
+    public PanelInfoNew getInfoController() {
+        return infoController;
+    }
+
+    public void setInfoController(PanelInfoNew infoController) {
+        this.infoController = infoController;
+    }
 
     public TextField getSearchObjects() {
         return searchObjects;
@@ -218,6 +219,9 @@ public class PanelBrowser implements Initializable {
                     if(event.getButton().equals(MouseButton.PRIMARY)){
                         if(event.getClickCount() == 2){
                             selectedSchemaName = schemaView.getRoot().getValue();
+
+                            // Display active schema in info panel
+                            infoController.setSelected(DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName));
                         }
                     }
 
@@ -231,6 +235,10 @@ public class PanelBrowser implements Initializable {
                             Table selectedTable = selectedTableOptional.get();
                             if (getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem, tableBranch))) {
                                 // TODO: Table
+
+                                // Display table in info panel
+                                infoController.setSelected(selectedTable);
+
 //                                infoController.getColumnInfoPanel().setVisible(false);
 //                                infoController.getIndexInfoPanel().setVisible(false);
 //                                infoController.getForeignKeyInfoPanel().setVisible(false);
@@ -257,6 +265,9 @@ public class PanelBrowser implements Initializable {
                                 Column selectedColumn = DatabaseInspector.getInstance().getColumnByName(table, columnName);
                                 if (selectedColumn != null) {
                                     // TODO: Columns
+
+                                    // Display column in info panel
+                                    infoController.setSelected(selectedColumn);
 //                                    infoController.getColumnLabel().setText(columnName);
 //                                    infoController.getTableInfoPanel().setVisible(false);
 //                                    infoController.getIndexInfoPanel().setVisible(false);

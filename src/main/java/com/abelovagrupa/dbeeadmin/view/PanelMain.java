@@ -199,7 +199,7 @@ public class PanelMain implements Initializable {
 
 
 
-//        browserController.setInfoController(infoController);
+        browserController.setInfoController(infoController);
 //        for (PanelSchemaTree schemaTree : browserController.getSchemaControllers()) {
 //            schemaTree.setBrowserController(browserController);
 //        }

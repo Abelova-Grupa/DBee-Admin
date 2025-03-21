@@ -1,5 +1,11 @@
 package com.abelovagrupa.dbeeadmin.view;
 
+import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
+import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
@@ -73,6 +79,101 @@ public class PanelInfoNew implements Initializable {
         }
 
     }
+
+    /**
+     * Overload of addProperty with boolean parameters, for use in PanelInfoNew class.
+     * @see #addProperty(String, String, boolean, String...)
+     */
+    private void addProperty(String key, String value, boolean title, boolean primary, boolean foreign, boolean unique)
+    {
+        HBox propertyContainer = new HBox();
+        Label keyLabel = new Label(key);
+        Label valueLabel = new Label(value);
+
+        // TODO: Add icons for primary key, foreign key, and unique value
+            if(primary) {
+                keyLabel.setText(keyLabel.getText() + " (\uD83D\uDD11)");
+            }
+
+            if(foreign) {
+                keyLabel.setText(keyLabel.getText() + " (FK)");
+            }
+
+            if(unique) {
+                keyLabel.setText(keyLabel.getText() + " (U)");
+            }
+
+
+        // If title is selected, make fonts bigger; To be used for 'Selected table: <table_name>'
+        if(title) {
+            keyLabel.setFont(Font.font("System", 15));
+            valueLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
+        }
+
+        // Empty panel used to separate key and value evenly.
+        Pane filler = new Pane();
+        HBox.setHgrow(filler, Priority.ALWAYS);
+
+
+        // Add key, separator and then value
+        propertyContainer.getChildren().addAll(keyLabel, filler, valueLabel);
+
+        // Add property to the info panels content vbox.
+        infoContent.getChildren().add(propertyContainer);
+
+        // Purely aesthetic; Adds a separator if the title is selected
+        if(title) {
+            Separator separator = new Separator();
+            separator.setOrientation(Orientation.HORIZONTAL);
+            infoContent.getChildren().add(separator);
+        }
+
+    }
+
+
+    public void clearInfo() {
+        this.infoContent.getChildren().clear();
+    }
+
+    /*
+    setSelected is overloaded on purpose. I don't really want to think about what's selected in the browser
+    while displaying info.
+     */
+
+
+    public void setSelected(Schema schema) {
+        // TODO: Set selected schema in ProgramState.
+        clearInfo();
+        addProperty("Schema:", schema.getName(), true);
+        addProperty("Charset:", schema.getCharset().toString(), false);
+        addProperty("Collation:", schema.getCollation().toString(), false);
+        addProperty("Size:", Double.toString(schema.getDatabaseSize()), false);
+
+    }
+
+    public void setSelected(Table table) {
+        // TODO: Set selected schema and table in ProgramState
+        clearInfo();
+        addProperty("Table:", table.getSchema().getName() + "." + table.getName(), true);
+        for(var c : table.getColumns()) {
+            addProperty(c.getName(), c.getType().toString(), false, c.isPrimaryKey(), false, c.isUnique());
+        }
+    }
+
+    public void setSelected(Column column) {
+        // TODO: ProgramState
+        clearInfo();
+        addProperty("Column:", column.isPrimaryKey() ? column.getName() + " (\uD83D\uDD11)" : column.getName(), true);
+        addProperty("Type", column.getType().toString(), false);
+        // TODO: Implement size
+        addProperty("Default", column.getDefaultValue() == null ? "/" : column.getDefaultValue(), false);
+    }
+
+    public void setSelected(ForeignKey foreignKey) {}
+
+    public void setSelected(Index index) {}
+
+    public void setSelected(Trigger trigger) {}
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
