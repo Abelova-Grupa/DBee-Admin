@@ -1,14 +1,19 @@
 package com.abelovagrupa.dbeeadmin.services;
 
+import com.abelovagrupa.dbeeadmin.model.TableAttributes;
+import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 
 public class ProgramState {
 
+
     private static ProgramState instance = null;
 
     private Schema selectedSchema;
     private Table selectedTable;
+    private Column selectedColumn;
+    private TableAttributes selectedAttribute;
 
     private ProgramState() {
         System.out.println("Initializing program state.");
