@@ -40,113 +40,19 @@
          </top>
 
          <center>
-            <TabPane side="BOTTOM" BorderPane.alignment="CENTER">
+            <TabPane side="BOTTOM" BorderPane.alignment="CENTER" fx:id="tableAttributeTabPane">
                <tabs>
-                  <Tab text="Columns">
-                  <VBox  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
-                     <children>
-
-                        <TableView fx:id="columnTable" GridPane.columnIndex="0" VBox.vgrow="ALWAYS">
-                           <columns>
-<!--                              TODO: Think of better variable names-->
-                              <TableColumn fx:id="columnNameColumn" text="Column Name" />
-                              <TableColumn fx:id="columnDataTypeColumn" text="Datatype" />
-                              <TableColumn fx:id="columnPKColumn" text="PK"/>
-                              <TableColumn fx:id="columnNNColumn" text="NN"/>
-                              <TableColumn fx:id="columnUQColumn" text="UQ"/>
-                              <TableColumn fx:id="columnZFColumn" text="ZF"/>
-                              <TableColumn fx:id="columnAIColumn" text="AI"/>
-                              <TableColumn fx:id="columnGColumn" text="G"/>
-                              <TableColumn fx:id="columnDefaultColumn" text="Default / Expression"/>
-                           </columns>
-                        </TableView>
-                     </children>
-                  </VBox>
-                  </Tab>
-                  <Tab text="Indexes">
-                     <VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
-                        <children>
-                           <GridPane>
-                              <columnConstraints>
-                                 <ColumnConstraints percentWidth="40"/>
-                                 <ColumnConstraints percentWidth="40"/>
-                                 <ColumnConstraints percentWidth="20"/>
-                              </columnConstraints>
-
-                              <TableView fx:id="indexTable" GridPane.columnIndex="0">
-                                 <columns>
-                                    <TableColumn fx:id="indexNameColumn" text="Index Name" />
-                                    <TableColumn fx:id="referencedTableColumnIX" text="Type" />
-                                 </columns>
-                              </TableView>
-
-                              <TableView fx:id="indexColumnTable" GridPane.columnIndex="1">
-                                 <columns>
-<!--                                    TODO: Think of a better name for columns-->
-                                    <TableColumn fx:id="indexedColumnsCheckColumn"/>
-                                    <TableColumn fx:id="indexedColumnsNameColumn" text="Column" />
-                                    <TableColumn fx:id="indexedColumnsNoColumn" text="#" />
-                                    <TableColumn fx:id="indexedColumnOrderColumn" text="Order"/>
-                                    <TableColumn fx:id="indexedColumnOrderLength" text="Length"/>
-                                 </columns>
-                              </TableView>
-                              <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">
-                                 <content>
-                                 </content>
-                              </ScrollPane>
-                           </GridPane>
-
-                        </children>
-                     </VBox>
-                  </Tab>
-                  <Tab text="Foreign Keys">
-                     <VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
-                        <children>
-                           <GridPane>
-                              <columnConstraints>
-                                 <ColumnConstraints percentWidth="40"/>
-                                 <ColumnConstraints percentWidth="40"/>
-                                 <ColumnConstraints percentWidth="20"/>
-                              </columnConstraints>
-
-                              <TableView fx:id="foreignKeyColumnsTable" GridPane.columnIndex="0">
-                                 <columns>
-                                    <TableColumn fx:id="foreignKeyNameColumn" text="Foreign Key Name" />
-                                    <TableColumn fx:id="referencedTableColumnFK" text="Referenced Table" />
-                                 </columns>
-                              </TableView>
-                              <TableView fx:id="foreignKeyTable" GridPane.columnIndex="1">
-                                 <columns>
-                                    <TableColumn fx:id="foreignKeyColumn" text="Column" />
-                                    <TableColumn fx:id="referencedColumnFK" text="Referenced Column" />
-                                 </columns>
-                              </TableView>
-                              <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">
-                                 <content>
-                                 </content>
-                              </ScrollPane>
-                           </GridPane>
-                        </children>
-                     </VBox>
-                  </Tab>
-                  <Tab text="Triggers">
-                     <VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
-                        <children>
-                           <ScrollPane fx:id="scrollTriggers" hbarPolicy="NEVER" pannable="true" prefHeight="500.0">
-                              <content>
-                                 <VBox fx:id="scrollContentTriggers" prefHeight="132.0" />
-                              </content>
-                           </ScrollPane>
-                        </children>
-                     </VBox>
-                  </Tab>
+                   <!--Insert column tab here-->
+                   <!--Insert index tab here-->
+                   <!--Insert foreign ket tab here-->
+                   <!--Insert trigger tab here-->
                </tabs>
             </TabPane>
          </center>
          <bottom>
             <HBox alignment="CENTER_RIGHT">
                <children>
-                  <Button text="Apply" onAction="#createTable">
+                  <Button text="Apply">
                      <HBox.margin>
                         <Insets right="10" top="10" bottom="10"/>
                      </HBox.margin>

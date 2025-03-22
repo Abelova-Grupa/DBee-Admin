@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<Tab text="Triggers" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTriggerTab">
+    <VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
+        <children>
+            <ScrollPane fx:id="scrollTriggers" hbarPolicy="NEVER" pannable="true" prefHeight="500.0">
+                <content>
+                    <VBox fx:id="scrollContentTriggers" prefHeight="132.0" />
+                </content>
+            </ScrollPane>
+        </children>
+    </VBox>
+</Tab>
