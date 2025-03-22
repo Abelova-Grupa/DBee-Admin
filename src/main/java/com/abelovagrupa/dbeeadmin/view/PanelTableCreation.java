@@ -13,24 +13,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class PanelTableCreation implements Initializable {
-
-    @FXML
-    ScrollPane scrollColumns;
-
-    @FXML
-    VBox scrollContent;
 
     @FXML
     ComboBox<DBEngine> cbEngines;
@@ -40,42 +28,6 @@ public class PanelTableCreation implements Initializable {
 
     @FXML
     TabPane tableAttributeTabPane;
-
-    List<PanelColumnTab> columnControllers;
-
-
-//    public void addColumn() throws IOException {
-//        FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
-//        HBox column = loader.load();
-//        PanelColumnTab controller = loader.getController();
-//        controller.setParent(scrollContent);
-//        columnControllers.add(controller);
-//        scrollContent.getChildren().add(column);
-//    }
-
-//    public void createTable() {
-//
-//        if(txtTableName.getText().isEmpty())
-//        {
-//            AlertManager.showErrorDialog(null, null, "Table name must not be empty.");
-//            return;
-//        }
-//
-//        // TODO: Import schema from programstate instead of this.
-//        Schema tempSchema = new Schema.SchemaBuilder(txtTableName.getText().split("\\.")[0], null, null).build();
-//        Table tempTable = new Table.TableBuilder(null, txtTableName.getText().split("\\.")[1], tempSchema, null).build();
-//        List<Column> columns = new LinkedList<>();
-//        for (PanelColumnTab c : columnControllers) {
-//            if(c.isDeleted()) continue;
-//            columns.add(c.getColumn(tempTable));
-//        }
-//        tempTable.setColumns(columns);
-//        try {
-//            DDLGenerator.createTable(tempTable, true);
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -105,10 +57,35 @@ public class PanelTableCreation implements Initializable {
             throw new RuntimeException(e);
         }
 
-
+        // Filling comboBox with engine values
         ObservableList<DBEngine> engines = FXCollections.observableArrayList(DBEngine.values());
         cbEngines.setItems(engines);
 
-
     }
+
+//    public void createTable() {
+//
+//        if(txtTableName.getText().isEmpty())
+//        {
+//            AlertManager.showErrorDialog(null, null, "Table name must not be empty.");
+//            return;
+//        }
+//
+//        // TODO: Import schema from programstate instead of this.
+//        Schema tempSchema = new Schema.SchemaBuilder(txtTableName.getText().split("\\.")[0], null, null).build();
+//        Table tempTable = new Table.TableBuilder(null, txtTableName.getText().split("\\.")[1], tempSchema, null).build();
+//        List<Column> columns = new LinkedList<>();
+//        for (PanelColumnTab c : columnControllers) {
+//            if(c.isDeleted()) continue;
+//            columns.add(c.getColumn(tempTable));
+//        }
+//        tempTable.setColumns(columns);
+//        try {
+//            DDLGenerator.createTable(tempTable, true);
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
+
 }
