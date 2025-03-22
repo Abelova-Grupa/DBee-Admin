@@ -44,12 +44,12 @@ public class PanelIndexTab implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        setColumnWidth();
-        setColumnResizable(false);
+        setColumnsWidth();
+        setColumnsResizable(false);
         setColumnsReorderable(false);
     }
 
-    public void setColumnWidth(){
+    public void setColumnsWidth(){
         // Setting width of index table
         ReadOnlyDoubleProperty indexTableWidthProperty = indexTable.widthProperty();
         indexNameColumn.prefWidthProperty().bind(indexTableWidthProperty.multiply(0.3));
@@ -73,7 +73,7 @@ public class PanelIndexTab implements Initializable {
         }
     }
 
-    public void setColumnResizable(boolean isResizable){
+    public void setColumnsResizable(boolean isResizable){
         for(TableColumn<?,?> column : indexTable.getColumns()){
             column.setResizable(isResizable);
         }

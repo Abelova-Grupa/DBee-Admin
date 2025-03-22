@@ -44,12 +44,12 @@ public class PanelColumnTab implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        setColumnWidth();
+        setColumnsWidth();
         setColumnsReorderable(false);
-        setColumnResizable(false);
+        setColumnsResizable(false);
     }
 
-    public void setColumnWidth(){
+    public void setColumnsWidth(){
         // Current solution is to set columns widths to all sum up to 1 - table width
         ReadOnlyDoubleProperty tableWidthProperty = columnTable.widthProperty();
         columnNameColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.35));
@@ -71,7 +71,7 @@ public class PanelColumnTab implements Initializable{
         }
     }
 
-    public void setColumnResizable(boolean isResizable){
+    public void setColumnsResizable(boolean isResizable){
         for(TableColumn<?,?> column : columnTable.getColumns()){
             column.setResizable(isResizable);
         }
