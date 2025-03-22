@@ -9,6 +9,7 @@ import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
+import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -26,6 +27,7 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -224,10 +226,7 @@ public class PanelBrowser implements Initializable {
                         infoController.setSelected(DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName));
 
                         if(event.getClickCount() == 2){
-                            selectedSchemaName = schemaView.getRoot().getValue();
 
-                            // Display active schema in info panel
-                            infoController.setSelected(DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName));
                         }
                     }
 
@@ -244,6 +243,19 @@ public class PanelBrowser implements Initializable {
 
                                 // Display table in info panel
                                 infoController.setSelected(selectedTable);
+
+                                // Do SELECT on double click
+                                if(event.getClickCount() == 2) {
+                                    try {
+                                        mainController.resultsController.printResultSetToTable(
+                                            QueryExecutor.executeQuery(
+                                                "SELECT * FROM " + selectedSchemaName + "." + selectedTable.getName()
+                                            ).getFirst()
+                                        );
+                                    } catch (SQLException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
 
 //                                infoController.getColumnInfoPanel().setVisible(false);
 //                                infoController.getIndexInfoPanel().setVisible(false);
