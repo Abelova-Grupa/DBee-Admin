@@ -1,42 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
 
-<HBox alignment="CENTER_LEFT" fx:id="columnContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="38.0" spacing="5.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelColumnTab">
-   <children>
-      <Label text="Name:" />
-      <TextField fx:id="txtName" prefHeight="26.0" prefWidth="116.0" />
-      <Label text="Type:" />
-      <ComboBox fx:id="cbDataTypes" prefHeight="26.0" prefWidth="100.0" />
-      <Label text="Size:" />
-      <TextField fx:id="txtSize" prefHeight="26.0" prefWidth="42.0" />
-      <CheckBox fx:id="cbZerofill" mnemonicParsing="false" text="Zerofill" />
-      <Separator orientation="VERTICAL" prefHeight="200.0" />
-      <CheckBox fx:id="cbPrimary" mnemonicParsing="false" text="Primary Key" />
-      <CheckBox fx:id="cbNotNull" mnemonicParsing="false" text="Not Null" />
-      <CheckBox fx:id="cbAutoIncrement" mnemonicParsing="false" text="Auto Increment" />
-      <Separator orientation="VERTICAL" prefHeight="200.0" />
-      <CheckBox fx:id="cbUnique" mnemonicParsing="false" text="Unique" />
-      <Separator orientation="VERTICAL" prefHeight="200.0" />
-      <Label text="Default:" />
-      <TextField fx:id="txtDefault" prefHeight="26.0" prefWidth="62.0" />
-      <Label text="Comment:" />
-      <TextField fx:id="txtComment" prefHeight="26.0" prefWidth="78.0" />
-      <Button mnemonicParsing="false" fx:id="btnDelete" onAction="#handleDelete">
-         <graphic>
-            <FontIcon iconLiteral="fas-trash" iconSize="16" styleClass="font-icon" />
-         </graphic>
-      </Button>
-   </children>
-   <padding>
-      <Insets bottom="6.0" left="12.0" right="2.0" top="6.0" />
-   </padding>
-</HBox>
+<Tab text="Columns" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelColumnTab">
+   <VBox minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
+      <children>
+         <TableView fx:id="columnTable" VBox.vgrow="ALWAYS">
+            <columns>
+               <!--TODO: Think of better variable names-->
+               <TableColumn fx:id="columnNameColumn" text="Column Name" />
+               <TableColumn fx:id="columnDataTypeColumn" text="Datatype" />
+               <TableColumn fx:id="columnPKColumn" text="PK"/>
+               <TableColumn fx:id="columnNNColumn" text="NN"/>
+               <TableColumn fx:id="columnUQColumn" text="UQ"/>
+               <TableColumn fx:id="columnZFColumn" text="ZF"/>
+               <TableColumn fx:id="columnAIColumn" text="AI"/>
+               <TableColumn fx:id="columnGColumn" text="G"/>
+               <TableColumn fx:id="columnDefaultColumn" text="Default / Expression"/>
+            </columns>
+         </TableView>
+      </children>
+   </VBox>
+</Tab>
+

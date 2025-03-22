@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<Tab text="Indexes" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelIndexTab">
+    <VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
+        <children>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="40"/>
+                    <ColumnConstraints percentWidth="40"/>
+                    <ColumnConstraints percentWidth="20"/>
+                </columnConstraints>
+
+                <TableView fx:id="indexTable" GridPane.columnIndex="0">
+                    <columns>
+                        <TableColumn fx:id="indexNameColumn" text="Index Name" />
+                        <TableColumn fx:id="referencedTableColumnIX" text="Type" />
+                    </columns>
+                </TableView>
+
+                <TableView fx:id="indexColumnTable" GridPane.columnIndex="1">
+                    <columns>
+                        <!--                                    TODO: Think of a better name for columns-->
+                        <TableColumn fx:id="indexedColumnsCheckColumn"/>
+                        <TableColumn fx:id="indexedColumnsNameColumn" text="Column" />
+                        <TableColumn fx:id="indexedColumnsNoColumn" text="#" />
+                        <TableColumn fx:id="indexedColumnOrderColumn" text="Order"/>
+                        <TableColumn fx:id="indexedColumnLength" text="Length"/>
+                    </columns>
+                </TableView>
+                <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">
+                    <content>
+                    </content>
+                </ScrollPane>
+            </GridPane>
+
+        </children>
+    </VBox>
+</Tab>

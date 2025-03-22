@@ -2,73 +2,78 @@ package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.column.DataType;
-import com.abelovagrupa.dbeeadmin.model.table.Table;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class PanelColumnTab implements Initializable {
+public class PanelColumnTab implements Initializable{
 
-    public TextField txtName;
-    public ComboBox<DataType> cbDataTypes;
-    public TextField txtSize;
-    public CheckBox cbZerofill;
-    public CheckBox cbPrimary;
-    public CheckBox cbNotNull;
-    public CheckBox cbAutoIncrement;
-    public CheckBox cbUnique;
-    public TextField txtDefault;
-    public TextField txtComment;
-    public Button btnDelete;
-    public HBox columnContainer;
+    @FXML
+    TableView<Column> columnTable;
 
-    private boolean deleted = false;
+    @FXML
+    TableColumn<Column,String> columnNameColumn;
 
-    VBox parent;
+    @FXML
+    TableColumn<Column,DataType> columnDataTypeColumn;
+
+    @FXML
+    TableColumn<Column,Boolean> columnPKColumn;
+
+    @FXML
+    TableColumn<Column,Boolean> columnNNColumn;
+
+    @FXML
+    TableColumn<Column,Boolean> columnUQColumn;
+
+    @FXML
+    TableColumn<Column,Boolean> columnZFColumn;
+
+    @FXML
+    TableColumn<Column,Boolean> columnAIColumn;
+
+    @FXML
+    TableColumn<Column,Boolean> columnGColumn;
+
+    @FXML
+    TableColumn<Column,String> columnDefaultColumn;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        ObservableList<DataType> datatypes = FXCollections.observableArrayList(DataType.values());
-        cbDataTypes.setItems(datatypes);
+        setColumnsWidth();
+        setColumnsReorderable(false);
+        setColumnsResizable(false);
     }
 
-    public Column getColumn(Table table) {
+    public void setColumnsWidth(){
+        // Current solution is to set columns widths to all sum up to 1 - table width
+        ReadOnlyDoubleProperty tableWidthProperty = columnTable.widthProperty();
+        columnNameColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.35));
+        columnDataTypeColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.20));
+        columnPKColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
+        columnNNColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
+        columnPKColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
+        columnUQColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
+        columnZFColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
+        columnAIColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
+        columnGColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
+        columnDefaultColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.235));
 
-        if(this.deleted) return null;
-
-        return new Column.ColumnBuilder(txtName.getText(), cbDataTypes.getValue(), table)
-            .setPrimaryKey(cbPrimary.isSelected())
-            .setSize(txtSize.getText().isEmpty() ? null : Integer.parseInt(txtSize.getText()))
-            .setZeroFill(cbZerofill.isSelected())
-            .setNotNull(cbNotNull.isSelected())
-            .setAutoIncrement(cbAutoIncrement.isSelected())
-            .setUnique(cbUnique.isSelected())
-            .setDefaultValue(txtDefault.getText().isEmpty() ? null : txtDefault.getText())
-            .setComment(txtComment.getText().isEmpty() ? null : txtComment.getText())
-            .build();
     }
 
-    // Maybe there is a way to extract a superclass, will worry about optimization later.
-    public void setParent(VBox parent)
-    {
-        this.parent = parent;
+    public void setColumnsReorderable(boolean isReorderable){
+        for(TableColumn<?,?> column : columnTable.getColumns()){
+            column.setReorderable(isReorderable);
+        }
     }
 
-    public Boolean isDeleted() {
-        return deleted;
-    }
-
-    public void handleDelete(ActionEvent actionEvent) {
-        parent.getChildren().remove(columnContainer);
-        this.deleted = true;
+    public void setColumnsResizable(boolean isResizable){
+        for(TableColumn<?,?> column : columnTable.getColumns()){
+            column.setResizable(isResizable);
+        }
     }
 }
