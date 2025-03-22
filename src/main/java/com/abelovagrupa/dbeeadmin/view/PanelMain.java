@@ -133,7 +133,7 @@ public class PanelMain implements Initializable {
             Parent root = fxmlLoader.load();
             setInfoController(fxmlLoader.getController());
             leftPane.getItems().add(root);
-            leftPane.setDividerPositions(0.6);
+            leftPane.setDividerPositions(0.7);
             // TODO: Add info controller if necessary.
 //            infoController.setMainController(this);
 
@@ -166,7 +166,7 @@ public class PanelMain implements Initializable {
             setResultsController(fxmlLoader.getController());
             centerPane.getItems().add(root);
             resultsController.setMainController(this);
-
+            centerPane.setDividerPositions(0.7);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

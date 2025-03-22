@@ -9,7 +9,7 @@
 <SplitPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.abelovagrupa.dbeeadmin.view.PanelResults"
-               dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+               dividerPositions="0.7" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
     <items>
         <TableView fx:id="resultsTable" prefHeight="200.0" prefWidth="200.0" />
         <ScrollPane fx:id="historyPane" prefHeight="200.0" prefWidth="200.0">
