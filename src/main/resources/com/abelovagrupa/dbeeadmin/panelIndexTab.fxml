@@ -16,7 +16,7 @@
                 <TableView fx:id="indexTable" GridPane.columnIndex="0">
                     <columns>
                         <TableColumn fx:id="indexNameColumn" text="Index Name" />
-                        <TableColumn fx:id="referencedTableColumnIX" text="Type" />
+                        <TableColumn fx:id="referencedTableColumnIX" text="Referenced Table" />
                     </columns>
                 </TableView>
 
@@ -27,7 +27,7 @@
                         <TableColumn fx:id="indexedColumnsNameColumn" text="Column" />
                         <TableColumn fx:id="indexedColumnsNoColumn" text="#" />
                         <TableColumn fx:id="indexedColumnOrderColumn" text="Order"/>
-                        <TableColumn fx:id="indexedColumnOrderLength" text="Length"/>
+                        <TableColumn fx:id="indexedColumnLength" text="Length"/>
                     </columns>
                 </TableView>
                 <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">
