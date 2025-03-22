@@ -217,6 +217,12 @@ public class PanelBrowser implements Initializable {
 
                     // Selecting up active schema
                     if(event.getButton().equals(MouseButton.PRIMARY)){
+
+                        // Fetch schema name
+                        selectedSchemaName = schemaView.getRoot().getValue();
+                        // Display active schema in info panel
+                        infoController.setSelected(DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName));
+
                         if(event.getClickCount() == 2){
                             selectedSchemaName = schemaView.getRoot().getValue();
 
