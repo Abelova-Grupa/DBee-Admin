@@ -153,7 +153,9 @@ public class PanelBrowser implements Initializable {
                                             columnBranch.getChildren().remove(columnDummy);
                                             Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
                                             for (Column column : table.getColumns()) {
-                                                TreeItem<String> columnNode = new TreeItem<>(column.getName());
+                                                // Adding key icon to primary key columns. Aesthetic :)
+                                                String columnName = column.isPrimaryKey() ? column.getName() + " (\uD83D\uDD11)" : column.getName();
+                                                TreeItem<String> columnNode = new TreeItem<>(columnName);
                                                 columnBranch.getChildren().add(columnNode);
                                             }
                                             columnBranch.expandedProperty().removeListener(this);
@@ -267,7 +269,8 @@ public class PanelBrowser implements Initializable {
                         try {
                             if (selectedItem.getParent().getValue().equals("Columns") && getTreeItemDepth(selectedItem) == 5) {
                                 // TODO: make it efficient, for now it works
-                                String columnName = selectedItem.getValue();
+                                // Removes key icon from name (after " ") for searching
+                                String columnName = selectedItem.getValue().split(" ")[0];
                                 Table table = DatabaseInspector.getInstance().getTableByName(schema, selectedItem.getParent().getParent().getValue());
                                 Column selectedColumn = DatabaseInspector.getInstance().getColumnByName(table, columnName);
                                 if (selectedColumn != null) {
