@@ -123,6 +123,14 @@
                   <Tooltip text="New Table" />
                </tooltip>
             </Button>
+            <Button fx:id="btnNewView" mnemonicParsing="false" onAction="#newViewTab" prefWidth="38.0">
+                <graphic>
+                    <FontIcon iconLiteral="fas-eye" iconSize="16" styleClass="font-icon" />
+                </graphic>
+                <tooltip>
+                    <Tooltip text="New View" />
+                </tooltip>
+            </Button>
             <Separator orientation="VERTICAL" prefHeight="12.0">
                <padding>
                   <Insets left="3.0" />
