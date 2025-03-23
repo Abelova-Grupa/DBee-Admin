@@ -1,17 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<SplitPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-           fx:controller="com.abelovagrupa.dbeeadmin.view.PanelResults"
-               dividerPositions="0.7" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+<SplitPane dividerPositions="0.7" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelResults">
     <items>
-        <TableView fx:id="resultsTable" prefHeight="200.0" prefWidth="200.0" />
+      <VBox>
+         <children>
+            <ToolBar prefHeight="40.0">
+              <items>
+                <Button fx:id="btnExportTable" mnemonicParsing="false" prefWidth="38.0" onAction="#exportResultsToFile">
+                  <graphic>
+                      <FontIcon iconLiteral="fas-save" iconSize="16" styleClass="font-icon" />
+                  </graphic>
+                  <tooltip>
+                      <Tooltip text="Save results to file..." />
+                  </tooltip>
+                </Button>
+              </items>
+            </ToolBar>
+              <TableView fx:id="resultsTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
         <ScrollPane fx:id="historyPane" prefHeight="200.0" prefWidth="200.0">
             <content>
                 <VBox fx:id="resultContainer" prefHeight="200.0" />

@@ -1,9 +1,13 @@
 package com.abelovagrupa.dbeeadmin.services;
 
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
 
 import java.io.*;
+import java.lang.reflect.Method;
 
 /**
  * Utility class responsible for importing and exporting files.
@@ -74,6 +78,50 @@ public class FileProcessor {
             AlertManager.showErrorDialog(null, null, "Error reading file: " + e.getMessage());
         }
         return content.toString();
+    }
+
+    public static void saveTableToCSV(TableView<ObservableList<String>> tableView) {
+        // Create a FileChooser to select the file path
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setInitialFileName("output.csv");
+        File selectedFile = fileChooser.showSaveDialog(null);
+
+        if (selectedFile != null) {
+            // If a file was selected, save the TableView data to CSV
+            saveTableViewToCSV(tableView, selectedFile.getAbsolutePath());
+        } else {
+            System.err.println("No file selected.");
+        }
+    }
+
+    // Method to save data to CSV (same as before)
+    private static void saveTableViewToCSV(TableView<ObservableList<String>> tableView, String filePath) {
+        ObservableList<ObservableList<String>> items = tableView.getItems();
+        StringBuilder csvContent = new StringBuilder();
+
+        // Write the header (column names)
+        for (TableColumn<?, ?> column : tableView.getColumns()) {
+            csvContent.append(column.getText()).append(",");
+        }
+        csvContent.setLength(csvContent.length() - 1);  // Remove trailing comma
+        csvContent.append("\n");
+
+        // Write rows
+        for (ObservableList<String> item : items) {
+            for (String value : item) {
+                csvContent.append(value != null ? value : "").append(",");
+            }
+            csvContent.setLength(csvContent.length() - 1);  // Remove trailing comma
+            csvContent.append("\n");
+        }
+
+        // Write the content to the file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write(csvContent.toString());
+        } catch (IOException e) {
+            System.err.println("Error saving the CSV file.");
+        }
     }
 
 }
