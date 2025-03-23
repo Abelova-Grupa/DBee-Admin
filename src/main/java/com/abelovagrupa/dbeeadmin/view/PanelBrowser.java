@@ -9,6 +9,7 @@ import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
+import com.abelovagrupa.dbeeadmin.services.ProgramState;
 import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -222,8 +223,10 @@ public class PanelBrowser implements Initializable {
 
                         // Fetch schema name
                         selectedSchemaName = schemaView.getRoot().getValue();
-                        // Display active schema in info panel
-                        infoController.setSelected(DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName));
+                        // Display active schema in info panel and set in programState
+                        Schema selectedSchema = DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName);
+                        infoController.setSelected(selectedSchema);
+                        ProgramState.getInstance().setSelectedSchema(selectedSchema);
 
                         if(event.getClickCount() == 2){
 
@@ -242,6 +245,9 @@ public class PanelBrowser implements Initializable {
 
                                 // Display table in info panel
                                 infoController.setSelected(selectedTable);
+
+                                // Set selected table in ProgramState
+                                ProgramState.getInstance().setSelectedTable(selectedTable);
 
                                 // Do SELECT on double click
                                 if(event.getClickCount() == 2) {
