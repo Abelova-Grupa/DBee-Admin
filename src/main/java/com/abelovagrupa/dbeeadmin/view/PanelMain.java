@@ -311,6 +311,14 @@ public class PanelMain implements Initializable {
         editorController.createNewScript(FileProcessor.importSQL());
     }
 
+    public void newViewTab() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelViewCreation.fxml"));
+        Tab view = new Tab("New View");
+        view.setContent(fxmlLoader.load());
+        editorController.editorTabs.getTabs().add(view);
+        editorController.editorTabs.getSelectionModel().select(view);
+    }
+
     public void dumpDatabase() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelDump.fxml"));
         Scene scene = new Scene(fxmlLoader.load());

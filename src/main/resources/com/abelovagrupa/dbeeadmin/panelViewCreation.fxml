@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.fxmisc.richtext.CodeArea?>
+
+<VBox spacing="6.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelViewCreation">
+   <children>
+      <HBox alignment="CENTER_LEFT" spacing="6.0">
+         <children>
+            <Label text="Schema:" />
+            <ComboBox fx:id="cbSchema" prefWidth="256.0" promptText="Select Schema" />
+            <Label text="Name:" />
+            <TextField fx:id="txtName" promptText="Enter view name" HBox.hgrow="ALWAYS" />
+         </children>
+         <padding>
+            <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+         </padding>
+      </HBox>
+      <Separator prefWidth="200.0" />
+      <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS" />
+      <HBox alignment="CENTER_LEFT" spacing="6.0">
+         <padding>
+            <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+         </padding>
+         <children>
+            <Label text="Algorithm:" />
+            <ComboBox fx:id="cbAlgorithm" prefWidth="150.0" promptText="Select Algorithm" />
+            <AnchorPane HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnPreview" mnemonicParsing="false" onAction="#preview" text="Preview DDL" />
+            <Button fx:id="btnPersist" mnemonicParsing="false" onAction="#persist" text="Persist" />
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+   </padding>
+</VBox>
