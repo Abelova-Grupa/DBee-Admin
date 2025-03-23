@@ -3,6 +3,8 @@ package com.abelovagrupa.dbeeadmin.view;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.view.Algorithm;
+import com.abelovagrupa.dbeeadmin.util.AlertManager;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -16,6 +18,7 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -90,5 +93,33 @@ public class PanelViewCreation implements Initializable {
 
         // Resource heavy!
         cbSchema.getItems().addAll(DatabaseInspector.getInstance().getDatabaseNames());
+    }
+
+    public void preview(ActionEvent actionEvent) {
+        if(!validate()) return;
+    }
+
+    public void persist(ActionEvent actionEvent) {
+        if(!validate()) return;
+    }
+
+    private boolean validate() {
+        if(cbSchema.getSelectionModel().getSelectedItem() == null){
+            AlertManager.showErrorDialog(null, null, "Schema must be selected.");
+            return false;
+        }
+        if(cbAlgorithm.getSelectionModel().getSelectedItem() == null) {
+            AlertManager.showErrorDialog(null, null, "Algorithm must be selected.");
+            return false;
+        }
+        if(Objects.equals(txtName.getText(), "")) {
+            AlertManager.showErrorDialog(null, null, "View name must be set.");
+            return false;
+        }
+        if(Objects.equals(codeArea.getText(), "")) {
+            AlertManager.showErrorDialog(null, null, "View definition must be set.");
+            return false;
+        }
+        return true;
     }
 }

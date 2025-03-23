@@ -11,6 +11,8 @@ import com.abelovagrupa.dbeeadmin.model.schema.Collation;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
+import com.abelovagrupa.dbeeadmin.model.view.Algorithm;
+import com.abelovagrupa.dbeeadmin.model.view.View;
 import com.abelovagrupa.dbeeadmin.view.DialogSQLPreview;
 
 import java.sql.Connection;
@@ -592,5 +594,7 @@ public class DDLGenerator {
             new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
         else executeUpdate(query);
     }
+
+    public static void createView(View view, Algorithm algorithm, boolean preview) { /*TODO: Implement*/ }
 
 }

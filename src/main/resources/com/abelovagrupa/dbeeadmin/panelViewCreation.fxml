@@ -34,8 +34,8 @@
             <Label text="Algorithm:" />
             <ComboBox fx:id="cbAlgorithm" prefWidth="150.0" promptText="Select Algorithm" />
             <AnchorPane HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnPreview" mnemonicParsing="false" text="Preview DDL" />
-            <Button fx:id="btnPersist" mnemonicParsing="false" text="Persist" />
+            <Button fx:id="btnPreview" mnemonicParsing="false" onAction="#preview" text="Preview DDL" />
+            <Button fx:id="btnPersist" mnemonicParsing="false" onAction="#persist" text="Persist" />
          </children>
       </HBox>
    </children>
