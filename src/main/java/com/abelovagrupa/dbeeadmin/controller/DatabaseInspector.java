@@ -5,10 +5,7 @@ import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.Action;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
-import com.abelovagrupa.dbeeadmin.model.index.Index;
-import com.abelovagrupa.dbeeadmin.model.index.IndexStorageType;
-import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
-import com.abelovagrupa.dbeeadmin.model.index.Order;
+import com.abelovagrupa.dbeeadmin.model.index.*;
 import com.abelovagrupa.dbeeadmin.model.schema.Charset;
 import com.abelovagrupa.dbeeadmin.model.schema.Collation;
 import com.abelovagrupa.dbeeadmin.model.table.DBEngine;
@@ -538,8 +535,8 @@ public class DatabaseInspector {
         String query = "SELECT \n" +
                 "    INDEX_NAME, \n" +
                 "    NON_UNIQUE, \n" +
-                "    INDEX_TYPE,\n" +
-                "    IS_VISIBLE\n" +
+                "    INDEX_TYPE\n" +
+//                "    IS_VISIBLE\n" +
                 "FROM INFORMATION_SCHEMA.STATISTICS\n" +
                 "WHERE TABLE_SCHEMA = ? \n" +
                 "AND TABLE_NAME = ?;";
@@ -560,7 +557,7 @@ public class DatabaseInspector {
                 }
                 index.setName(indexName);
                 index.setUnique(indexRs.getInt("NON_UNIQUE") == 0);
-                index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));
+//                index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));
                 Optional<String> storageType = Optional.ofNullable(indexRs.getString("INDEX_TYPE"));
                 storageType.ifPresent(s -> index.setStorageType(IndexStorageType.valueOf(s.toUpperCase())));
                 index.setIndexedColumns(getIndexedColumns(schema,table,index));
@@ -569,7 +566,7 @@ public class DatabaseInspector {
 
 
         }catch(SQLException ex){
-            throw new RuntimeException(ex);
+            System.err.println(ex);
         }
         return indexes;
     }
@@ -583,8 +580,8 @@ public class DatabaseInspector {
         String query = "SELECT \n" +
                 "    INDEX_NAME, \n" +
                 "    NON_UNIQUE, \n" +
-                "    INDEX_TYPE,\n" +
-                "    IS_VISIBLE\n" +
+                "    INDEX_TYPE\n" +
+//                "    IS_VISIBLE\n" +
                 "FROM INFORMATION_SCHEMA.STATISTICS\n" +
                 "WHERE TABLE_SCHEMA = ? \n" +
                 "AND TABLE_NAME = ? AND INDEX_NAME=?;";
@@ -595,13 +592,13 @@ public class DatabaseInspector {
 
             ResultSet indexRs = indexStmt.executeQuery();
             if(indexRs.next()){
-                index.setName(indexName);
+                // index.setName(indexName);   // FIXME: Duplikat?
                 index.setName(indexName);
                 index.setUnique(indexRs.getInt("NON_UNIQUE") == 0);
-                index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));
+//                index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));
                 Optional<String> storageType = Optional.ofNullable(indexRs.getString("INDEX_TYPE"));
                 storageType.ifPresent(s -> index.setStorageType(IndexStorageType.valueOf(s.toUpperCase())));
-                index.setIndexedColumns(getIndexedColumns(schema,table,index));
+                index.setIndexedColumns(getIndexedColumns(schema,table,index)); // TODO: Mozda odavde?
             }
 
         }catch(SQLException ex){

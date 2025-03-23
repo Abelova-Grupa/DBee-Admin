@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import java.util.LinkedList;
 import java.util.List;
 
+@Deprecated
 public class PanelInfo {
 
     private PanelMain mainController;

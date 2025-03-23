@@ -133,6 +133,7 @@ public class PanelScript implements Initializable {
 
     @SuppressWarnings({"unchecked"})
     private void printResultSetToTable(ResultSet resultSet) throws SQLException {
+        if(resultSet == null) return;
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         int columnCount = resultSetMetaData.getColumnCount();
 

@@ -1,5 +1,6 @@
 package com.abelovagrupa.dbeeadmin.view;
 
+import com.abelovagrupa.dbeeadmin.services.FileProcessor;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,7 +47,12 @@ public class PanelResults {
         this.resultContainer = resultContainer;
     }
 
-    // TODO: Think of a more appropriate name
+    public void exportResultsToFile() {
+
+        FileProcessor.saveTableToCSV(resultsTable);
+
+    }
+
     @SuppressWarnings({"unchecked"})
     public void printResultSetToTable(ResultSet resultSet) throws SQLException {
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
