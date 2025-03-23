@@ -164,12 +164,48 @@ public class PanelInfoNew implements Initializable {
         // TODO: ProgramState
         clearInfo();
         addProperty("Column:", column.isPrimaryKey() ? column.getName() + " (\uD83D\uDD11)" : column.getName(), true);
-        addProperty("Type", column.getType().toString(), false);
-        addProperty("Default", column.getDefaultValue() == null ? "/" : column.getDefaultValue(), false);
+        addProperty("Type:", column.getType().toString(), false);
+        addProperty("Default:", column.getDefaultValue() == null ? "/" : column.getDefaultValue(), false);
     }
 
     public void setSelected(ForeignKey foreignKey) {
+        clearInfo();
 
+        String referencingCols, referencedCols;
+
+        addProperty("Foreign key:", foreignKey.getName(), true);
+        //addProperty("Referencing schema:", foreignKey.getReferencingSchema().getName(), false);
+        addProperty("Referencing table:", foreignKey.getReferencingTable().getName(), false);
+        //addProperty("Referenced schema:", foreignKey.getReferencedSchema().getName(), false);
+        addProperty("Referenced table:", foreignKey.getReferencedTable().getName(), false);
+
+        // Build referencing cols string
+        StringBuilder refingColsBuilder = new StringBuilder();
+        for(var col : foreignKey.getReferencingColumns()) {
+            refingColsBuilder.append(col.getName()).append(", ");
+        }
+
+        // Build referenced cols string
+        StringBuilder refedColsBuilder = new StringBuilder();
+        for(var col : foreignKey.getReferencingColumns()) {
+            refedColsBuilder.append(col.getName()).append(", ");
+        }
+
+        // Cut trailing comma and space
+        refingColsBuilder.setLength(refingColsBuilder.length() - 2);
+        refedColsBuilder.setLength(refedColsBuilder.length() - 2);
+
+        refingColsBuilder.append(" ->");
+
+        referencingCols = refingColsBuilder.toString();
+        referencedCols = refedColsBuilder.toString();
+
+        addProperty(null, null, false);
+        addProperty(referencingCols, referencedCols, false);
+        addProperty(null, null, false);
+
+        addProperty("On DELETE:", foreignKey.getOnDeleteAction().toString(), false);
+        addProperty("On UPDATE:", foreignKey.getOnUpdateAction().toString(), false);
     }
 
     public void setSelected(Index index) {
