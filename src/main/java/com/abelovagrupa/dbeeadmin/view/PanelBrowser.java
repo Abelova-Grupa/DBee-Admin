@@ -286,7 +286,7 @@ public class PanelBrowser implements Initializable {
                                 Table table = DatabaseInspector.getInstance().getTableByName(schema, selectedItem.getParent().getParent().getValue());
                                 Index selectedIndex = DatabaseInspector.getInstance().getIndexByName(schema, table, indexName);
                                 if (selectedIndex != null) {
-                                    List<IndexedColumn> indexedColumns = selectedIndex.getIndexedColumns();
+                                    infoController.setSelected(selectedIndex);
                                 }
 
                             }
