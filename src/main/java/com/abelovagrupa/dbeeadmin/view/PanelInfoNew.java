@@ -165,13 +165,28 @@ public class PanelInfoNew implements Initializable {
         clearInfo();
         addProperty("Column:", column.isPrimaryKey() ? column.getName() + " (\uD83D\uDD11)" : column.getName(), true);
         addProperty("Type", column.getType().toString(), false);
-        // TODO: Implement size
         addProperty("Default", column.getDefaultValue() == null ? "/" : column.getDefaultValue(), false);
     }
 
-    public void setSelected(ForeignKey foreignKey) {}
+    public void setSelected(ForeignKey foreignKey) {
 
-    public void setSelected(Index index) {}
+    }
+
+    public void setSelected(Index index) {
+        clearInfo();
+        addProperty("Index:", index.getName(), true);
+        addProperty("Type:", index.getType().toString(), false);
+        addProperty("Storage:", index.getStorageType().toString(), false);
+        addProperty("Key block size:", Integer.toString(index.getKeyBlockSize()), false);
+        addProperty("Parser:", index.getParser(), false);
+        addProperty("Visible:", Boolean.toString(index.isVisible()), false);
+        addProperty("Unique:", Boolean.toString(index.isUnique()), false);
+        addProperty("Indexed columns:", null, false);
+        for(var col : index.getIndexedColumns()) {
+            addProperty(col.getColumn().getName(), Integer.toString(col.getOrderNumber()), false);
+        }
+
+    }
 
     public void setSelected(Trigger trigger) {}
 
