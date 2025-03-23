@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelInfoNew">
+   <children>
+      <TitledPane text="Selected Entity" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox fx:id="infoContent" prefHeight="512.0" />
+         </content>
+      </TitledPane>
+   </children>
+</VBox>

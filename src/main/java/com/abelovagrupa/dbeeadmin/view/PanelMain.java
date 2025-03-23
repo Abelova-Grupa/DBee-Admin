@@ -37,7 +37,8 @@ public class PanelMain implements Initializable {
 
     PanelBrowser browserController;
 
-    PanelInfo infoController;
+    // New info controller
+    PanelInfoNew infoController;
 
     PanelEditor editorController;
 
@@ -73,11 +74,12 @@ public class PanelMain implements Initializable {
         this.browserController = browserController;
     }
 
-    public PanelInfo getInfoController() {
+    // New info panel getters and setters
+    public PanelInfoNew getInfoController() {
         return infoController;
     }
 
-    public void setInfoController(PanelInfo infoController) {
+    public void setInfoController(PanelInfoNew infoController) {
         this.infoController = infoController;
     }
 
@@ -113,7 +115,7 @@ public class PanelMain implements Initializable {
             setBrowserController(fxmlLoader.getController());
             leftPane.getItems().add(root);
             browserPane = (HBox) root;
-            browserPane.setMinHeight(browserController.getBrowserHeight() + 50);
+//            browserPane.setMinHeight(browserController.getBrowserHeight() + 50);
             browserController.setMainController(this);
             browserController.browserScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 //            browserController.browserScrollPane.setFitToHeight(true);
@@ -127,11 +129,13 @@ public class PanelMain implements Initializable {
 
     public void loadInfo() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelInfo.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelInfoNew.fxml"));
             Parent root = fxmlLoader.load();
             setInfoController(fxmlLoader.getController());
             leftPane.getItems().add(root);
-            infoController.setMainController(this);
+            leftPane.setDividerPositions(0.7);
+            // TODO: Add info controller if necessary.
+//            infoController.setMainController(this);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -162,7 +166,7 @@ public class PanelMain implements Initializable {
             setResultsController(fxmlLoader.getController());
             centerPane.getItems().add(root);
             resultsController.setMainController(this);
-
+            centerPane.setDividerPositions(0.7);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -191,15 +195,18 @@ public class PanelMain implements Initializable {
         // Add needed controller relations
         editorController.setResultsController(resultsController);
         editorController.getScriptController().setResultsController(resultsController);
+        // FIXME: Old info controller settings
+
+
 
         browserController.setInfoController(infoController);
-        for (PanelSchemaTree schemaTree : browserController.getSchemaControllers()) {
-            schemaTree.setBrowserController(browserController);
-        }
-        browserController.getInfoController().getClearInfoPanel().setVisible(true);
-        browserController.getInfoController().getForeignKeyInfoPanel().setVisible(false);
-        browserController.getInfoController().getIndexInfoPanel().setVisible(false);
-        browserController.getInfoController().getColumnInfoPanel().setVisible(false);
+//        for (PanelSchemaTree schemaTree : browserController.getSchemaControllers()) {
+//            schemaTree.setBrowserController(browserController);
+//        }
+//        browserController.getInfoController().getClearInfoPanel().setVisible(true);
+//        browserController.getInfoController().getForeignKeyInfoPanel().setVisible(false);
+//        browserController.getInfoController().getIndexInfoPanel().setVisible(false);
+//        browserController.getInfoController().getColumnInfoPanel().setVisible(false);
 
     }
 

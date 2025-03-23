@@ -544,7 +544,7 @@ public class DatabaseInspector {
                 "WHERE TABLE_SCHEMA = ? \n" +
                 "AND TABLE_NAME = ?;";
 
-        //INDEX_NAME,NON_UNIQUE,IS_VISIBLE,INDEX_TYPE
+        // FIXME: INDEX_NAME,NON_UNIQUE,IS_VISIBLE,INDEX_TYPE
         try(PreparedStatement indexStmt = connection.prepareStatement(query);){
             indexStmt.setString(1,schema.getName());
             indexStmt.setString(2,table.getName());

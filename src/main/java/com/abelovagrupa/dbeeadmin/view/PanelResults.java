@@ -48,7 +48,7 @@ public class PanelResults {
 
     // TODO: Think of a more appropriate name
     @SuppressWarnings({"unchecked"})
-    private void printResultSetToTable(ResultSet resultSet) throws SQLException {
+    public void printResultSetToTable(ResultSet resultSet) throws SQLException {
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         int columnCount = resultSetMetaData.getColumnCount();
 
