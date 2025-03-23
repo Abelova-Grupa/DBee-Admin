@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.CheckBoxTableCell;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -39,6 +40,7 @@ public class PanelFKTab implements Initializable {
         setColumnsWidth();
         setColumnsReorderable(false);
         setColumnsResizable(false);
+        foreignKeyColumnChecked.setCellFactory(CheckBoxTableCell.forTableColumn(foreignKeyColumnChecked));
     }
 
     public void setColumnsWidth(){

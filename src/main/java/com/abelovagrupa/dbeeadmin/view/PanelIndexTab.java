@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.CheckBoxTableCell;
 
 
 import java.net.URL;
@@ -47,6 +48,7 @@ public class PanelIndexTab implements Initializable {
         setColumnsWidth();
         setColumnsResizable(false);
         setColumnsReorderable(false);
+        indexedColumnsCheckColumn.setCellFactory(CheckBoxTableCell.forTableColumn(indexedColumnsCheckColumn));
     }
 
     public void setColumnsWidth(){
