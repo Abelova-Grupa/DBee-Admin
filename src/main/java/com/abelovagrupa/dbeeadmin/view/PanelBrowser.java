@@ -262,22 +262,6 @@ public class PanelBrowser implements Initializable {
                                     }
                                 }
 
-//                                infoController.getColumnInfoPanel().setVisible(false);
-//                                infoController.getIndexInfoPanel().setVisible(false);
-//                                infoController.getForeignKeyInfoPanel().setVisible(false);
-//                                infoController.getTableInfoPanel().setVisible(true);
-//                                infoController.getTableName().setText(selectedItem.getValue());
-//                                infoController.getAttributeContainer().getChildren().clear();
-//                                infoController.setAttributes(new LinkedList<>());
-//
-//                                for (Column column : selectedTable.getColumns()) {
-//                                    Label attributeName = new Label(column.getName());
-//                                    Label attributeType = new Label(column.getType().toString());
-//                                    BorderPane attributePane = new BorderPane();
-//                                    attributePane.setLeft(attributeName);
-//                                    attributePane.setRight(attributeType);
-//                                    infoController.addAttributePane(attributePane);
-//                                }
                             }
                         }
                         try {
@@ -287,16 +271,8 @@ public class PanelBrowser implements Initializable {
                                 Table table = DatabaseInspector.getInstance().getTableByName(schema, selectedItem.getParent().getParent().getValue());
                                 Column selectedColumn = DatabaseInspector.getInstance().getColumnByName(table, columnName);
                                 if (selectedColumn != null) {
-
                                     // Display column in info panel
                                     infoController.setSelected(selectedColumn);
-//                                    infoController.getColumnLabel().setText(columnName);
-//                                    infoController.getTableInfoPanel().setVisible(false);
-//                                    infoController.getIndexInfoPanel().setVisible(false);
-//                                    infoController.getForeignKeyInfoPanel().setVisible(false);
-//                                    infoController.getColumnName().setText(selectedColumn.getName());
-//                                    infoController.getColumnType().setText(selectedColumn.getType().toString());
-//                                    infoController.getColumnInfoPanel().setVisible(true);
                                 }
                             }
 
@@ -308,26 +284,6 @@ public class PanelBrowser implements Initializable {
                                 Index selectedIndex = DatabaseInspector.getInstance().getIndexByName(schema, table, indexName);
                                 if (selectedIndex != null) {
                                     List<IndexedColumn> indexedColumns = selectedIndex.getIndexedColumns();
-
-//                                    Uncomment following line after indexes are implemented in DBInspector.
-//                                    infoController.setSelected(selectedIndex);
-//
-//                                    infoController.getTableInfoPanel().setVisible(false);
-//                                    infoController.getColumnInfoPanel().setVisible(false);
-//                                    infoController.getForeignKeyInfoPanel().setVisible(false);
-//                                    infoController.getIndexInfoPanel().setVisible(true);
-//                                    infoController.getIndexColumnContainer().getChildren().clear();
-//                                    infoController.getIndexName().setText(selectedIndex.getName());
-//                                    infoController.getVisibleName().setText(selectedIndex.isVisible() + "");
-//                                    infoController.getUniqueName().setText(selectedIndex.isUnique() + "");
-//                                    infoController.getTypeName().setText(selectedIndex.getStorageType() + "");
-
-//                                    for (IndexedColumn indexColumn : indexedColumns) {
-//                                        BorderPane columnField = new BorderPane();
-//                                        columnField.setCenter(new Label(indexColumn.getColumn().getName()));
-//                                        infoController.getIndexColumnContainer().getChildren().add(columnField);
-//                                    }
-
                                 }
 
                             }
@@ -339,34 +295,6 @@ public class PanelBrowser implements Initializable {
                                 if (selectedForeignKey != null) {
                                     // TODO: Foreign Keys
                                     infoController.setSelected(selectedForeignKey);
-//                                    infoController.getKeyContainer().getChildren().clear();
-//                                    infoController.getColumnInfoPanel().setVisible(false);
-//                                    infoController.getIndexInfoPanel().setVisible(false);
-//                                    infoController.getTableInfoPanel().setVisible(false);
-//                                    infoController.getForeignKeyInfoPanel().setVisible(true);
-//                                    infoController.getForeignKeyName().setText(selectedForeignKey.getName());
-//                                    infoController.getRefTable().setText(selectedForeignKey.getReferencedTable().getName());
-//                                    for (int i = 0; i < selectedForeignKey.getReferencingColumns().size(); i++) {
-                                        // Not sure if i sorted both column lists will check later
-//                                        String referencingColumnName = selectedForeignKey.
-//                                            getReferencingColumns().get(i).getName();
-//                                        String referencedColumnName = selectedForeignKey.
-//                                            getReferencedColumns().get(i).getName();
-//                                        BorderPane keyRow = new BorderPane();
-//                                        keyRow.setLeft(new Label("Target"));
-//                                        keyRow.setRight(new Label("(" + referencingColumnName + " -> " + referencedColumnName + ")"));
-//                                        infoController.getKeyContainer().getChildren().add(keyRow);
-//                                    }
-//                                    BorderPane onUpdateRow = new BorderPane();
-//                                    onUpdateRow.setLeft(new Label("On Update"));
-//                                    onUpdateRow.setRight(new Label(selectedForeignKey.getOnUpdateAction().toString()));
-//                                    infoController.getKeyContainer().getChildren().add(onUpdateRow);
-//
-//                                    BorderPane onDeleteRow = new BorderPane();
-//                                    onDeleteRow.setLeft(new Label("On Delete"));
-//                                    onDeleteRow.setRight(new Label(selectedForeignKey.getOnDeleteAction().toString()));
-//                                    infoController.getKeyContainer().getChildren().add(onDeleteRow);
-
                                 }
 
                             }
