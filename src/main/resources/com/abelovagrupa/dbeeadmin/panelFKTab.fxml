@@ -4,34 +4,33 @@
 <?import javafx.scene.layout.*?>
 
 
-<Tab text="Foreign Keys" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelFKTab">
-    <VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
-        <children>
-            <GridPane>
-                <columnConstraints>
-                    <ColumnConstraints percentWidth="40"/>
-                    <ColumnConstraints percentWidth="40"/>
-                    <ColumnConstraints percentWidth="20"/>
-                </columnConstraints>
+<VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelFKTab">
+    <children>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints percentWidth="40"/>
+                <ColumnConstraints percentWidth="40"/>
+                <ColumnConstraints percentWidth="20"/>
+            </columnConstraints>
 
-                <TableView fx:id="foreignKeyTable" GridPane.columnIndex="0">
-                    <columns>
-                        <TableColumn fx:id="foreignKeyNameColumn" text="Foreign Key Name" />
-                        <TableColumn fx:id="referencedTableFK" text="Referenced Table" />
-                    </columns>
-                </TableView>
-                <TableView fx:id="foreignKeyColumnsTable" GridPane.columnIndex="1">
-                    <columns>
-                        <TableColumn fx:id="foreignKeyColumnChecked"/>
-                        <TableColumn fx:id="foreignKeyColumnName" text="Column" />
-                        <TableColumn fx:id="referencedColumnNameFK" text="Referenced Column" />
-                    </columns>
-                </TableView>
-                <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">
-                    <content>
-                    </content>
-                </ScrollPane>
-            </GridPane>
-        </children>
-    </VBox>
-</Tab>
+            <TableView fx:id="foreignKeyTable" GridPane.columnIndex="0">
+                <columns>
+                    <TableColumn fx:id="foreignKeyNameColumn" text="Foreign Key Name" />
+                    <TableColumn fx:id="referencedTableFK" text="Referenced Table" />
+                </columns>
+            </TableView>
+            <TableView fx:id="foreignKeyColumnsTable" GridPane.columnIndex="1">
+                <columns>
+                    <TableColumn fx:id="foreignKeyColumnChecked"/>
+                    <TableColumn fx:id="foreignKeyColumnName" text="Column" />
+                    <TableColumn fx:id="referencedColumnNameFK" text="Referenced Column" />
+                </columns>
+            </TableView>
+            <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">
+                <content>
+                </content>
+            </ScrollPane>
+        </GridPane>
+    </children>
+</VBox>
+

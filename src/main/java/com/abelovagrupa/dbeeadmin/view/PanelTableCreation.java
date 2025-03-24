@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,23 +35,31 @@ public class PanelTableCreation implements Initializable {
         try {
             // Initialize column tab
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
-            Tab columnsTab = loader.load();
+            VBox columnsTabContent = loader.load();
+            Tab columnsTab = new Tab("Columns");
+            columnsTab.setContent(columnsTabContent);
             tableAttributeTabPane.getTabs().add(columnsTab);
             tableAttributeTabPane.getSelectionModel().select(columnsTab);
 
             // Initialize index tab
             loader = new FXMLLoader(Main.class.getResource("panelIndexTab.fxml"));
-            Tab indexTab = loader.load();
+            VBox indexTabContent = loader.load();
+            Tab indexTab = new Tab("Indexes");
+            indexTab.setContent(indexTabContent);
             tableAttributeTabPane.getTabs().add(indexTab);
 
             // Initialize foreign key tab
             loader = new FXMLLoader(Main.class.getResource("panelFKTab.fxml"));
-            Tab foreignKeyTab = loader.load();
+            VBox foreignKeyTabContent = loader.load();
+            Tab foreignKeyTab = new Tab("Foreign Keys");
+            foreignKeyTab.setContent(foreignKeyTabContent);
             tableAttributeTabPane.getTabs().add(foreignKeyTab);
 
             // Initialize trigger tab
             loader = new FXMLLoader(Main.class.getResource("panelTriggerTab.fxml"));
-            Tab triggerTab = loader.load();
+            VBox triggerTabContent = loader.load();
+            Tab triggerTab = new Tab("Triggers");
+            triggerTab.setContent(triggerTabContent);
             tableAttributeTabPane.getTabs().add(triggerTab);
 
         } catch (IOException e) {
