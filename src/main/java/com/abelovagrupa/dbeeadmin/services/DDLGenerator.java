@@ -166,9 +166,9 @@ public class DDLGenerator {
             sql.append("DEFAULT ");
             sql.append(c.getDefaultValue()).append(" ");
         }
-        if(c.getGenerationExpression() != null) {
-            sql.append("GENERATED ALWAYS AS ");
-            sql.append(c.getGenerationExpression()).append(" ");
+        if(c.isGenerationExpression()) {
+            sql.append("GENERATED ALWAYS AS (");
+            sql.append(c.getDefaultValue()).append(") ");
         }
         sql.setLength(sql.length() - 1); // Cut trailing space
         sql.append(",\n");
