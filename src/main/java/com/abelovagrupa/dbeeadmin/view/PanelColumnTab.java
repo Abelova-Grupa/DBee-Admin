@@ -3,9 +3,15 @@ package com.abelovagrupa.dbeeadmin.view;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -42,12 +48,50 @@ public class PanelColumnTab implements Initializable{
     @FXML
     TableColumn<Column,String> columnDefaultColumn;
 
+    ObservableList<Column> columnsData = FXCollections.observableArrayList(new Column(),new Column());
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Setting up table properties
+        columnTable.setEditable(true);
+        columnTable.setItems(columnsData);
+
+        // Setting up table column properties
         setColumnsWidth();
         setColumnsReorderable(false);
         setColumnsResizable(false);
+        setColumnsEditable(true);
+
+        // Setting column name properties
+        columnNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        columnNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        columnNameColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setName(event.getNewValue());
+        });
+
+        // Setting data type column properties
+        ObservableList<DataType> dataTypes = FXCollections.observableArrayList(DataType.values());
+        columnDataTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        columnDataTypeColumn.setCellFactory(ComboBoxTableCell.forTableColumn(dataTypes));
+        columnDataTypeColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setType(event.getNewValue());
+        });
+
+        // Setting checkbox columns
+        setCheckBoxes();
+
+        // Setting default expression column properties
+        columnDefaultColumn.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
+        columnDefaultColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        columnDefaultColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setDefaultValue(event.getNewValue());
+        });
     }
+
+
 
     public void setColumnsWidth(){
         // Current solution is to set columns widths to all sum up to 1 - table width
@@ -75,5 +119,49 @@ public class PanelColumnTab implements Initializable{
         for(TableColumn<?,?> column : columnTable.getColumns()){
             column.setResizable(isResizable);
         }
+    }
+
+    private void setColumnsEditable(boolean isEditable) {
+        for(TableColumn<?,?> column : columnTable.getColumns()){
+            column.setEditable(isEditable);
+        }
+    }
+
+    private void setCheckBoxes(){
+        columnPKColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnPKColumn));
+        columnPKColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setPrimaryKey(event.getNewValue());
+        });
+
+        columnNNColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnNNColumn));
+        columnNNColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setNotNull(event.getNewValue());
+        });
+
+        columnUQColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnUQColumn));
+        columnUQColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setUnique(event.getNewValue());
+        });
+
+        columnAIColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnAIColumn));
+        columnAIColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setAutoIncrement(event.getNewValue());
+        });
+
+        columnZFColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnZFColumn));
+        columnZFColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setZeroFill(event.getNewValue());
+        });
+
+        columnGColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnGColumn));
+        columnGColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            
+        });
     }
 }

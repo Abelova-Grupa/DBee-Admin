@@ -16,7 +16,7 @@
                 <TableView fx:id="indexTable" GridPane.columnIndex="0">
                     <columns>
                         <TableColumn fx:id="indexNameColumn" text="Index Name" />
-                        <TableColumn fx:id="referencedTableColumnIX" text="Type" />
+                        <TableColumn fx:id="indexTypeColumn" text="Type" />
                     </columns>
                 </TableView>
 
