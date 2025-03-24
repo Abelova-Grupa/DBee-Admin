@@ -2,7 +2,6 @@ package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.column.DataType;
-import com.abelovagrupa.dbeeadmin.model.index.IndexType;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,7 +10,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.net.URL;
@@ -64,19 +62,29 @@ public class PanelColumnTab implements Initializable{
         setColumnsEditable(true);
 
         // Setting column name properties
-        columnNameColumn.setEditable(true);
         columnNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        columnNameColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setName(event.getNewValue());
+        });
 
         // Setting data type column properties
         ObservableList<DataType> dataTypes = FXCollections.observableArrayList(DataType.values());
         columnDataTypeColumn.setCellFactory(ComboBoxTableCell.forTableColumn(dataTypes));
+        columnDataTypeColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setType(event.getNewValue());
+        });
 
         // Setting checkbox columns
         setCheckBoxes();
 
         // Setting default expression column properties
         columnDefaultColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-
+        columnDefaultColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setDefaultValue(event.getNewValue());
+        });
     }
 
 
@@ -117,10 +125,39 @@ public class PanelColumnTab implements Initializable{
 
     private void setCheckBoxes(){
         columnPKColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnPKColumn));
+        columnPKColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setPrimaryKey(event.getNewValue());
+        });
+
         columnNNColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnNNColumn));
+        columnNNColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setNotNull(event.getNewValue());
+        });
+
         columnUQColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnUQColumn));
+        columnUQColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setUnique(event.getNewValue());
+        });
+
         columnAIColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnAIColumn));
+        columnAIColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setAutoIncrement(event.getNewValue());
+        });
+
         columnZFColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnZFColumn));
+        columnZFColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setZeroFill(event.getNewValue());
+        });
+
         columnGColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnGColumn));
+        columnGColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            
+        });
     }
 }
