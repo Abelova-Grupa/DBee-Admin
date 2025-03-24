@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.net.URL;
@@ -62,6 +63,7 @@ public class PanelColumnTab implements Initializable{
         setColumnsEditable(true);
 
         // Setting column name properties
+        columnNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         columnNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         columnNameColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
@@ -70,6 +72,7 @@ public class PanelColumnTab implements Initializable{
 
         // Setting data type column properties
         ObservableList<DataType> dataTypes = FXCollections.observableArrayList(DataType.values());
+        columnDataTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         columnDataTypeColumn.setCellFactory(ComboBoxTableCell.forTableColumn(dataTypes));
         columnDataTypeColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
@@ -80,6 +83,7 @@ public class PanelColumnTab implements Initializable{
         setCheckBoxes();
 
         // Setting default expression column properties
+        columnDefaultColumn.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
         columnDefaultColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         columnDefaultColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
