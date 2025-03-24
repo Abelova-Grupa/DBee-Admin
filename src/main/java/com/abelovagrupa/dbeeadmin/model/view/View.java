@@ -7,7 +7,7 @@ public class View {
     private String definition;
     private Schema schema;
 
-    public View(String name, String definition, Schema schema) {
+    public View(Schema schema, String name, String definition) {
         this.name = name;
         this.definition = definition;
         this.schema = schema;

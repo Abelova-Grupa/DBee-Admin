@@ -3,6 +3,8 @@ package com.abelovagrupa.dbeeadmin.view;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.view.Algorithm;
+import com.abelovagrupa.dbeeadmin.model.view.View;
+import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -97,10 +99,22 @@ public class PanelViewCreation implements Initializable {
 
     public void preview(ActionEvent actionEvent) {
         if(!validate()) return;
+        View view = new View(DatabaseInspector
+            .getInstance()
+            .getDatabaseByName(cbSchema.getSelectionModel().getSelectedItem()),
+            txtName.getText(),
+            codeArea.getText());
+        DDLGenerator.createView(view, cbAlgorithm.getSelectionModel().getSelectedItem(), true);
     }
 
     public void persist(ActionEvent actionEvent) {
         if(!validate()) return;
+        View view = new View(DatabaseInspector
+            .getInstance()
+            .getDatabaseByName(cbSchema.getSelectionModel().getSelectedItem()),
+            txtName.getText(),
+            codeArea.getText());
+        DDLGenerator.createView(view, cbAlgorithm.getSelectionModel().getSelectedItem(), false);
     }
 
     private boolean validate() {

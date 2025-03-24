@@ -13,6 +13,7 @@ import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import com.abelovagrupa.dbeeadmin.model.view.Algorithm;
 import com.abelovagrupa.dbeeadmin.model.view.View;
+import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.view.DialogSQLPreview;
 
 import java.sql.Connection;
@@ -68,7 +69,7 @@ public class DDLGenerator {
             Statement st = conn.createStatement();
             st.executeUpdate(query);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            AlertManager.showErrorDialog("Error executing SQL", null, e.getMessage());
         }
     }
 
@@ -595,6 +596,26 @@ public class DDLGenerator {
         else executeUpdate(query);
     }
 
-    public static void createView(View view, Algorithm algorithm, boolean preview) { /*TODO: Implement*/ }
+    public static void createView(View view, Algorithm algorithm, boolean preview) {
+
+        // TOOD: Validate
+
+        // Build query
+        StringBuilder queryBuilder = new StringBuilder("CREATE\n\tALGORITHM = ");
+        queryBuilder.append(algorithm.name()).append("\n");
+        queryBuilder.append("VIEW ")
+            .append(view.getSchema().getName())
+            .append(".")
+            .append(view.getName())
+            .append(" AS\n");
+        queryBuilder.append(view.getDefinition());
+
+        String query = queryBuilder.toString();
+
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
+
+    }
 
 }

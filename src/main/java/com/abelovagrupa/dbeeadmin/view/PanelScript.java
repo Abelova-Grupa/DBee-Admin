@@ -49,7 +49,7 @@ public class PanelScript implements Initializable {
         "CASE", "WHEN", "THEN", "ELSE", "END", "IF", "LOOP", "WHILE", "RETURN",
         "SET", "VALUES", "COLUMN_NAME", "DATABASE_NAME", "SCHEMA", "ISNULL", "COALESCE",
         "CAST", "CONVERT", "TRIM", "SUBSTRING", "LEN", "ROUND", "AVG", "COUNT",
-        "SUM", "MAX", "MIN", "LIMIT", "OFFSET"
+        "SUM", "MAX", "MIN", "LIMIT", "OFFSET", "ASC", "DESC"
     };
 
     /*
