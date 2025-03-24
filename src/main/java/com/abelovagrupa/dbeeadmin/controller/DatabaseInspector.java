@@ -592,7 +592,6 @@ public class DatabaseInspector {
 
             ResultSet indexRs = indexStmt.executeQuery();
             if(indexRs.next()){
-                // index.setName(indexName);   // FIXME: Duplikat?
                 index.setName(indexName);
                 index.setUnique(indexRs.getInt("NON_UNIQUE") == 0);
 //                index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));

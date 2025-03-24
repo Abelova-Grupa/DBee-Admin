@@ -15,7 +15,7 @@ public class Column {
     private boolean zeroFill;
     private boolean autoIncrement;
     private Integer size;
-    private String generationExpression;
+    private boolean generationExpression;
     private String defaultValue;
     private String comment;
     private DataType type;
@@ -33,7 +33,7 @@ public class Column {
                   boolean zeroFill,
                   boolean autoIncrement,
                   Integer size,
-                  String generationExpression,
+                  boolean generationExpression,
                   String defaultValue,
                   String comment,
                   DataType type,
@@ -159,11 +159,11 @@ public class Column {
         this.size = size;
     }
 
-    public String getGenerationExpression() {
+    public boolean isGenerationExpression() {
         return generationExpression;
     }
 
-    public void setGenerationExpression(String generationExpression) {
+    public void setGenerationExpression(boolean generationExpression) {
         this.generationExpression = generationExpression;
     }
 
@@ -241,7 +241,7 @@ public class Column {
         private boolean zeroFill;
         private boolean autoIncrement;
         private Integer size;
-        private String generationExpression;
+        private boolean generationExpression;
         private String defaultValue;
         private String comment;
         private DataType type;
@@ -294,7 +294,7 @@ public class Column {
             return this;
         }
 
-        public ColumnBuilder setGenerationExpression(String generationExpression) {
+        public ColumnBuilder setGenerationExpression(boolean generationExpression) {
             this.generationExpression = generationExpression;
             return this;
         }

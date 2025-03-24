@@ -128,40 +128,174 @@ public class PanelColumnTab implements Initializable{
     }
 
     private void setCheckBoxes(){
-        columnPKColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnPKColumn));
-        columnPKColumn.setOnEditCommit(event -> {
-            Column column = event.getRowValue();
-            column.setPrimaryKey(event.getNewValue());
+        columnPKColumn.setCellValueFactory(new PropertyValueFactory<>("primaryKey"));
+        // Creating a custom checkBox that has a listener for checking
+        columnPKColumn.setCellFactory(col ->{
+            return new CheckBoxTableCell<Column, Boolean>() {
+                private final CheckBox checkBox = new CheckBox();
+                {
+                    checkBox.setOnAction(event -> {
+                        int row = getIndex();
+                        if (row >= 0 && row < columnTable.getItems().size()) {
+                            Column column = columnTable.getItems().get(row);
+                            boolean newValue = checkBox.isSelected();
+                            column.setPrimaryKey(newValue);
+                        }
+                    });
+                }
+
+                // CheckBox rendering logic
+                @Override
+                public void updateItem(Boolean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        checkBox.setSelected(item != null && item);
+                        setGraphic(checkBox);
+                    }
+                }
+            };
         });
 
-        columnNNColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnNNColumn));
-        columnNNColumn.setOnEditCommit(event -> {
-            Column column = event.getRowValue();
-            column.setNotNull(event.getNewValue());
+        columnNNColumn.setCellFactory(col ->{
+            return new CheckBoxTableCell<Column, Boolean>() {
+                private final CheckBox checkBox = new CheckBox();
+                {
+                    checkBox.setOnAction(event -> {
+                        int row = getIndex();
+                        if (row >= 0 && row < columnTable.getItems().size()) {
+                            Column column = columnTable.getItems().get(row);
+                            boolean newValue = checkBox.isSelected();
+                            column.setNotNull(newValue);
+                        }
+                    });
+                }
+
+                // CheckBox rendering logic
+                @Override
+                public void updateItem(Boolean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        checkBox.setSelected(item != null && item);
+                        setGraphic(checkBox);
+                    }
+                }
+            };
         });
 
-        columnUQColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnUQColumn));
-        columnUQColumn.setOnEditCommit(event -> {
-            Column column = event.getRowValue();
-            column.setUnique(event.getNewValue());
+        columnUQColumn.setCellFactory(col ->{
+            return new CheckBoxTableCell<Column, Boolean>() {
+                private final CheckBox checkBox = new CheckBox();
+                {
+                    checkBox.setOnAction(event -> {
+                        int row = getIndex();
+                        if (row >= 0 && row < columnTable.getItems().size()) {
+                            Column column = columnTable.getItems().get(row);
+                            boolean newValue = checkBox.isSelected();
+                            column.setUnique(newValue);
+                        }
+                    });
+                }
+
+                // CheckBox rendering logic
+                @Override
+                public void updateItem(Boolean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        checkBox.setSelected(item != null && item);
+                        setGraphic(checkBox);
+                    }
+                }
+            };
         });
 
-        columnAIColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnAIColumn));
-        columnAIColumn.setOnEditCommit(event -> {
-            Column column = event.getRowValue();
-            column.setAutoIncrement(event.getNewValue());
+        columnAIColumn.setCellFactory(col ->{
+            return new CheckBoxTableCell<Column, Boolean>() {
+                private final CheckBox checkBox = new CheckBox();
+                {
+                    checkBox.setOnAction(event -> {
+                        int row = getIndex();
+                        if (row >= 0 && row < columnTable.getItems().size()) {
+                            Column column = columnTable.getItems().get(row);
+                            boolean newValue = checkBox.isSelected();
+                            column.setAutoIncrement(newValue);
+                        }
+                    });
+                }
+
+                // CheckBox rendering logic
+                @Override
+                public void updateItem(Boolean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        checkBox.setSelected(item != null && item);
+                        setGraphic(checkBox);
+                    }
+                }
+            };
         });
 
-        columnZFColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnZFColumn));
-        columnZFColumn.setOnEditCommit(event -> {
-            Column column = event.getRowValue();
-            column.setZeroFill(event.getNewValue());
+        columnZFColumn.setCellFactory(col ->{
+            return new CheckBoxTableCell<Column, Boolean>() {
+                private final CheckBox checkBox = new CheckBox();
+                {
+                    checkBox.setOnAction(event -> {
+                        int row = getIndex();
+                        if (row >= 0 && row < columnTable.getItems().size()) {
+                            Column column = columnTable.getItems().get(row);
+                            boolean newValue = checkBox.isSelected();
+                            column.setZeroFill(newValue);
+                        }
+                    });
+                }
+
+                // CheckBox rendering logic
+                @Override
+                public void updateItem(Boolean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        checkBox.setSelected(item != null && item);
+                        setGraphic(checkBox);
+                    }
+                }
+            };
         });
 
-        columnGColumn.setCellFactory(CheckBoxTableCell.forTableColumn(columnGColumn));
-        columnGColumn.setOnEditCommit(event -> {
-            Column column = event.getRowValue();
-            
+        columnGColumn.setCellFactory(col ->{
+            return new CheckBoxTableCell<Column, Boolean>() {
+                private final CheckBox checkBox = new CheckBox();
+                {
+                    checkBox.setOnAction(event -> {
+                        int row = getIndex();
+                        if (row >= 0 && row < columnTable.getItems().size()) {
+                            Column column = columnTable.getItems().get(row);
+                            boolean newValue = checkBox.isSelected();
+                            column.setGenerationExpression(newValue);
+                        }
+                    });
+                }
+
+                // CheckBox rendering logic
+                @Override
+                public void updateItem(Boolean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        checkBox.setSelected(item != null && item);
+                        setGraphic(checkBox);
+                    }
+                }
+            };
         });
     }
 }
