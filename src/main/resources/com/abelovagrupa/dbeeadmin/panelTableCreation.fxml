@@ -12,59 +12,53 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 
-<!--TODO: Table textFields shouldn't repeat in each tab-->
+<!--TODO: Table textFields shouldn't repeat in each tab :Finished?-->
 <?import javafx.scene.layout.BorderPane?>
 
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
-<Tab text="New Table" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTableCreation">
-   <content>
-      <BorderPane>
-         <top>
-            <HBox alignment="CENTER_LEFT" spacing="6.0" BorderPane.alignment="TOP_CENTER">
-               <children>
-                  <Label text="Table name:" />
-                  <TextField fx:id="txtTableName" prefHeight="26.0" prefWidth="204.0" />
-                  <Label text="Engine:" />
-                  <ComboBox fx:id="cbEngines" prefWidth="150.0" />
-               </children>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-               <padding>
-                  <Insets bottom="12.0" left="6.0" top="12.0" />
-               </padding>
-            </HBox>
-         </top>
 
-         <center>
-            <TabPane side="BOTTOM" BorderPane.alignment="CENTER" fx:id="tableAttributeTabPane">
-               <tabs>
-                   <!--Insert column tab here-->
-                   <!--Insert index tab here-->
-                   <!--Insert foreign ket tab here-->
-                   <!--Insert trigger tab here-->
-               </tabs>
-            </TabPane>
-         </center>
-         <bottom>
-            <HBox alignment="CENTER_RIGHT">
-               <children>
-                  <Button text="Apply">
-                     <HBox.margin>
-                        <Insets right="10" top="10" bottom="10"/>
-                     </HBox.margin>
-                  </Button>
-                  <Button text="Revert" >
-                     <HBox.margin>
-                        <Insets right="10" top="10" bottom="10"/>
-                     </HBox.margin>
-                  </Button>
-               </children>
-            </HBox>
-         </bottom>
-      </BorderPane>
-   </content>
-</Tab>
+<BorderPane  xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTableCreation">
+   <top>
+      <HBox alignment="CENTER_LEFT" spacing="6.0" BorderPane.alignment="TOP_CENTER">
+         <children>
+            <Label text="Table name:" />
+            <TextField fx:id="txtTableName" prefHeight="26.0" prefWidth="204.0" />
+            <Label text="Engine:" />
+            <ComboBox fx:id="cbEngines" prefWidth="150.0" />
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets bottom="12.0" left="6.0" top="12.0" />
+         </padding>
+      </HBox>
+   </top>
+
+   <center>
+      <TabPane side="BOTTOM" BorderPane.alignment="CENTER" fx:id="tableAttributeTabPane">
+         <tabs>
+             <!--Insert column tab here-->
+             <!--Insert index tab here-->
+             <!--Insert foreign ket tab here-->
+             <!--Insert trigger tab here-->
+         </tabs>
+      </TabPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_RIGHT">
+         <children>
+            <Button text="Apply">
+               <HBox.margin>
+                  <Insets right="10" top="10" bottom="10"/>
+               </HBox.margin>
+            </Button>
+            <Button text="Revert" >
+               <HBox.margin>
+                  <Insets right="10" top="10" bottom="10"/>
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>
+

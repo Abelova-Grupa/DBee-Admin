@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
@@ -214,32 +215,12 @@ public class PanelMain implements Initializable {
 
     public void newTableTab() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelTableCreation.fxml"));
-        Tab tableTab = fxmlLoader.load();
+        BorderPane tableTabContent = fxmlLoader.load();
+        Tab tableTab = new Tab("New Table");
+        tableTab.setContent(tableTabContent);
         editorController.editorTabs.getTabs().add(tableTab);
         editorController.editorTabs.getSelectionModel().select(tableTab);
-//        Scene scene = new Scene(fxmlLoader.load());
-//        Stage stage = new Stage();
-//        stage.initModality(Modality.APPLICATION_MODAL);
-//
-//        stage.setTitle("DBee Admin - New Table");
-//        stage.setScene(scene);
-//
-//        stage.setOnShown(event -> {
-//            // Get the screen's bounds (width and height)
-//            double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
-//            double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
-//
-//            // Get the stage width and height
-//            double stageWidth = stage.getWidth();
-//            double stageHeight = stage.getHeight();
-//
-//            // Calculate the center position
-//            stage.setX((screenWidth - stageWidth) / 2);
-//            stage.setY((screenHeight - stageHeight) / 2);
-//        });
-//        scene.getStylesheets().add(Main.class.getResource("styles.css").toExternalForm());
-//
-//        stage.show();
+
     }
 
     public void newSchemaTab(ActionEvent actionEvent) throws IOException {

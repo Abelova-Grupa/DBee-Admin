@@ -5,24 +5,24 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
 
-<Tab text="Columns" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelColumnTab">
-   <VBox minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" >
-      <children>
-         <TableView fx:id="columnTable" VBox.vgrow="ALWAYS">
-            <columns>
-               <!--TODO: Think of better variable names-->
-               <TableColumn fx:id="columnNameColumn" text="Column Name" />
-               <TableColumn fx:id="columnDataTypeColumn" text="Datatype" />
-               <TableColumn fx:id="columnPKColumn" text="PK"/>
-               <TableColumn fx:id="columnNNColumn" text="NN"/>
-               <TableColumn fx:id="columnUQColumn" text="UQ"/>
-               <TableColumn fx:id="columnZFColumn" text="ZF"/>
-               <TableColumn fx:id="columnAIColumn" text="AI"/>
-               <TableColumn fx:id="columnGColumn" text="G"/>
-               <TableColumn fx:id="columnDefaultColumn" text="Default / Expression"/>
-            </columns>
-         </TableView>
-      </children>
-   </VBox>
-</Tab>
+
+<VBox minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelColumnTab">
+   <children>
+      <TableView fx:id="columnTable" VBox.vgrow="ALWAYS">
+         <columns>
+            <!--TODO: Think of better variable names-->
+            <TableColumn fx:id="columnNameColumn" text="Column Name" />
+            <TableColumn fx:id="columnDataTypeColumn" text="Datatype" />
+            <TableColumn fx:id="columnPKColumn" text="PK"/>
+            <TableColumn fx:id="columnNNColumn" text="NN"/>
+            <TableColumn fx:id="columnUQColumn" text="UQ"/>
+            <TableColumn fx:id="columnZFColumn" text="ZF"/>
+            <TableColumn fx:id="columnAIColumn" text="AI"/>
+            <TableColumn fx:id="columnGColumn" text="G"/>
+            <TableColumn fx:id="columnDefaultColumn" text="Default / Expression"/>
+         </columns>
+      </TableView>
+   </children>
+</VBox>
+
 
