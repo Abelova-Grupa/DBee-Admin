@@ -22,7 +22,7 @@
 
             <TableView fx:id="indexColumnTable" GridPane.columnIndex="1">
                 <columns>
-                    <!--                                    TODO: Think of a better name for columns-->
+                    <!--TODO: Think of a better name for columns-->
                     <TableColumn fx:id="indexedColumnsCheckColumn"/>
                     <TableColumn fx:id="indexedColumnsNameColumn" text="Column" />
                     <TableColumn fx:id="indexedColumnsNoColumn" text="#" />
@@ -30,7 +30,7 @@
                     <TableColumn fx:id="indexedColumnLength" text="Length"/>
                 </columns>
             </TableView>
-            <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">
+            <ScrollPane hbarPolicy="NEVER" pannable="true" prefHeight="200.0" GridPane.columnIndex="2" >
                 <content>
                 </content>
             </ScrollPane>

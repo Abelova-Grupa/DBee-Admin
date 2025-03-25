@@ -1,6 +1,7 @@
 package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.Main;
+import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.DBEngine;
@@ -22,7 +23,7 @@ import java.util.ResourceBundle;
 public class PanelTableCreation implements Initializable {
 
     @FXML
-    ComboBox<DBEngine> cbEngines;
+    ComboBox<String> cbSchema;
 
     @FXML
     TextField txtTableName;
@@ -67,8 +68,9 @@ public class PanelTableCreation implements Initializable {
         }
 
         // Filling comboBox with engine values
-        ObservableList<DBEngine> engines = FXCollections.observableArrayList(DBEngine.values());
-        cbEngines.setItems(engines);
+        // Resource heavy?
+        cbSchema.getItems().addAll(DatabaseInspector.getInstance().getDatabaseNames());
+
 
     }
 

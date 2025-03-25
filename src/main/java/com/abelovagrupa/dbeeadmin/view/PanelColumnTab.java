@@ -48,7 +48,7 @@ public class PanelColumnTab implements Initializable{
     @FXML
     TableColumn<Column,String> columnDefaultColumn;
 
-    ObservableList<Column> columnsData = FXCollections.observableArrayList(new Column(),new Column());
+    ObservableList<Column> columnsData = FXCollections.observableArrayList(new Column());
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -89,6 +89,31 @@ public class PanelColumnTab implements Initializable{
             Column column = event.getRowValue();
             column.setDefaultValue(event.getNewValue());
         });
+
+        // Setting up listener for data change in column table
+        columnTable.getSelectionModel().selectedItemProperty().addListener((observable,oldSelection,newSelection) -> {
+            if(newSelection == null) return;
+            int index = columnTable.getItems().indexOf(newSelection);
+            int lastIndex = columnTable.getItems().size() -1;
+
+            // Column name property listener
+            newSelection.nameProperty().addListener((obs,oldVal,newVal) -> {
+                if(index != lastIndex) return;
+                columnTable.getItems().add(new Column());
+            });
+            // Column type property listener
+            newSelection.typeProperty().addListener((obs,oldVal,newVal) -> {
+                if(index != lastIndex) return;
+                columnTable.getItems().add(new Column());
+            });
+            // Column default value property listener
+            newSelection.defaultValueProperty().addListener((obs,oldVal,newVal) -> {
+                if(index != lastIndex) return;
+                columnTable.getItems().add(new Column());
+            });
+
+        });
+
     }
 
 
@@ -136,10 +161,15 @@ public class PanelColumnTab implements Initializable{
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setPrimaryKey(newValue);
+                            // Add new table row if its last
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -164,10 +194,14 @@ public class PanelColumnTab implements Initializable{
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setNotNull(newValue);
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -192,10 +226,14 @@ public class PanelColumnTab implements Initializable{
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setUnique(newValue);
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -220,10 +258,14 @@ public class PanelColumnTab implements Initializable{
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setAutoIncrement(newValue);
+                            if(row == tableSize - 1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -248,10 +290,14 @@ public class PanelColumnTab implements Initializable{
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setZeroFill(newValue);
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -276,10 +322,14 @@ public class PanelColumnTab implements Initializable{
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setGenerationExpression(newValue);
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
