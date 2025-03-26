@@ -1,6 +1,7 @@
 package com.abelovagrupa.dbeeadmin.model.column;
 
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import javafx.beans.property.*;
 
 import java.util.Objects;
 
@@ -20,6 +21,18 @@ public class Column {
     private String comment;
     private DataType type;
     private Table table;
+
+    // TableView properties
+    // Attribute setters will update these properties if they exist
+    private  StringProperty nameProperty;
+    private  BooleanProperty primaryKeyProperty;
+    private  BooleanProperty notNullProperty;
+    private  BooleanProperty uniqueProperty;
+    private  BooleanProperty zeroFillProperty;
+    private  BooleanProperty autoIncrementProperty;
+    private  BooleanProperty generationExpressionProperty;
+    private  StringProperty defaultValueProperty;
+    private  ObjectProperty<DataType> typeProperty;
 
     public Column() {
     }
@@ -72,35 +85,80 @@ public class Column {
     }
 
     public String getName() {
-        return name;
+        if(nameProperty != null)
+            return nameProperty.get();
+        else return name;
     }
 
     public void setName(String name) {
+        if(nameProperty != null){
+            nameProperty.set(name);
+        }
         this.name = name;
     }
 
+    public StringProperty nameProperty(){
+        if(nameProperty == null){
+            nameProperty = new SimpleStringProperty(this,"name",name);
+        }
+        return nameProperty;
+    }
+
     public boolean isPrimaryKey() {
-        return primaryKey;
+        if(primaryKeyProperty != null)
+            return primaryKeyProperty.get();
+        else return primaryKey;
     }
 
     public void setPrimaryKey(boolean primaryKey) {
+        if(primaryKeyProperty != null){
+            primaryKeyProperty.set(primaryKey);
+        }
         this.primaryKey = primaryKey;
     }
 
+    public BooleanProperty primaryKeyProperty(){
+        if(primaryKeyProperty == null){
+            primaryKeyProperty = new SimpleBooleanProperty(this,"primaryKey",primaryKey);
+        }
+        return primaryKeyProperty;
+    }
+
     public boolean isNotNull() {
-        return notNull;
+        if(notNullProperty != null)
+            return notNullProperty.get();
+        else return notNull;
     }
 
     public void setNotNull(boolean notNull) {
+        if(notNullProperty != null)
+            notNullProperty.set(notNull);
         this.notNull = notNull;
     }
 
+    public BooleanProperty notNullProperty(){
+        if(notNullProperty == null){
+            notNullProperty = new SimpleBooleanProperty(this,"notNull",notNull);
+        }
+        return notNullProperty;
+    }
+
     public boolean isUnique() {
-        return unique;
+        if(uniqueProperty != null)
+            return uniqueProperty.get();
+        else return unique;
     }
 
     public void setUnique(boolean unique) {
+        if(uniqueProperty != null)
+            uniqueProperty.set(unique);
         this.unique = unique;
+    }
+
+    public BooleanProperty uniqueProperty(){
+        if(uniqueProperty == null)
+            uniqueProperty = new SimpleBooleanProperty(this,"unique",unique);
+        return uniqueProperty;
     }
 
     public boolean isBinary() {
@@ -108,6 +166,7 @@ public class Column {
     }
 
     public void setBinary(boolean binary) {
+
         this.binary = binary;
     }
 
@@ -120,27 +179,57 @@ public class Column {
     }
 
     public boolean isZeroFill() {
-        return zeroFill;
+        if(zeroFillProperty != null)
+            return zeroFillProperty.get();
+        else return zeroFill;
     }
 
     public void setZeroFill(boolean zeroFill) {
+        if(zeroFillProperty != null)
+            zeroFillProperty.set(zeroFill);
         this.zeroFill = zeroFill;
     }
 
+    public BooleanProperty zeroFillProperty(){
+        if(zeroFillProperty == null)
+            zeroFillProperty = new SimpleBooleanProperty(this,"zeroFill",zeroFill);
+        return zeroFillProperty;
+    }
+
     public boolean isAutoIncrement() {
-        return autoIncrement;
+        if(autoIncrementProperty != null)
+            return autoIncrementProperty.get();
+        else return autoIncrement;
     }
 
     public void setAutoIncrement(boolean autoIncrement) {
+        if(autoIncrementProperty != null)
+            autoIncrementProperty.set(autoIncrement);
         this.autoIncrement = autoIncrement;
     }
 
+    public BooleanProperty autoIncrementProperty(){
+        if(autoIncrementProperty == null)
+            autoIncrementProperty = new SimpleBooleanProperty(this,"autoIncrement",autoIncrement);
+        return autoIncrementProperty;
+    }
+
     public DataType getType() {
-        return type;
+        if(typeProperty != null)
+            return typeProperty.get();
+        else return type;
     }
 
     public void setType(DataType type) {
+        if(typeProperty != null)
+            typeProperty.set(type);
         this.type = type;
+    }
+
+    public ObjectProperty<DataType> typeProperty(){
+        if(typeProperty == null)
+            typeProperty = new SimpleObjectProperty<DataType>(this,"type",type);
+        return typeProperty;
     }
 
     public Table getTable() {
@@ -160,19 +249,39 @@ public class Column {
     }
 
     public boolean isGenerationExpression() {
-        return generationExpression;
+        if(generationExpressionProperty != null)
+            return generationExpressionProperty.get();
+        else return generationExpression;
     }
 
     public void setGenerationExpression(boolean generationExpression) {
+        if(generationExpressionProperty != null)
+            generationExpressionProperty.set(generationExpression);
         this.generationExpression = generationExpression;
     }
 
+    public BooleanProperty generationExpressionProperty(){
+        if(generationExpressionProperty == null)
+            generationExpressionProperty = new SimpleBooleanProperty(this,"generationExpression",generationExpression);
+        return generationExpressionProperty;
+    }
+
     public String getDefaultValue() {
-        return defaultValue;
+        if(defaultValueProperty != null)
+            return defaultValueProperty.get();
+        else return defaultValue;
     }
 
     public void setDefaultValue(String defaultValue) {
+        if(defaultValueProperty != null)
+            defaultValueProperty.set(defaultValue);
         this.defaultValue = defaultValue;
+    }
+
+    public StringProperty defaultValueProperty(){
+        if(defaultValueProperty == null)
+            defaultValueProperty = new SimpleStringProperty(this,"defaultValue",defaultValue);
+        return defaultValueProperty;
     }
 
     public String getComment() {
@@ -182,6 +291,8 @@ public class Column {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+
 
     @Override
     public String toString() {

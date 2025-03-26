@@ -97,7 +97,8 @@ public class DDLGenerator {
                 break;
             }
         }
-        if(!hasprimaryKey) throw new IllegalArgumentException("Table must contain a primary key.");
+        //Table does not need to have a primary key column
+//        if(!hasprimaryKey) throw new IllegalArgumentException("Table must contain a primary key.");
 
 
         // Create query builder (because we don't want a new string in each iteration of a for loop)

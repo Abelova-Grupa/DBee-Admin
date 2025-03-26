@@ -7,13 +7,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class PanelColumnTab implements Initializable{
@@ -48,7 +50,7 @@ public class PanelColumnTab implements Initializable{
     @FXML
     TableColumn<Column,String> columnDefaultColumn;
 
-    ObservableList<Column> columnsData = FXCollections.observableArrayList(new Column(),new Column());
+    ObservableList<Column> columnsData = FXCollections.observableArrayList(new Column());
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -63,7 +65,7 @@ public class PanelColumnTab implements Initializable{
         setColumnsEditable(true);
 
         // Setting column name properties
-        columnNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        columnNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         columnNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         columnNameColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
@@ -72,7 +74,7 @@ public class PanelColumnTab implements Initializable{
 
         // Setting data type column properties
         ObservableList<DataType> dataTypes = FXCollections.observableArrayList(DataType.values());
-        columnDataTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        columnDataTypeColumn.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
         columnDataTypeColumn.setCellFactory(ComboBoxTableCell.forTableColumn(dataTypes));
         columnDataTypeColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
@@ -83,12 +85,39 @@ public class PanelColumnTab implements Initializable{
         setCheckBoxes();
 
         // Setting default expression column properties
-        columnDefaultColumn.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
+        columnDefaultColumn.setCellValueFactory(cellData -> cellData.getValue().defaultValueProperty());
         columnDefaultColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         columnDefaultColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
             column.setDefaultValue(event.getNewValue());
         });
+
+        // Setting up listener for data change in column table
+        columnTable.getSelectionModel().selectedItemProperty().addListener((observable,oldSelection,newSelection) -> {
+            if(newSelection == null) return;
+            int index = columnTable.getItems().indexOf(newSelection);
+
+            // Column name property listener
+            newSelection.nameProperty().addListener((obs,oldVal,newVal) -> {
+                int lastIndex = columnTable.getItems().size() -1;
+                if(index != lastIndex) return;
+                columnTable.getItems().add(new Column());
+            });
+            // Column type property listener
+            newSelection.typeProperty().addListener((obs,oldVal,newVal) -> {
+                int lastIndex = columnTable.getItems().size() -1;
+                if(index != lastIndex) return;
+                columnTable.getItems().add(new Column());
+            });
+            // Column default value property listener
+            newSelection.defaultValueProperty().addListener((obs,oldVal,newVal) -> {
+                int lastIndex = columnTable.getItems().size() -1;
+                if(index != lastIndex) return;
+                columnTable.getItems().add(new Column());
+            });
+
+        });
+
     }
 
 
@@ -128,7 +157,7 @@ public class PanelColumnTab implements Initializable{
     }
 
     private void setCheckBoxes(){
-        columnPKColumn.setCellValueFactory(new PropertyValueFactory<>("primaryKey"));
+        columnPKColumn.setCellValueFactory(cellData -> cellData.getValue().primaryKeyProperty());
         // Creating a custom checkBox that has a listener for checking
         columnPKColumn.setCellFactory(col ->{
             return new CheckBoxTableCell<Column, Boolean>() {
@@ -136,10 +165,20 @@ public class PanelColumnTab implements Initializable{
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setPrimaryKey(newValue);
+                            //Checking not null if the primary key checkbox is selected
+                            if(newValue == true){
+                                column.setNotNull(newValue);
+                                columnTable.refresh();
+                            }
+                            // Add new table row if its last
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -157,17 +196,21 @@ public class PanelColumnTab implements Initializable{
                 }
             };
         });
-
+        columnNNColumn.setCellValueFactory(cellData -> cellData.getValue().notNullProperty());
         columnNNColumn.setCellFactory(col ->{
             return new CheckBoxTableCell<Column, Boolean>() {
                 private final CheckBox checkBox = new CheckBox();
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setNotNull(newValue);
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -185,17 +228,21 @@ public class PanelColumnTab implements Initializable{
                 }
             };
         });
-
+        columnUQColumn.setCellValueFactory(cellData -> cellData.getValue().uniqueProperty());
         columnUQColumn.setCellFactory(col ->{
             return new CheckBoxTableCell<Column, Boolean>() {
                 private final CheckBox checkBox = new CheckBox();
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setUnique(newValue);
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -214,16 +261,21 @@ public class PanelColumnTab implements Initializable{
             };
         });
 
+        columnAIColumn.setCellValueFactory(cellData -> cellData.getValue().autoIncrementProperty());
         columnAIColumn.setCellFactory(col ->{
             return new CheckBoxTableCell<Column, Boolean>() {
                 private final CheckBox checkBox = new CheckBox();
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setAutoIncrement(newValue);
+                            if(row == tableSize - 1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -242,16 +294,21 @@ public class PanelColumnTab implements Initializable{
             };
         });
 
+        columnZFColumn.setCellValueFactory(cellData -> cellData.getValue().zeroFillProperty());
         columnZFColumn.setCellFactory(col ->{
             return new CheckBoxTableCell<Column, Boolean>() {
                 private final CheckBox checkBox = new CheckBox();
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setZeroFill(newValue);
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -270,16 +327,21 @@ public class PanelColumnTab implements Initializable{
             };
         });
 
+        columnGColumn.setCellValueFactory(cellData -> cellData.getValue().generationExpressionProperty());
         columnGColumn.setCellFactory(col ->{
             return new CheckBoxTableCell<Column, Boolean>() {
                 private final CheckBox checkBox = new CheckBox();
                 {
                     checkBox.setOnAction(event -> {
                         int row = getIndex();
-                        if (row >= 0 && row < columnTable.getItems().size()) {
+                        int tableSize = columnTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setGenerationExpression(newValue);
+                            if(row == tableSize -1){
+                                columnTable.getItems().add(new Column());
+                            }
                         }
                     });
                 }
@@ -297,5 +359,15 @@ public class PanelColumnTab implements Initializable{
                 }
             };
         });
+    }
+
+    public List<Column> getTableColumns(){
+        columnsData.removeIf(this::emptyProperties);
+        return columnsData;
+    }
+
+    public boolean emptyProperties(Column column){
+        // For some reason nameProperties of empty rows are not null
+        return column.getName() == null || column.getType() == null;
     }
 }

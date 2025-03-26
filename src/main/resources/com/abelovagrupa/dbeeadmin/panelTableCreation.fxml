@@ -4,12 +4,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 
 <!--TODO: Table textFields shouldn't repeat in each tab :Finished?-->
@@ -22,8 +18,8 @@
          <children>
             <Label text="Table name:" />
             <TextField fx:id="txtTableName" prefHeight="26.0" prefWidth="204.0" />
-            <Label text="Engine:" />
-            <ComboBox fx:id="cbEngines" prefWidth="150.0" />
+            <Label text="Schema:" />
+            <ComboBox fx:id="cbSchema" prefWidth="200.0" />
          </children>
          <opaqueInsets>
             <Insets />
@@ -47,12 +43,12 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT">
          <children>
-            <Button text="Apply">
+            <Button text="Apply" fx:id="applyBtn" onAction="#handleTableChange">
                <HBox.margin>
                   <Insets right="10" top="10" bottom="10"/>
                </HBox.margin>
             </Button>
-            <Button text="Revert" >
+            <Button text="Revert" fx:id="revertBtn">
                <HBox.margin>
                   <Insets right="10" top="10" bottom="10"/>
                </HBox.margin>
