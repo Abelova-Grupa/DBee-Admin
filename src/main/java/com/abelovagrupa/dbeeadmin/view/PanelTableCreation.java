@@ -87,14 +87,10 @@ public class PanelTableCreation implements Initializable {
 
             // Initialize trigger tab
             loader = new FXMLLoader(Main.class.getResource("panelTriggerTab.fxml"));
-
-            VBox triggerTabContent = loader.load();
-            triggerTab = new Tab("Triggers");
-
             HBox triggerTabContent = loader.load();
-            
-            triggerTab.setClosable(false);
 
+            triggerTab = new Tab("Triggers");
+            triggerTab.setClosable(false);
             triggerTab.setContent(triggerTabContent);
             tableAttributeTabPane.getTabs().add(triggerTab);
 
