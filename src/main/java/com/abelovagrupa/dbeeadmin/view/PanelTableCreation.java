@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -55,8 +56,11 @@ public class PanelTableCreation implements Initializable {
             // Initialize column tab
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
             VBox columnsTabContent = loader.load();
+
             columTabController = loader.getController();
             columnsTab = new Tab("Columns");
+            columnsTab.setClosable(false);
+
             columnsTab.setContent(columnsTabContent);
             tableAttributeTabPane.getTabs().add(columnsTab);
             tableAttributeTabPane.getSelectionModel().select(columnsTab);
@@ -64,21 +68,33 @@ public class PanelTableCreation implements Initializable {
             // Initialize index tab
             loader = new FXMLLoader(Main.class.getResource("panelIndexTab.fxml"));
             VBox indexTabContent = loader.load();
+
             indexTab = new Tab("Indexes");
+            indexTab.setClosable(false);
+
             indexTab.setContent(indexTabContent);
             tableAttributeTabPane.getTabs().add(indexTab);
 
             // Initialize foreign key tab
             loader = new FXMLLoader(Main.class.getResource("panelFKTab.fxml"));
             VBox foreignKeyTabContent = loader.load();
+
             foreignKeyTab = new Tab("Foreign Keys");
+            foreignKeyTab.setClosable(false);
+
             foreignKeyTab.setContent(foreignKeyTabContent);
             tableAttributeTabPane.getTabs().add(foreignKeyTab);
 
             // Initialize trigger tab
             loader = new FXMLLoader(Main.class.getResource("panelTriggerTab.fxml"));
+
             VBox triggerTabContent = loader.load();
             triggerTab = new Tab("Triggers");
+
+            HBox triggerTabContent = loader.load();
+            
+            triggerTab.setClosable(false);
+
             triggerTab.setContent(triggerTabContent);
             tableAttributeTabPane.getTabs().add(triggerTab);
 
