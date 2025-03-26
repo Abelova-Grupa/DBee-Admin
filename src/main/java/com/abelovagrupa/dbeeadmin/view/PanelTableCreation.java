@@ -48,11 +48,12 @@ public class PanelTableCreation implements Initializable {
 
     PanelColumnTab columTabController;
 
-
+    boolean[] tabLoaded;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
+            tabLoaded = new boolean[]{true,false,false,false};
             // Initialize column tab
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
             VBox columnsTabContent = loader.load();
@@ -66,37 +67,67 @@ public class PanelTableCreation implements Initializable {
             tableAttributeTabPane.getSelectionModel().select(columnsTab);
 
             // Initialize index tab
-            loader = new FXMLLoader(Main.class.getResource("panelIndexTab.fxml"));
-            VBox indexTabContent = loader.load();
-
             indexTab = new Tab("Indexes");
             indexTab.setClosable(false);
-
-            indexTab.setContent(indexTabContent);
             tableAttributeTabPane.getTabs().add(indexTab);
 
             // Initialize foreign key tab
-            loader = new FXMLLoader(Main.class.getResource("panelFKTab.fxml"));
-            VBox foreignKeyTabContent = loader.load();
-
             foreignKeyTab = new Tab("Foreign Keys");
             foreignKeyTab.setClosable(false);
-
-            foreignKeyTab.setContent(foreignKeyTabContent);
             tableAttributeTabPane.getTabs().add(foreignKeyTab);
 
             // Initialize trigger tab
-            loader = new FXMLLoader(Main.class.getResource("panelTriggerTab.fxml"));
-            HBox triggerTabContent = loader.load();
-
             triggerTab = new Tab("Triggers");
             triggerTab.setClosable(false);
-            triggerTab.setContent(triggerTabContent);
             tableAttributeTabPane.getTabs().add(triggerTab);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // Implementing lazy loading, tabs other than column tab will load its content
+        // only if they are selected for the first time
+        tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldTab, newTab) -> {
+                    if(newTab.equals(indexTab) && !tabLoaded[1]){
+                        try {
+                            FXMLLoader indexLoader = new FXMLLoader(Main.class.getResource("panelIndexTab.fxml"));
+                            VBox indexTabContent = indexLoader.load();
+                            indexTab.setContent(indexTabContent);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        tabLoaded[1] = true;
+                    }
+                });
+
+        tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldTab, newTab) -> {
+                    if(newTab.equals(foreignKeyTab) && !tabLoaded[2]){
+                        try {
+                            FXMLLoader fkLoader = new FXMLLoader(Main.class.getResource("panelFKTab.fxml"));
+                            VBox foreignKeyTabContent = fkLoader.load();
+                            foreignKeyTab.setContent(foreignKeyTabContent);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        tabLoaded[2] = true;
+                    }
+                });
+
+        tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldTab, newTab) -> {
+                    if(newTab.equals(triggerTab) && !tabLoaded[3]){
+                        try {
+                            FXMLLoader triggerLoader = new FXMLLoader(Main.class.getResource("panelTriggerTab.fxml"));
+                            HBox triggerTabContent = triggerLoader.load();
+                            triggerTab.setContent(triggerTabContent);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        tabLoaded[3] = true;
+                    }
+                });
 
         // Filling comboBox with engine values
         // Resource heavy?
