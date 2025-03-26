@@ -12,6 +12,8 @@ import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -27,10 +29,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class PanelBrowser implements Initializable {
 
@@ -40,7 +39,7 @@ public class PanelBrowser implements Initializable {
 
     private List<PanelSchemaTree> schemaControllers;
 
-    private List<TreeView<String>> schemaViews;
+    private ObservableList<TreeView<String>> schemaViews;
 
     private PanelInfoNew infoController;
 
@@ -95,16 +94,18 @@ public class PanelBrowser implements Initializable {
         // TODO: WRITE COMMENTS FROM THIS METHOD
         try {
             schemaControllers = new LinkedList<>();
-            schemaViews = new LinkedList<>();
+            schemaViews = FXCollections.observableArrayList();
             List<String> schemaNames = DatabaseInspector.getInstance().getDatabaseNames();
             for (String schemaName : schemaNames) {
                 // Loading each schema treeView
                 FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelSchemaTree.fxml"));
                 TreeView<String> schemaView = loader.load();
-                schemaView.setFixedCellSize(TREE_CELL_HEIGHT);
+                // Setting up standard height of tree node
+                schemaView.setPrefHeight(TREE_CELL_HEIGHT);
+                // Adding schema controller to the list
                 schemaControllers.add(loader.getController());
 
-
+                // Creating a root node with its first children tables, views, stored procedures and functions
                 TreeItem<String> schemaNode = new TreeItem<>(schemaName, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database.png").toExternalForm())));
                 schemaView.setRoot(schemaNode);
                 TreeItem<String> tableBranch = new TreeItem<>("Tables", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));
@@ -112,14 +113,12 @@ public class PanelBrowser implements Initializable {
                 TreeItem<String> procedureBranch = new TreeItem<>("Stored Procedures", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));
                 TreeItem<String> functionBranch = new TreeItem<>("Functions", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));
 
-
                 // Creating an initial tableDummy so that the tableBranch can be expandable
                 TreeItem<String> tableDummyNode = new TreeItem<>("Dummy table");
                 tableBranch.getChildren().add(tableDummyNode);
 
                 schemaNode.getChildren().addAll(tableBranch, viewBranch, procedureBranch, functionBranch);
-                schemaView.setPrefHeight(TREE_CELL_HEIGHT);
-                schemaView.setFixedCellSize(TREE_CELL_HEIGHT);
+                // Adding expanding and collapsing listeners to the treeview so that the height of it would change
                 schemaView.getRoot().addEventHandler(TreeItem.branchExpandedEvent(), event -> {
                     Platform.runLater(() -> schemaView.setPrefHeight(schemaView.getExpandedItemCount() * TREE_CELL_HEIGHT));
                 });
@@ -130,6 +129,8 @@ public class PanelBrowser implements Initializable {
 
                 schemaViews.add(schemaView);
 
+                // If the "Tables" branch of schema expands its children are being loaded
+                // in this case table name nodes and the dummy node is being removed
                 ChangeListener<Boolean> tableBranchListener = new ChangeListener<>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -138,12 +139,13 @@ public class PanelBrowser implements Initializable {
                             List<String> tableNames = DatabaseInspector.getInstance().getTableNames(schema);
                             tableBranch.getChildren().remove(tableDummyNode);
                             for (String tableName : tableNames) {
-
+                                // Adding "Columns" branch for each table which has a dummy branch
                                 TreeItem<String> tableNode = new TreeItem<>(tableName, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
                                 TreeItem<String> columnBranch = new TreeItem<>("Columns", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
                                 TreeItem<String> columnDummy = new TreeItem<>("Column Dummy");
                                 columnBranch.getChildren().add(columnDummy);
 
+                                // Same logic applies to column expansion listener
                                 ChangeListener<Boolean> columnBranchListener = new ChangeListener<Boolean>() {
                                     @Override
                                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -156,16 +158,19 @@ public class PanelBrowser implements Initializable {
                                                 TreeItem<String> columnNode = new TreeItem<>(columnName);
                                                 columnBranch.getChildren().add(columnNode);
                                             }
+                                            // Removing column listener
                                             columnBranch.expandedProperty().removeListener(this);
                                         }
                                     }
                                 };
                                 columnBranch.expandedProperty().addListener(columnBranchListener);
 
+                                // Adding index branch with dummy child
                                 TreeItem<String> indexBranch = new TreeItem<>("Indexes", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/indexes.png").toExternalForm())));
                                 TreeItem<String> indexDummy = new TreeItem<>("Index dummy");
                                 indexBranch.getChildren().add(indexDummy);
 
+                                // Same logic applies for index expansion listener
                                 ChangeListener<Boolean> indexBranchListener = new ChangeListener<Boolean>() {
                                     @Override
                                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -177,16 +182,19 @@ public class PanelBrowser implements Initializable {
                                                 TreeItem<String> indexNode = new TreeItem<>(index.getName());
                                                 indexBranch.getChildren().add(indexNode);
                                             }
+                                            // Removing index listener after first usage
                                             indexBranch.expandedProperty().removeListener(this);
                                         }
                                     }
                                 };
                                 indexBranch.expandedProperty().addListener(indexBranchListener);
 
+                                // Adding foreign key branch with dummy child
                                 TreeItem<String> foreignKeyBranch = new TreeItem<>("Foreign Keys", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/foreignkeys.png").toExternalForm())));
                                 TreeItem<String> foreignKeyDummy = new TreeItem<>("ForeignKeyDummy");
                                 foreignKeyBranch.getChildren().add(foreignKeyDummy);
 
+                                // Same logic as before for this listener
                                 ChangeListener<Boolean> foreignKeyListener = new ChangeListener<Boolean>() {
                                     @Override
                                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -198,17 +206,20 @@ public class PanelBrowser implements Initializable {
                                                 TreeItem<String> foreignKeyNode = new TreeItem<>(foreignKey.getName());
                                                 foreignKeyBranch.getChildren().add(foreignKeyNode);
                                             }
+                                            // Removing listener after first usage
                                             foreignKeyBranch.expandedProperty().removeListener(this);
                                         }
                                     }
                                 };
                                 foreignKeyBranch.expandedProperty().addListener(foreignKeyListener);
 
+                                // Not implemented yet
                                 TreeItem<String> triggersBranch = new TreeItem<>("Triggers", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/triggers.png").toExternalForm())));
 
                                 tableNode.getChildren().addAll(columnBranch, indexBranch, foreignKeyBranch, triggersBranch);
                                 tableBranch.getChildren().add(tableNode);
                             }
+                            // Removing the table branch listener because its first level children are loaded
                             tableBranch.expandedProperty().removeListener(this);
                         }
                     }
@@ -220,7 +231,6 @@ public class PanelBrowser implements Initializable {
 
                     // Selecting up active schema
                     if(event.getButton().equals(MouseButton.PRIMARY)){
-
                         // Fetch schema name
                         selectedSchemaName = schemaView.getRoot().getValue();
                         // Display active schema in info panel and set in programState
@@ -321,19 +331,66 @@ public class PanelBrowser implements Initializable {
                 if(!s.getCode().equals(KeyCode.ENTER)) return;
 
                 if(!(searchObjects.getText().isEmpty() || searchObjects.getText().equals("Search Objects"))){
-                    for(TreeView<String> schemaView : schemaViews){
-                        schemaView.setVisible(schemaView.getRoot().getValue().startsWith(searchObjects.getText()));
-                    }
+                    sortAndFilterSchemas(searchObjects.getText());
                 }else {
-                    for(TreeView<String> schemaView : schemaViews){
-                        schemaView.setVisible(true);
-                    }
+                    sortAndFilterSchemas(null);
                 }
             });
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void sortAndFilterSchemas(String text) {
+        if(text == null){
+            ObservableList<TreeView<String>> sortedSchemaViews = schemaViews;
+            FXCollections.sort(sortedSchemaViews, Comparator.comparing(view -> {
+                if(view != null){
+                    return ((TreeView<String>) view).getRoot().getValue();
+                }
+                return "";
+            }));
+            for(TreeView<String> schemaView : schemaViews){
+                schemaView.setVisible(true);
+            }
+            vboxBrowser.getChildren().setAll(sortedSchemaViews);
+            return;
+        }
+        // If the search query is not empty
+        Comparator<TreeView<String>> comparator = new Comparator<TreeView<String>>() {
+            @Override
+            public int compare(TreeView<String> o1, TreeView<String> o2) {
+                String firstSchemaName = o1.getRoot().getValue();
+                String secondSchemaName = o2.getRoot().getValue();
+                if(searchCharacterCount(firstSchemaName,text) > searchCharacterCount(secondSchemaName,text)){
+                    return -1;
+                }else if (searchCharacterCount(firstSchemaName,text) < searchCharacterCount(secondSchemaName,text)){
+                    return 1;
+                }else return 0;
+            }
+        };
+        // Sorting tree views
+        ObservableList<TreeView<String>> sortedSchemaViews = schemaViews;
+        FXCollections.sort(sortedSchemaViews, comparator::compare);
+
+        //Filtering tree views
+        for (TreeView<String> schemaView : sortedSchemaViews){
+            if(!schemaView.getRoot().getValue().startsWith(searchObjects.getText())){
+                schemaView.setVisible(false);
+            }
+        }
+        vboxBrowser.getChildren().setAll(sortedSchemaViews);
+    }
+
+    private int searchCharacterCount(String text,String searchText){
+        int length = Math.min(text.length(),searchText.length());
+        int count = 0;
+        for(int i = 0; i < length; i++){
+            if(text.charAt(i) == searchText.charAt(i)) count++;
+            else break;
+        }
+        return count;
     }
 
     public static boolean isChildOf(TreeItem<?> item, TreeItem<?> potentialParent) {
