@@ -612,9 +612,15 @@ public class DDLGenerator {
 
         String query = queryBuilder.toString();
 
+        // Connect to schema
+        DatabaseConnection.getInstance().setCurrentSchema(view.getSchema());
+
         if(preview)
             new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
         else executeUpdate(query);
+
+        // Reset connection to the whole dbms (Might not be needed and deleted later)
+        DatabaseConnection.getInstance().setCurrentSchema(null);
 
     }
 

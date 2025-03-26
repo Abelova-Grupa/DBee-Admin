@@ -1,5 +1,6 @@
 package com.abelovagrupa.dbeeadmin.connection;
 
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -103,4 +104,22 @@ public class DatabaseConnection {
             return host+":"+port;
         }else return "jdbc:mysql://"+host+":" + port;
     }
+
+    /**
+     * Sets connection to specific schema.
+     * @param schema Schema to connect to. Pass null to reset.
+     */
+    public void setCurrentSchema(Schema schema) {
+
+        Dotenv dotenv = Dotenv.configure().directory("src/main/resources/com/abelovagrupa/dbeeadmin/.env").load();
+        String dbUrl = dotenv.get("DB_URL");
+        String dbUsername = dotenv.get("DB_USERNAME");
+        String dbPassword = dotenv.get("DB_PASSWORD");
+
+        if(schema != null)
+            setConnection(dbUrl + '/' + schema.getName(), dbUsername, dbPassword);
+        else
+            setConnection(dbUrl, dbUsername, dbPassword);
+    }
+
 }

@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class PanelTableCreation implements Initializable {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
             VBox columnsTabContent = loader.load();
             Tab columnsTab = new Tab("Columns");
+            columnsTab.setClosable(false);
             columnsTab.setContent(columnsTabContent);
             tableAttributeTabPane.getTabs().add(columnsTab);
             tableAttributeTabPane.getSelectionModel().select(columnsTab);
@@ -45,6 +47,7 @@ public class PanelTableCreation implements Initializable {
             loader = new FXMLLoader(Main.class.getResource("panelIndexTab.fxml"));
             VBox indexTabContent = loader.load();
             Tab indexTab = new Tab("Indexes");
+            indexTab.setClosable(false);
             indexTab.setContent(indexTabContent);
             tableAttributeTabPane.getTabs().add(indexTab);
 
@@ -52,13 +55,15 @@ public class PanelTableCreation implements Initializable {
             loader = new FXMLLoader(Main.class.getResource("panelFKTab.fxml"));
             VBox foreignKeyTabContent = loader.load();
             Tab foreignKeyTab = new Tab("Foreign Keys");
+            foreignKeyTab.setClosable(false);
             foreignKeyTab.setContent(foreignKeyTabContent);
             tableAttributeTabPane.getTabs().add(foreignKeyTab);
 
             // Initialize trigger tab
             loader = new FXMLLoader(Main.class.getResource("panelTriggerTab.fxml"));
-            VBox triggerTabContent = loader.load();
+            HBox triggerTabContent = loader.load();
             Tab triggerTab = new Tab("Triggers");
+            triggerTab.setClosable(false);
             triggerTab.setContent(triggerTabContent);
             tableAttributeTabPane.getTabs().add(triggerTab);
 

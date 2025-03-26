@@ -105,17 +105,7 @@ public class Trigger {
 
     @Override
     public String toString() {
-        return "Trigger{" +
-                "name='" + name + '\'' +
-                ", event=" + event +
-                ", timing=" + timing +
-                ", table=" + table +
-                ", triggerDescription='" + triggerDescription + '\'' +
-                ", createdAt=" + createdAt +
-                ", isEnabled=" + isEnabled +
-                ", definer='" + definer + '\'' +
-                ", statement='" + statement + '\'' +
-                '}';
+        return name + ": " + timing + " " + event;
     }
 
     @Override
