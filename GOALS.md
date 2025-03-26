@@ -21,7 +21,7 @@ This document contains a list of objectives that must be accomplished in order t
 - [ ] View removal
 
 #### Tables
-- [ ] Table creation
+- [x] Table creation
 - [ ] Table altering
 - [ ] Table removal (DROP)
 - [ ] Table clearing (TRUNCATE)
@@ -34,8 +34,8 @@ This document contains a list of objectives that must be accomplished in order t
 - [ ] Column removal
 
 #### Primary keys
-- [ ] Simple PK creation (during table creation)
-- [ ] Composite PK creatione
+- [x] Simple PK creation (during table creation)
+- [ ] Composite PK creation
 
 #### Foreign keys
 
