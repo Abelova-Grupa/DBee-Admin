@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -12,19 +13,19 @@
 <?import org.fxmisc.richtext.CodeArea?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
-<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTriggerTab">
    <children>
       <VBox HBox.hgrow="ALWAYS">
          <children>
             <HBox alignment="CENTER_LEFT" spacing="6.0">
                <children>
-                  <Label text="Name:" />
+                  <Label alignment="CENTER_RIGHT" prefWidth="74.0" text="Name:" />
                   <TextField fx:id="txtName" promptText="Enter trigger name" HBox.hgrow="ALWAYS" />
                   <Label text="Timing:" />
                   <ComboBox fx:id="cbTiming" prefWidth="150.0" promptText="Select timing" />
                   <Label text="Action:" />
                   <ComboBox fx:id="cbAction" prefWidth="150.0" promptText="Select action" />
+                  <CheckBox fx:id="cbEnabled" mnemonicParsing="false" selected="true" text="Enabled" />
                </children>
                <padding>
                   <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
@@ -33,11 +34,25 @@
                   <Insets />
                </VBox.margin>
             </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="6.0">
+               <children>
+                  <Label text="Description:" />
+                  <TextField fx:id="txtDescription" promptText="Enter trigger description" HBox.hgrow="ALWAYS" />
+               </children>
+               <padding>
+                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+               </padding>
+            </HBox>
             <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS" />
             <HBox spacing="6.0">
                <children>
+                  <Button fx:id="btnDelete" contentDisplay="RIGHT" mnemonicParsing="false" text="Delete Trigger">
+                     <graphic>
+                        <FontIcon iconLiteral="fas-trash" styleClass="font-icon" />
+                     </graphic>
+                  </Button>
                   <AnchorPane HBox.hgrow="ALWAYS" />
-                  <Button contentDisplay="RIGHT" mnemonicParsing="false" text="Add">
+                  <Button fx:id="btnSave" contentDisplay="RIGHT" mnemonicParsing="false" text="Save">
                      <graphic>
                         <FontIcon iconLiteral="fas-arrow-circle-right" styleClass="font-icon" />
                      </graphic>
@@ -49,8 +64,13 @@
             </HBox>
          </children>
       </VBox>
-      <VBox>
+      <VBox spacing="6.0">
          <children>
+            <Button fx:id="btnAdd" contentDisplay="RIGHT" mnemonicParsing="false" text="New">
+               <graphic>
+                  <FontIcon iconLiteral="fas-plus" styleClass="font-icon" />
+               </graphic>
+            </Button>
             <ListView fx:id="triggerListView" editable="true" VBox.vgrow="ALWAYS" />
          </children>
          <padding>
