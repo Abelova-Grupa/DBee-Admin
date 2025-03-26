@@ -43,12 +43,12 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT">
          <children>
-            <Button text="Apply">
+            <Button text="Apply" fx:id="applyBtn" onAction="#handleTableChange">
                <HBox.margin>
                   <Insets right="10" top="10" bottom="10"/>
                </HBox.margin>
             </Button>
-            <Button text="Revert" >
+            <Button text="Revert" fx:id="revertBtn">
                <HBox.margin>
                   <Insets right="10" top="10" bottom="10"/>
                </HBox.margin>
