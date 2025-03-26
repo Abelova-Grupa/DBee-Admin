@@ -1,16 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.fxmisc.richtext.CodeArea?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 
-<VBox maxHeight="-Infinity"  minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTriggerTab">
-    <children>
-        <ScrollPane fx:id="scrollTriggers" hbarPolicy="NEVER" pannable="true" prefHeight="500.0">
-            <content>
-                <VBox fx:id="scrollContentTriggers" prefHeight="132.0" />
-            </content>
-        </ScrollPane>
-    </children>
-</VBox>
-
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox HBox.hgrow="ALWAYS">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="6.0">
+               <children>
+                  <Label text="Name:" />
+                  <TextField fx:id="txtName" promptText="Enter trigger name" HBox.hgrow="ALWAYS" />
+                  <Label text="Timing:" />
+                  <ComboBox fx:id="cbTiming" prefWidth="150.0" promptText="Select timing" />
+                  <Label text="Action:" />
+                  <ComboBox fx:id="cbAction" prefWidth="150.0" promptText="Select action" />
+               </children>
+               <padding>
+                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+            <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS" />
+            <HBox spacing="6.0">
+               <children>
+                  <AnchorPane HBox.hgrow="ALWAYS" />
+                  <Button contentDisplay="RIGHT" mnemonicParsing="false" text="Add">
+                     <graphic>
+                        <FontIcon iconLiteral="fas-arrow-circle-right" styleClass="font-icon" />
+                     </graphic>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="6.0" left="6.0" top="6.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox>
+         <children>
+            <ListView fx:id="triggerListView" editable="true" VBox.vgrow="ALWAYS" />
+         </children>
+         <padding>
+            <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+         </padding>
+      </VBox>
+   </children>
+</HBox>
