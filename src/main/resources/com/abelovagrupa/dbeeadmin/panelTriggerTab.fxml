@@ -13,7 +13,7 @@
 <?import org.fxmisc.richtext.CodeArea?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTriggerTab">
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-style: solid; -fx-border-width: 1; -fx-border-color: #c9c9c9;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTriggerTab">
    <children>
       <VBox HBox.hgrow="ALWAYS">
          <children>
@@ -28,7 +28,7 @@
                   <CheckBox fx:id="cbEnabled" mnemonicParsing="false" selected="true" text="Enabled" />
                </children>
                <padding>
-                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                  <Insets bottom="6.0" left="6.0" top="6.0" />
                </padding>
                <VBox.margin>
                   <Insets />
@@ -40,10 +40,13 @@
                   <TextField fx:id="txtDescription" promptText="Enter trigger description" HBox.hgrow="ALWAYS" />
                </children>
                <padding>
-                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                  <Insets bottom="6.0" left="6.0" top="6.0" />
                </padding>
             </HBox>
-            <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS" />
+            <CodeArea fx:id="codeArea" style="-fx-border-style: solid; -fx-border-color: #c9c9c9;" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets left="6.0" />
+               </VBox.margin></CodeArea>
             <HBox spacing="6.0">
                <children>
                   <Button fx:id="btnDelete" contentDisplay="RIGHT" mnemonicParsing="false" text="Delete Trigger">
@@ -78,4 +81,7 @@
          </padding>
       </VBox>
    </children>
+   <padding>
+      <Insets top="6.0" />
+   </padding>
 </HBox>
