@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import org.fxmisc.richtext.CodeArea?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.fxmisc.richtext.*?>
+<?import org.kordamp.ikonli.javafx.*?>
 
-<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-style: solid; -fx-border-width: 1; -fx-border-color: #c9c9c9;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTriggerTab">
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-style: solid; -fx-border-width: 1; -fx-border-color: #c9c9c9;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTriggerTab">
    <children>
       <VBox HBox.hgrow="ALWAYS">
          <children>
@@ -49,13 +42,13 @@
                </VBox.margin></CodeArea>
             <HBox spacing="6.0">
                <children>
-                  <Button fx:id="btnDelete" contentDisplay="RIGHT" mnemonicParsing="false" text="Delete Trigger">
+                  <Button fx:id="btnDelete" contentDisplay="RIGHT" mnemonicParsing="false" text="Delete Trigger" onAction="#deleteTrigger">
                      <graphic>
                         <FontIcon iconLiteral="fas-trash" styleClass="font-icon" />
                      </graphic>
                   </Button>
                   <AnchorPane HBox.hgrow="ALWAYS" />
-                  <Button fx:id="btnSave" contentDisplay="RIGHT" mnemonicParsing="false" text="Save">
+                  <Button fx:id="btnSave" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#saveTrigger" text="Save">
                      <graphic>
                         <FontIcon iconLiteral="fas-arrow-circle-right" styleClass="font-icon" />
                      </graphic>
@@ -69,12 +62,12 @@
       </VBox>
       <VBox spacing="6.0">
          <children>
-            <Button fx:id="btnAdd" contentDisplay="RIGHT" mnemonicParsing="false" text="New">
+            <Button fx:id="btnAdd" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#addBlankTrigger" text="New">
                <graphic>
                   <FontIcon iconLiteral="fas-plus" styleClass="font-icon" />
                </graphic>
             </Button>
-            <ListView fx:id="triggerListView" editable="true" VBox.vgrow="ALWAYS" />
+            <ListView fx:id="triggerListView" editable="true" onMouseClicked="#setSelectedTrigger" VBox.vgrow="ALWAYS" />
          </children>
          <padding>
             <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
