@@ -140,7 +140,7 @@ public class PanelBrowser implements Initializable {
                             List<String> viewNames = DatabaseInspector.getInstance().getViewNames(schema);
                             viewBranch.getChildren().remove(tableDummyNode);
                             for(var v : viewNames) {
-                                viewBranch.getChildren().add(new TreeItem<>(v));
+                                viewBranch.getChildren().add(new TreeItem<>(v, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/view.png").toExternalForm()))));
                             }
                         }
                         viewBranch.expandedProperty().removeListener(this);
