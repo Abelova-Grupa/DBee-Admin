@@ -116,6 +116,7 @@ public class PanelBrowser implements Initializable {
                 // Creating an initial tableDummy so that the tableBranch can be expandable
                 TreeItem<String> tableDummyNode = new TreeItem<>("Dummy table");
                 tableBranch.getChildren().add(tableDummyNode);
+                viewBranch.getChildren().add(tableDummyNode);
 
                 schemaNode.getChildren().addAll(tableBranch, viewBranch, procedureBranch, functionBranch);
                 // Adding expanding and collapsing listeners to the treeview so that the height of it would change
@@ -128,6 +129,22 @@ public class PanelBrowser implements Initializable {
                 });
 
                 schemaViews.add(schemaView);
+
+                // If "Views" branch is expanded, its children are loaded and dummy node is removed.
+                ChangeListener<Boolean> viewBranchListener = new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observableValue, Boolean odlValue, Boolean newValue) {
+                        if(newValue) {
+                            Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
+                            List<String> viewNames = DatabaseInspector.getInstance().getViewNames(schema);
+                            viewBranch.getChildren().remove(tableDummyNode);
+                            for(var v : viewNames) {
+                                viewBranch.getChildren().add(new TreeItem<>(v));
+                            }
+                        }
+                        viewBranch.expandedProperty().removeListener(this);
+                    }
+                };
 
                 // If the "Tables" branch of schema expands its children are being loaded
                 // in this case table name nodes and the dummy node is being removed
@@ -225,7 +242,12 @@ public class PanelBrowser implements Initializable {
                     }
                 };
 
+                // Register table branch listener
                 tableBranch.expandedProperty().addListener(tableBranchListener);
+
+                // Register view branch listener
+                viewBranch.expandedProperty().addListener(viewBranchListener);
+
                 // TODO: REFACTOR
                 schemaView.setOnMouseClicked(event -> {
 
