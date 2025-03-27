@@ -16,7 +16,7 @@ This document contains a list of objectives that must be accomplished in order t
 ### Visual table operations
 
 #### Views
-- [ ] View creation
+- [x] View creation
 - [ ] View altering
 - [ ] View removal
 
@@ -29,7 +29,7 @@ This document contains a list of objectives that must be accomplished in order t
 
 #### Columns
 
-- [ ] Column creation
+- [x] Column creation
 - [ ] Column altering
 - [ ] Column removal
 
