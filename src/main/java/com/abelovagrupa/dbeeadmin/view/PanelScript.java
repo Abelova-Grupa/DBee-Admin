@@ -38,7 +38,7 @@ public class PanelScript implements Initializable {
     CodeArea codeArea;
 
     public static final String[] SQL_KEYWORDS = {
-        "SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP", "HAVING", "ORDER",
+        "SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP", "HAVING", "ORDER", "INTO",
         "BY", "JOIN", "INNER", "LEFT", "RIGHT", "FULL", "OUTER", "ON", "AND", "OR", "NOT",
         "NULL", "IS", "BETWEEN", "LIKE", "IN", "EXISTS", "DISTINCT", "AS", "CREATE",
         "TABLE", "DROP", "ALTER", "ADD", "COLUMN", "CONSTRAINT", "PRIMARY", "KEY", "FOREIGN",
