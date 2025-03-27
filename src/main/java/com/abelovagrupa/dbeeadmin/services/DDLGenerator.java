@@ -2,6 +2,7 @@ package com.abelovagrupa.dbeeadmin.services;
 
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexType;
@@ -147,7 +148,7 @@ public class DDLGenerator {
         else sql.append(c.getType().name());
 
         // Append size
-        if(c.getSize() != null) {
+        if(c.getSize() != null && DataType.hasVariableLength(c.getType())) {
             sql.append("(");
             sql.append(c.getSize());
             sql.append(")");
