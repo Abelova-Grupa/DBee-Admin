@@ -12,14 +12,16 @@ import java.sql.Statement;
 public class QueryExecutor {
 
     public static Pair<ResultSet, Integer> executeQuery(String sql) {
-
+        DatabaseConnection.getInstance().setCurrentSchema(ProgramState.getInstance().getSelectedSchema());
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
         Integer rowsAffected = null;
 
         try {
+
             connection = DatabaseConnection.getInstance().getConnection();
+
 
             statement = connection.createStatement();
 
@@ -40,7 +42,7 @@ public class QueryExecutor {
             System.err.println("Error executing SQL query: " + e.getMessage());
             AlertManager.showErrorDialog(null, "Error executing SQL query:", e.getMessage());
         }
-
+        DatabaseConnection.getInstance().setCurrentSchema(null);
         return Pair.of(resultSet, rowsAffected);
 
     }

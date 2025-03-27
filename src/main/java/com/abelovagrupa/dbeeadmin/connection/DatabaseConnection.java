@@ -52,8 +52,8 @@ public class DatabaseConnection {
     public void setConnection(String dbUrl, String dbUsername, String dbPassword){
         try {
             connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-            setConnectionParameters(dbUrl,dbUsername,dbPassword);
-        } catch (SQLException  | IOException e) {
+            //setConnectionParameters(dbUrl,dbUsername,dbPassword);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -117,9 +117,11 @@ public class DatabaseConnection {
         String dbPassword = dotenv.get("DB_PASSWORD");
 
         if(schema != null)
-            setConnection(dbUrl + '/' + schema.getName(), dbUsername, dbPassword);
+            setConnection(dbUrl + schema.getName(), dbUsername, dbPassword);
+
         else
             setConnection(dbUrl, dbUsername, dbPassword);
+        System.out.println(dbUrl);
     }
 
 }
