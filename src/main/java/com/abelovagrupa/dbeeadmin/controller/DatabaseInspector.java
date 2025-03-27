@@ -68,7 +68,7 @@ public class DatabaseInspector {
 
         List<String> tableNames = new LinkedList<>();
 
-        String query = "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?";
+        String query = "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND table_type = 'BASE TABLE'";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, schema.getName());
 
@@ -87,7 +87,7 @@ public class DatabaseInspector {
     public List<Table> getTables(Schema schema){
 
         List<Table> tables = new LinkedList<>();
-        String query = "SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?;";
+        String query = "SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND table_type = 'BASE TABLE';";
 
         try(PreparedStatement ps = connection.prepareStatement(query)){
             ps.setString(1,schema.getName());
@@ -115,7 +115,7 @@ public class DatabaseInspector {
     public Table getTableByName(Schema schema, String tableName) {
 
         Table table = null;
-        String query = "SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA =? AND TABLE_NAME=?;";
+        String query = "SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA =? AND TABLE_NAME=? AND table_type = 'BASE TABLE'";
 
         try(PreparedStatement ps = connection.prepareStatement(query)){
             ps.setString(1, schema.getName());
