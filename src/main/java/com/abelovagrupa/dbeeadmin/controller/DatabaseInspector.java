@@ -14,12 +14,11 @@ import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.model.trigger.Event;
 import com.abelovagrupa.dbeeadmin.model.trigger.Timing;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
+import com.abelovagrupa.dbeeadmin.model.view.View;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class DatabaseInspector {
 
@@ -717,6 +716,52 @@ public class DatabaseInspector {
         }
 
         return trigger;
+    }
+
+    public List<String> getViewNames(Schema schema) {
+        List<String> viewNames = new LinkedList<>();
+        String schemaName = schema.getName();
+
+        String query = "SELECT TABLE_NAME FROM information_schema.views WHERE TABLE_SCHEMA = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, schemaName);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    viewNames.add(rs.getString("TABLE_NAME"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving views: " + e.getMessage());
+        }
+
+        return viewNames;
+    }
+
+    public List<View> getViews(@NotNull Schema schema) {
+        List<View> views = new LinkedList<>();
+        String schemaName = schema.getName();
+
+        String query = "SELECT TABLE_NAME FROM information_schema.views WHERE TABLE_SCHEMA = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, schemaName);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    views.add(new View(
+                        schema,
+                        rs.getString("TABLE_NAME"),
+                        rs.getString("VIEW_DEFINITION")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving views: " + e.getMessage());
+        }
+
+        return views;
     }
 
 //    public static void main(String[] args) {

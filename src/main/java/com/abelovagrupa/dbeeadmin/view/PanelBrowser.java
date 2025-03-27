@@ -7,6 +7,7 @@ import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.model.view.View;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
 import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
 import javafx.application.Platform;
@@ -116,6 +117,7 @@ public class PanelBrowser implements Initializable {
                 // Creating an initial tableDummy so that the tableBranch can be expandable
                 TreeItem<String> tableDummyNode = new TreeItem<>("Dummy table");
                 tableBranch.getChildren().add(tableDummyNode);
+                viewBranch.getChildren().add(tableDummyNode);
 
                 schemaNode.getChildren().addAll(tableBranch, viewBranch, procedureBranch, functionBranch);
                 // Adding expanding and collapsing listeners to the treeview so that the height of it would change
@@ -128,6 +130,22 @@ public class PanelBrowser implements Initializable {
                 });
 
                 schemaViews.add(schemaView);
+
+                // If "Views" branch is expanded, its children are loaded and dummy node is removed.
+                ChangeListener<Boolean> viewBranchListener = new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observableValue, Boolean odlValue, Boolean newValue) {
+                        if(newValue) {
+                            Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
+                            List<String> viewNames = DatabaseInspector.getInstance().getViewNames(schema);
+                            viewBranch.getChildren().remove(tableDummyNode);
+                            for(var v : viewNames) {
+                                viewBranch.getChildren().add(new TreeItem<>(v));
+                            }
+                        }
+                        viewBranch.expandedProperty().removeListener(this);
+                    }
+                };
 
                 // If the "Tables" branch of schema expands its children are being loaded
                 // in this case table name nodes and the dummy node is being removed
@@ -225,7 +243,12 @@ public class PanelBrowser implements Initializable {
                     }
                 };
 
+                // Register table branch listener
                 tableBranch.expandedProperty().addListener(tableBranchListener);
+
+                // Register view branch listener
+                viewBranch.expandedProperty().addListener(viewBranchListener);
+
                 // TODO: REFACTOR
                 schemaView.setOnMouseClicked(event -> {
 
@@ -251,6 +274,7 @@ public class PanelBrowser implements Initializable {
                         Optional<Table> selectedTableOptional = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
                         if (selectedTableOptional.isPresent()) {
                             Table selectedTable = selectedTableOptional.get();
+                            // If table is and selected
                             if (getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem, tableBranch))) {
 
                                 // Display table in info panel
@@ -273,7 +297,34 @@ public class PanelBrowser implements Initializable {
                                 }
 
                             }
+
                         }
+//                        // If view branch is selected
+//                        if (getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem, viewBranch))) {
+//
+//                            // FIXME: Find a way to store views instead of querying for them each time.
+//                            // Get selected view (non optimal solution)
+//                            Optional<View> selectedView = DatabaseInspector.getInstance().getViews(schema).stream().filter(view -> view.getName().equals(selectedItem.getValue())).findFirst();
+//                            if(selectedView.isPresent()) {
+//                                // Display table in info panel
+//                                infoController.setSelected(selectedView.get());
+//
+//                                // Do SELECT on double click
+//                                if(event.getClickCount() == 2) {
+//                                    try {
+//                                        mainController.resultsController.printResultSetToTable(
+//                                            QueryExecutor.executeQuery(
+//                                                "SELECT * FROM " + selectedView.get().getName()
+//                                            ).getFirst()
+//                                        );
+//                                    } catch (SQLException e) {
+//                                        throw new RuntimeException(e);
+//                                    }
+//                                }
+//                            }
+//
+
+//                        }
                         try {
                             if (selectedItem.getParent().getValue().equals("Columns") && getTreeItemDepth(selectedItem) == 5) {
                                 // TODO: make it efficient, for now it works
