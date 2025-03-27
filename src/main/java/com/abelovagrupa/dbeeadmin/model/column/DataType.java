@@ -50,4 +50,56 @@ public enum DataType {
     GEOMETRY,
     GEOMETRY_COLLECTION;
 
+    public static boolean hasVariableLength(DataType dataType){
+        switch (dataType) {
+            // Variable-length types
+            case VARCHAR:
+            case VARBINARY:
+            case TINYBLOB:
+            case BLOB:
+            case MEDIUMBLOB:
+            case LONGBLOB:
+            case TINYTEXT:
+            case TEXT:
+            case MEDIUMTEXT:
+            case LONGTEXT:
+            case ENUM:
+            case SET:
+            case JSON:
+            case GEOMETRY:
+            case GEOMETRY_COLLECTION:
+            case POINT:
+            case LINESTRING_2D:
+            case POLYGON_2D:
+            case LINESTRING_3D:
+            case POLYGON_3D:
+            case MULTIPOINT:
+                return true;
+
+            // Fixed-length types
+            case TINYINT:
+            case SMALLINT:
+            case MEDIUMINT:
+            case INT:
+            case BIGINT:
+            case DECIMAL:
+            case NUMERIC:
+            case FLOAT:
+            case DOUBLE:
+            case BIT:
+            case BINARY:
+            case DATE:
+            case TIME:
+            case DATETIME:
+            case TIMESTAMP:
+            case YEAR:
+            case CHAR:
+                return false;
+
+            // Handle unexpected cases
+            default:
+                throw new IllegalArgumentException("Unknown SQL data type: " + dataType);
+        }
+    }
+
 }

@@ -13,6 +13,7 @@
             <!--TODO: Think of better variable names-->
             <TableColumn fx:id="columnNameColumn" text="Column Name" />
             <TableColumn fx:id="columnDataTypeColumn" text="Datatype" />
+            <TableColumn fx:id="columnSizeColumn" text="Size"/>
             <TableColumn fx:id="columnPKColumn" text="PK"/>
             <TableColumn fx:id="columnNNColumn" text="NN"/>
             <TableColumn fx:id="columnUQColumn" text="UQ"/>

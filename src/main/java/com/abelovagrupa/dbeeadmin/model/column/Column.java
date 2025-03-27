@@ -25,6 +25,7 @@ public class Column {
     // TableView properties
     // Attribute setters will update these properties if they exist
     private  StringProperty nameProperty;
+    private IntegerProperty sizeProperty;
     private  BooleanProperty primaryKeyProperty;
     private  BooleanProperty notNullProperty;
     private  BooleanProperty uniqueProperty;
@@ -241,11 +242,25 @@ public class Column {
     }
 
     public Integer getSize() {
-        return size;
+        if(sizeProperty != null)
+            return sizeProperty.get();
+        else return size;
     }
 
     public void setSize(Integer size) {
+        if(sizeProperty != null)
+            sizeProperty.set(size);
         this.size = size;
+    }
+
+    public IntegerProperty sizeProperty(){
+        if(size == null){
+            sizeProperty = new SimpleIntegerProperty(this,"size",0);
+        }
+        if(sizeProperty == null){
+            sizeProperty = new SimpleIntegerProperty(this,"size",size);
+        }
+        return sizeProperty;
     }
 
     public boolean isGenerationExpression() {
