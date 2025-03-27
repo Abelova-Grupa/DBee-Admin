@@ -16,10 +16,7 @@ import com.abelovagrupa.dbeeadmin.model.trigger.Timing;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 
 import java.sql.*;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class DatabaseInspector {
 
@@ -717,6 +714,27 @@ public class DatabaseInspector {
         }
 
         return trigger;
+    }
+
+    public List<String> getViewNames(Schema schema) {
+        List<String> viewNames = new LinkedList<>();
+        String schemaName = schema.getName();
+
+        String query = "SELECT TABLE_NAME FROM information_schema.views WHERE TABLE_SCHEMA = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, schemaName);  // Set schema name as parameter
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    viewNames.add(rs.getString("TABLE_NAME"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving views: " + e.getMessage());
+        }
+
+        return viewNames;
     }
 
 //    public static void main(String[] args) {
