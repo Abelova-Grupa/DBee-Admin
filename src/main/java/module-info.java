@@ -8,6 +8,7 @@ module com.abelovagrupa.dbeeadmin {
     requires java.sql;
     requires java.dotenv;
     requires java.desktop;
+    requires annotations;
 
 
     opens com.abelovagrupa.dbeeadmin to javafx.fxml;

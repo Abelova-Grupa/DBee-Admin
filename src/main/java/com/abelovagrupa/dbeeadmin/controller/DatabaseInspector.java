@@ -14,6 +14,8 @@ import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.model.trigger.Event;
 import com.abelovagrupa.dbeeadmin.model.trigger.Timing;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
+import com.abelovagrupa.dbeeadmin.model.view.View;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.*;
@@ -723,7 +725,7 @@ public class DatabaseInspector {
         String query = "SELECT TABLE_NAME FROM information_schema.views WHERE TABLE_SCHEMA = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, schemaName);  // Set schema name as parameter
+            stmt.setString(1, schemaName);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -735,6 +737,31 @@ public class DatabaseInspector {
         }
 
         return viewNames;
+    }
+
+    public List<View> getViews(@NotNull Schema schema) {
+        List<View> views = new LinkedList<>();
+        String schemaName = schema.getName();
+
+        String query = "SELECT TABLE_NAME FROM information_schema.views WHERE TABLE_SCHEMA = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, schemaName);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    views.add(new View(
+                        schema,
+                        rs.getString("TABLE_NAME"),
+                        rs.getString("VIEW_DEFINITION")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving views: " + e.getMessage());
+        }
+
+        return views;
     }
 
 //    public static void main(String[] args) {

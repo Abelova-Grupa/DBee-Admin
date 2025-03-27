@@ -6,6 +6,7 @@ import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
+import com.abelovagrupa.dbeeadmin.model.view.View;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
@@ -225,6 +226,12 @@ public class PanelInfoNew implements Initializable {
     }
 
     public void setSelected(Trigger trigger) {}
+
+    public void setSelected(View view) {
+        clearInfo();
+        addProperty("View:", view.getName(), true);
+        addProperty("Belongs to:" ,view.getSchema().getName(), false);
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
