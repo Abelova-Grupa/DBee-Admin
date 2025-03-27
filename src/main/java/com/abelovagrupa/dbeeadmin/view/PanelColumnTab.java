@@ -13,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.converter.IntegerStringConverter;
 
 import java.net.URL;
 import java.util.List;
@@ -28,6 +29,9 @@ public class PanelColumnTab implements Initializable{
 
     @FXML
     TableColumn<Column,DataType> columnDataTypeColumn;
+
+    @FXML
+    TableColumn<Column,Integer> columnSizeColumn;
 
     @FXML
     TableColumn<Column,Boolean> columnPKColumn;
@@ -80,7 +84,13 @@ public class PanelColumnTab implements Initializable{
             Column column = event.getRowValue();
             column.setType(event.getNewValue());
         });
-
+        // Setting column size properties for certain types
+        columnSizeColumn.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
+        columnSizeColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        columnSizeColumn.setOnEditCommit(event -> {
+            Column column = event.getRowValue();
+            column.setSize(event.getNewValue());
+        });
         // Setting checkbox columns
         setCheckBoxes();
 
@@ -105,6 +115,8 @@ public class PanelColumnTab implements Initializable{
             });
             // Column type property listener
             newSelection.typeProperty().addListener((obs,oldVal,newVal) -> {
+                columnSizeColumn.setEditable(DataType.hasVariableLength(newVal));
+
                 int lastIndex = columnTable.getItems().size() -1;
                 if(index != lastIndex) return;
                 columnTable.getItems().add(new Column());
@@ -127,6 +139,7 @@ public class PanelColumnTab implements Initializable{
         ReadOnlyDoubleProperty tableWidthProperty = columnTable.widthProperty();
         columnNameColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.35));
         columnDataTypeColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.20));
+        columnSizeColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
         columnPKColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
         columnNNColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
         columnPKColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
@@ -134,7 +147,7 @@ public class PanelColumnTab implements Initializable{
         columnZFColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
         columnAIColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
         columnGColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.035));
-        columnDefaultColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.235));
+        columnDefaultColumn.prefWidthProperty().bind(tableWidthProperty.multiply(0.2));
 
     }
 

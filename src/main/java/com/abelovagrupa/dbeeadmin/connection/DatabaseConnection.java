@@ -117,7 +117,7 @@ public class DatabaseConnection {
         String dbPassword = dotenv.get("DB_PASSWORD");
 
         if(schema != null)
-            setConnection(dbUrl + schema.getName(), dbUsername, dbPassword);
+            setConnection(dbUrl +"/"+ schema.getName(), dbUsername, dbPassword);
 
         else
             setConnection(dbUrl, dbUsername, dbPassword);
