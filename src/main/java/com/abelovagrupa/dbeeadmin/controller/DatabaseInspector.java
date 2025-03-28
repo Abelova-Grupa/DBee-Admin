@@ -17,6 +17,7 @@ import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import com.abelovagrupa.dbeeadmin.model.view.View;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.*;
 
@@ -529,82 +530,77 @@ public class DatabaseInspector {
     public List<Index> getIndexes(Schema schema, Table table){
         if(schema == null) throw new IllegalArgumentException("Schema is not set");
         if(table == null) throw new IllegalArgumentException("Table is not set");
+        List<Index> indexList = new LinkedList<>();
 
-        List<Index> indexes = new LinkedList<>();
-        String query = "SELECT \n" +
-                "    INDEX_NAME, \n" +
-                "    NON_UNIQUE, \n" +
-                "    INDEX_TYPE\n" +
-//                "    IS_VISIBLE\n" +
-                "FROM INFORMATION_SCHEMA.STATISTICS\n" +
-                "WHERE TABLE_SCHEMA = ? \n" +
-                "AND TABLE_NAME = ?;";
+        String sql = "SHOW INDEX FROM " + table.getName() + " FROM " + schema.getName();
 
-        // FIXME: INDEX_NAME,NON_UNIQUE,IS_VISIBLE,INDEX_TYPE
-        try(PreparedStatement indexStmt = connection.prepareStatement(query);){
-            indexStmt.setString(1,schema.getName());
-            indexStmt.setString(2,table.getName());
-            ResultSet indexRs = indexStmt.executeQuery();
-            List<String> indexNames = new LinkedList<>();
-            while(indexRs.next()){
-                Index index = new Index();
-                String indexName = indexRs.getString("INDEX_NAME");
-                if(indexNames.contains(indexName)){
-                    continue;
-                }else{
-                    indexNames.add(indexName);
-                }
-                index.setName(indexName);
-                index.setUnique(indexRs.getInt("NON_UNIQUE") == 0);
-//                index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));
-                Optional<String> storageType = Optional.ofNullable(indexRs.getString("INDEX_TYPE"));
-                storageType.ifPresent(s -> index.setStorageType(IndexStorageType.valueOf(s.toUpperCase())));
-                index.setIndexedColumns(getIndexedColumns(schema,table,index));
-                indexes.add(index);
+        DatabaseConnection.getInstance().setCurrentSchema(schema);
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try(Statement st = conn.createStatement()) {
+
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                String indexName = rs.getString("KEY_NAME");
+                String storageTypeString = rs.getString("INDEX_TYPE");
+                IndexStorageType storageType = IndexStorageType.valueOf(storageTypeString.toUpperCase());
+                int keyBlockSize = rs.getInt("PACKED");
+//                String parser = rs.getString("Parser");
+                boolean visible = "NO".equals(rs.getString("IGNORED"));
+                boolean unique = rs.getInt("NON_UNIQUE") == 0; // 0 means unique, 1 means not unique
+
+
+
+                Index index = new Index(indexName, null, storageType, keyBlockSize, null, visible, null, unique);
+                List<IndexedColumn> indexedColumns = getIndexedColumns(schema, table, index);
+                index.setIndexedColumns(indexedColumns);
+                indexList.add(index);
             }
 
-
-        }catch(SQLException ex){
-            System.err.println(ex);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return indexes;
+
+
+        DatabaseConnection.getInstance().setCurrentSchema(null);
+        return indexList;
     }
 
     public Index getIndexByName(Schema schema,Table table, String indexName){
         if(schema == null) throw new IllegalArgumentException("Schema is not set");
         if(table == null) throw new IllegalArgumentException("Table is not set");
-        if(indexName == null) throw new IllegalArgumentException("Index name is not set");
+        Index index = null;
 
-        Index index = new Index();
-        String query = "SELECT \n" +
-                "    INDEX_NAME, \n" +
-                "    NON_UNIQUE, \n" +
-                "    INDEX_TYPE\n" +
-//                "    IS_VISIBLE\n" +
-                "FROM INFORMATION_SCHEMA.STATISTICS\n" +
-                "WHERE TABLE_SCHEMA = ? \n" +
-                "AND TABLE_NAME = ? AND INDEX_NAME=?;";
-        try(PreparedStatement indexStmt = connection.prepareStatement(query)){
-            indexStmt.setString(1,schema.getName());
-            indexStmt.setString(2,table.getName());
-            indexStmt.setString(3,indexName);
+        String sql = "SHOW INDEX FROM " + table.getName() + " FROM " + schema.getName() + " WHERE Key_name = '" + indexName + "'";
 
-            ResultSet indexRs = indexStmt.executeQuery();
-            if(indexRs.next()){
-                index.setName(indexName);
-                index.setUnique(indexRs.getInt("NON_UNIQUE") == 0);
-//                index.setVisible(indexRs.getString("IS_VISIBLE").equals("YES"));
-                Optional<String> storageType = Optional.ofNullable(indexRs.getString("INDEX_TYPE"));
-                storageType.ifPresent(s -> index.setStorageType(IndexStorageType.valueOf(s.toUpperCase())));
-                index.setIndexedColumns(getIndexedColumns(schema,table,index)); // TODO: Mozda odavde?
+        DatabaseConnection.getInstance().setCurrentSchema(schema);
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try(Statement st = conn.createStatement()) {
+
+            ResultSet rs = st.executeQuery(sql);
+            if (rs.next()) {
+                String storageTypeString = rs.getString("INDEX_TYPE");
+                IndexStorageType storageType = IndexStorageType.valueOf(storageTypeString.toUpperCase());
+                int keyBlockSize = rs.getInt("PACKED");
+//                String parser = rs.getString("Parser");
+                boolean visible = "NO".equals(rs.getString("IGNORED"));
+                boolean unique = rs.getInt("NON_UNIQUE") == 0; // 0 means unique, 1 means not unique
+
+
+
+                index = new Index(indexName, null, storageType, keyBlockSize, null, visible, null, unique);
+                List<IndexedColumn> indexedColumns = getIndexedColumns(schema, table, index);
+                index.setIndexedColumns(indexedColumns);
             }
 
-        }catch(SQLException ex){
-            throw new RuntimeException(ex);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
+
+        DatabaseConnection.getInstance().setCurrentSchema(null);
         return index;
     }
+
 
     public List<IndexedColumn> getIndexedColumns(Schema schema, Table table, Index index) {
         List<IndexedColumn> indexedColumns = new LinkedList<>();
