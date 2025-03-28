@@ -4,20 +4,17 @@ import com.abelovagrupa.dbeeadmin.model.trigger.Event;
 import com.abelovagrupa.dbeeadmin.model.trigger.Timing;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
+import com.abelovagrupa.dbeeadmin.util.SyntaxHighlighter;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import org.fxmisc.richtext.model.StyleSpans;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 // TODO: Add deselect functionality sometime in the future.
 public class PanelTriggerTab implements Initializable {
@@ -62,7 +59,7 @@ public class PanelTriggerTab implements Initializable {
         // Setup the code area
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
         codeArea.textProperty().addListener((_, _, newText) -> {
-            codeArea.setStyleSpans(0, computeHighlighting(newText));
+            codeArea.setStyleSpans(0, SyntaxHighlighter.computeHighlighting(newText));
         });
 
         codeArea.appendText("-- Define trigger statements here:\n");
@@ -72,37 +69,6 @@ public class PanelTriggerTab implements Initializable {
     private void initComboBoxes() {
         cbAction.getItems().addAll(Event.values());
         cbTiming.getItems().addAll(Timing.values());
-    }
-
-    private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", PanelScript.SQL_KEYWORDS) + ")\\b";
-    private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
-    private static final String NUMBER_PATTERN = "\\b\\d+\\b";
-    private static final String COMMENT_PATTERN = "--[^\n]*" + "|" + "/\\*[^\\*]*\\*/";
-
-    private static final Pattern PATTERN = Pattern.compile(
-        "(?<KEYWORD>" + KEYWORD_PATTERN + ")"
-            + "|(?<STRING>" + STRING_PATTERN + ")"
-            + "|(?<NUMBER>" + NUMBER_PATTERN + ")"
-            + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
-    );
-
-    private static StyleSpans<Collection<String>> computeHighlighting(String text) {
-        Matcher matcher = PATTERN.matcher(text.toUpperCase());
-        int lastKwEnd = 0;
-        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-        while (matcher.find()) {
-            String styleClass =
-                matcher.group("KEYWORD") != null ? "keyword" :
-                    matcher.group("STRING") != null ? "string" :
-                        matcher.group("NUMBER") != null ? "number" :
-                            matcher.group("COMMENT") != null ? "comment" :
-                                null;
-            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
-            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
-            lastKwEnd = matcher.end();
-        }
-        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
-        return spansBuilder.create();
     }
 
     public void addBlankTrigger() {
