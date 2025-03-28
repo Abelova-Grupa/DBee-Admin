@@ -1,6 +1,9 @@
 package com.abelovagrupa.dbeeadmin.util;
 
+import com.abelovagrupa.dbeeadmin.Main;
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
 public class AlertManager {
 
@@ -32,7 +35,8 @@ public class AlertManager {
         alert.setTitle((title == null) ? "DBee Admin" : title);
         alert.setHeaderText(header);
         alert.setContentText(content);
-
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Main.class.getResource("images/bee.png").toExternalForm()));
         alert.showAndWait();
     }
 
