@@ -90,7 +90,7 @@ public class PanelScript implements Initializable {
 
     public void runScript() {
         if(codeArea.getText() == null || codeArea.getText().isEmpty()) return;
-        Pair<ResultSet, Integer> result = QueryExecutor.executeQuery(codeArea.getText());
+        Pair<ResultSet, Integer> result = QueryExecutor.executeBatch(codeArea.getText());
         printHistory((result.getSecond() != null) ? result.getSecond() : 0, result.getFirst() != null);
         try {
             printResultSetToTable(result.getFirst());
