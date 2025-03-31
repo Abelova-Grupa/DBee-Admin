@@ -155,7 +155,7 @@ public class PanelIndexTab implements Initializable {
         indexedColumnsNameColumn.prefWidthProperty().bind(indexedColumnTableWidthProperty.multiply(0.25));
         indexedColumnsNoColumn.prefWidthProperty().bind(indexedColumnTableWidthProperty.multiply(0.075));
         indexedColumnOrderColumn.prefWidthProperty().bind(indexedColumnTableWidthProperty.multiply(0.2));
-        indexedColumnLength.prefWidthProperty().bind(indexedColumnTableWidthProperty.multiply(0.45));
+        indexedColumnLength.prefWidthProperty().bind(indexedColumnTableWidthProperty.multiply(0.4));
 
     }
 
