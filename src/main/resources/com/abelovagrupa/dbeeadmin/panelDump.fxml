@@ -10,7 +10,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="765.0" spacing="12.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="765.0" spacing="12.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
+fx:controller="com.abelovagrupa.dbeeadmin.view.panelDump">
    <children>
       <TitledPane collapsible="false" prefWidth="231.0" text="SQL">
          <content>
@@ -71,7 +72,7 @@
             <Button fx:id="btnSelectPath" mnemonicParsing="false" text="Select path" />
             <Label fx:id="lblStatus" text="No path selected." />
             <AnchorPane HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnStart" mnemonicParsing="false" text="Start Dump" />
+            <Button fx:id="btnStart" mnemonicParsing="false" text="Start Dump" onAction="#executeDump"/>
             <AnchorPane />
          </children>
          <padding>
