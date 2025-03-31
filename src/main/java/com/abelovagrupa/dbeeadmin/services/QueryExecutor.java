@@ -11,6 +11,72 @@ import java.sql.Statement;
 
 public class QueryExecutor {
 
+    public static Pair<ResultSet, Integer> executeBatch(String sql) {
+        DatabaseConnection.getInstance().setCurrentSchema(ProgramState.getInstance().getSelectedSchema());
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Integer rowsAffected = null;
+
+        try {
+            // Get the database connection
+            connection = DatabaseConnection.getInstance().getConnection();
+            statement = connection.createStatement();
+
+            // Disable auto-commit to ensure batch execution is handled in a transaction
+            connection.setAutoCommit(false);
+
+            // Split the SQL string
+            String[] sqlStatements = sql.split(";");
+
+            // Add each SQL statement to the batch
+            for (String singleSql : sqlStatements) {
+                singleSql = singleSql.trim();
+                if (!singleSql.isEmpty()) {
+                    statement.addBatch(singleSql);
+                }
+            }
+
+            // Execute the batch
+            int[] updateCounts = statement.executeBatch();
+
+            // Iterate through the update counts to process each result
+            for (int updateCount : updateCounts) {
+                boolean isResultSet = statement.getMoreResults();
+
+                // If it is a SELECT query, process the ResultSet
+                if (isResultSet) {
+                    resultSet = statement.getResultSet();
+                } else {
+                    if(rowsAffected == null) rowsAffected = 0;
+                    rowsAffected += updateCount;
+                }
+            }
+
+            // Commit the transaction if everything is successful
+            connection.commit();
+            connection.setAutoCommit(true);
+
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                System.err.println("Error during rollback: " + rollbackEx.getMessage());
+            }
+            System.err.println("Error executing SQL query: " + e.getMessage());
+            AlertManager.showErrorDialog(null, "Error executing SQL query:", e.getMessage());
+        } finally {
+            DatabaseConnection.getInstance().setCurrentSchema(null);
+            try {
+                DatabaseConnection.getInstance().getConnection().setAutoCommit(true);
+            } catch (SQLException e) {
+                System.err.println("Something extremely dire and profoundly fucked happened.");
+            }
+        }
+
+        return Pair.of(resultSet, rowsAffected);
+    }
+
     public static Pair<ResultSet, Integer> executeQuery(String sql) {
         DatabaseConnection.getInstance().setCurrentSchema(ProgramState.getInstance().getSelectedSchema());
         Connection connection = null;
@@ -19,15 +85,9 @@ public class QueryExecutor {
         Integer rowsAffected = null;
 
         try {
-
             connection = DatabaseConnection.getInstance().getConnection();
-
-
             statement = connection.createStatement();
-
             boolean isResultSet = statement.execute(sql);
-
-            // TODO: Find a way to set a selected schema (for which I created the State class).
 
             // Process the result (if it's a SELECT query)
             if (isResultSet) {

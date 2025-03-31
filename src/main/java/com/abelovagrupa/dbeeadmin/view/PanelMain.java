@@ -2,6 +2,8 @@ package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.services.FileProcessor;
+import com.abelovagrupa.dbeeadmin.services.ProgramState;
+import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -303,6 +305,12 @@ public class PanelMain implements Initializable {
     }
 
     public void dumpDatabase() throws IOException {
+
+        if(ProgramState.getInstance().getSelectedSchema() == null) {
+            AlertManager.showInformationDialog(null, null, "You must select schema first.");
+            return;
+        }
+
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelDump.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         Stage stage = new Stage();

@@ -33,7 +33,7 @@
                                     <Tooltip text="Execute Line (F5)" />
                                 </tooltip>
                             </Button>
-                            <Button mnemonicParsing="false" disable="true" prefWidth="38">
+                            <Button mnemonicParsing="false" prefWidth="38" onAction="#importSQLToEditor">
                                 <graphic>
                                     <FontIcon iconLiteral="fas-file-import:16" styleClass="font-icon"/>
                                 </graphic>
