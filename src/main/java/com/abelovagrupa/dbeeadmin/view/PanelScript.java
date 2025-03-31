@@ -7,6 +7,7 @@ import com.abelovagrupa.dbeeadmin.util.SyntaxHighlighter;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -145,4 +146,8 @@ public class PanelScript implements Initializable {
         FileProcessor.exportSQL(codeArea.getText());
     }
 
+    public void importSQLToEditor(ActionEvent actionEvent) {
+        codeArea.clear();
+        codeArea.appendText(FileProcessor.importSQL());
+    }
 }
