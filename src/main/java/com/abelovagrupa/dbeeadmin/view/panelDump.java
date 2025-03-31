@@ -36,8 +36,6 @@ public class panelDump {
     public CheckBox cbInsertIgnore;
     public CheckBox cbReplace;
     public TextField txtArguments;
-    public Button btnSelectPath;
-    public Label lblStatus;
     public Button btnStart;
 
     /**
@@ -115,7 +113,7 @@ public class panelDump {
             Process process = processBuilder.start();
             process.waitFor();
 
-            AlertManager.showInformationDialog(null, "Success.", "Dump finished.");
+            AlertManager.showWarningDialog(null, "Success.", "Dump finished.");
         } catch (Exception e) {
             AlertManager.showErrorDialog(null, "Dump failed.", e.getMessage());
         }
