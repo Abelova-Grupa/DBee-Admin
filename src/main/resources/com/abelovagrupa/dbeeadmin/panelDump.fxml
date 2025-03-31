@@ -69,8 +69,6 @@ fx:controller="com.abelovagrupa.dbeeadmin.view.panelDump">
       </HBox>
       <HBox alignment="CENTER_LEFT" spacing="12.0">
          <children>
-            <Button fx:id="btnSelectPath" mnemonicParsing="false" text="Select path" />
-            <Label fx:id="lblStatus" text="No path selected." />
             <AnchorPane HBox.hgrow="ALWAYS" />
             <Button fx:id="btnStart" mnemonicParsing="false" text="Start Dump" onAction="#executeDump"/>
             <AnchorPane />
