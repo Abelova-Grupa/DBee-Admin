@@ -1,5 +1,8 @@
 package com.abelovagrupa.dbeeadmin.model.index;
 
+import com.abelovagrupa.dbeeadmin.model.column.DataType;
+import javafx.beans.property.*;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -13,6 +16,10 @@ public class Index {
     private boolean visible;
     private List<IndexedColumn> indexedColumns;
     private boolean unique;
+
+    // Index table properties
+    private StringProperty nameProperty;
+    private ObjectProperty<IndexType> typeProperty;
 
     public Index() {
     }
@@ -29,19 +36,44 @@ public class Index {
     }
 
     public String getName() {
-        return name;
+        if(nameProperty != null)
+            return nameProperty.get();
+        else return name;
     }
 
     public void setName(String name) {
+        if(nameProperty != null){
+            nameProperty.set(name);
+        }
         this.name = name;
     }
 
+    public StringProperty nameProperty(){
+        if(nameProperty == null){
+            nameProperty = new SimpleStringProperty(this,"name",name);
+        }
+        return nameProperty;
+    }
+
     public IndexType getType() {
-        return type;
+        if(typeProperty != null){
+            return typeProperty.get();
+        }
+        else return type;
     }
 
     public void setType(IndexType type) {
+        if(typeProperty != null){
+            typeProperty.set(type);
+        }
         this.type = type;
+    }
+
+    public ObjectProperty<IndexType> typeProperty(){
+        if(typeProperty == null){
+            typeProperty = new SimpleObjectProperty<>(this,"type",type);
+        }
+        return typeProperty;
     }
 
     public IndexStorageType getStorageType() {
