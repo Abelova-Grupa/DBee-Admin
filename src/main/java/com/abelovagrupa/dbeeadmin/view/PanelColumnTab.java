@@ -2,6 +2,9 @@ package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.column.DataType;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexType;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +19,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -55,6 +59,9 @@ public class PanelColumnTab implements Initializable{
     TableColumn<Column,String> columnDefaultColumn;
 
     ObservableList<Column> columnsData = FXCollections.observableArrayList(new Column());
+
+    // Controllers
+    PanelIndexTab indexTabController;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -184,9 +191,29 @@ public class PanelColumnTab implements Initializable{
                             boolean newValue = checkBox.isSelected();
                             column.setPrimaryKey(newValue);
                             //Checking not null if the primary key checkbox is selected
-                            if(newValue == true){
+                            if(newValue){
+                                // Checking not null box
                                 column.setNotNull(newValue);
                                 columnTable.refresh();
+
+                                // Creating a PRIMARY Index in index tab
+                                if(indexTabController != null && !indexTabController.primaryExists()){
+                                    Index primaryIndex = new Index();
+                                    primaryIndex.setName("PRIMARY");
+                                    primaryIndex.setType(IndexType.PRIMARY);
+                                    primaryIndex.setIndexedColumns(new LinkedList<>());
+                                    IndexedColumn newColumn = new IndexedColumn();
+                                    newColumn.setColumn(column);
+                                    newColumn.setIndex(primaryIndex);
+                                    primaryIndex.getIndexedColumns().add(newColumn);
+                                    indexTabController.indexTable.getItems().add(primaryIndex);
+                                    indexTabController.indexTable.getItems().add(new Index());
+                                }else if(indexTabController != null){
+                                    IndexedColumn newColumn = new IndexedColumn();
+                                    newColumn.setColumn(column);
+                                    //Not implemented yet
+                                }
+
                             }
                             // Add new table row if its last
                             if(row == tableSize -1){

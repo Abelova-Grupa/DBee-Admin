@@ -1,6 +1,7 @@
 package com.abelovagrupa.dbeeadmin.model.index;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import javafx.beans.property.*;
 
 import java.util.Objects;
 
@@ -11,6 +12,13 @@ public class IndexedColumn {
     private Order order;
     private int length;
     private Index index;
+
+    // Indexed column table properties
+    private BooleanProperty checkedColumnProperty;
+    private StringProperty columnNameProperty;
+    private IntegerProperty orderNumberProperty;
+    private ObjectProperty<Order> orderProperty;
+    private IntegerProperty lengthProperty;
 
     public IndexedColumn() {
     }
@@ -23,6 +31,17 @@ public class IndexedColumn {
         this.index = index;
     }
 
+    public BooleanProperty checkedColumnProperty() {
+        if(checkedColumnProperty == null){
+            checkedColumnProperty = new SimpleBooleanProperty(this,"checkedColumn",false);
+        }
+        return checkedColumnProperty;
+    }
+
+    public void setCheckedColumnProperty(boolean checked){
+        this.checkedColumnProperty().set(checked);
+    }
+
     public Column getColumn() {
         return column;
     }
@@ -31,28 +50,74 @@ public class IndexedColumn {
         this.column = column;
     }
 
+    public StringProperty columnNameProperty(){
+        if(columnNameProperty == null){
+            columnNameProperty = new SimpleStringProperty(this,"columnName",column.getName());
+        }
+        return columnNameProperty;
+    }
+
     public int getOrderNumber() {
-        return orderNumber;
+        if(orderNumberProperty != null){
+            return orderNumberProperty.get();
+        }
+        else return orderNumber;
     }
 
     public void setOrderNumber(int orderNumber) {
+        if(orderNumberProperty != null){
+            orderNumberProperty.set(orderNumber);
+        }
         this.orderNumber = orderNumber;
     }
 
+    public IntegerProperty orderNumberProperty(){
+        if(orderNumberProperty == null){
+            orderNumberProperty = new SimpleIntegerProperty(this,"orderNumber",orderNumber);
+        }
+        return orderNumberProperty;
+    }
+
     public Order getOrder() {
-        return order;
+        if(orderProperty != null){
+            return orderProperty.get();
+        }
+        else return order;
     }
 
     public void setOrder(Order order) {
+        if(orderProperty != null){
+            orderProperty.set(order);
+        }
         this.order = order;
     }
 
+    public ObjectProperty<Order> orderProperty(){
+        if(orderProperty == null){
+            orderProperty = new SimpleObjectProperty<>(this,"order",order);
+        }
+        return orderProperty;
+    }
+
     public int getLength() {
-        return length;
+        if(lengthProperty != null){
+            return lengthProperty.get();
+        }
+        else return length;
     }
 
     public void setLength(int length) {
+        if(lengthProperty != null){
+            lengthProperty.set(length);
+        }
         this.length = length;
+    }
+
+    public IntegerProperty lengthProperty(){
+        if(lengthProperty == null){
+            lengthProperty = new SimpleIntegerProperty(this,"length",length);
+        }
+        return lengthProperty;
     }
 
     public Index getIndex() {
@@ -79,6 +144,10 @@ public class IndexedColumn {
         if (this == o) return true;
         if (!(o instanceof IndexedColumn that)) return false;
 
+        // Table property case
+        if(getIndex() == null){
+            return getOrderNumber() == that.getOrderNumber() && getLength() == that.getLength() && getColumn().equals(that.getColumn()) && getOrder() == that.getOrder();
+        }
         return getOrderNumber() == that.getOrderNumber() && getLength() == that.getLength() && getColumn().equals(that.getColumn()) && getOrder() == that.getOrder() && getIndex().equals(that.getIndex());
     }
 

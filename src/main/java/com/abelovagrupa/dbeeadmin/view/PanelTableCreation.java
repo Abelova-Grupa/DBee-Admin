@@ -4,10 +4,13 @@ import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -47,6 +50,14 @@ public class PanelTableCreation implements Initializable {
     Tab triggerTab;
 
     PanelColumnTab columTabController;
+
+    PanelIndexTab indexTabController;
+
+    PanelFKTab foreignKeyTabController;
+
+    PanelTriggerTab triggerTabController;
+
+    ObservableList<IndexedColumn> indexedColumns = FXCollections.observableArrayList();
 
     boolean[] tabLoaded;
 
@@ -89,15 +100,36 @@ public class PanelTableCreation implements Initializable {
         // only if they are selected for the first time
         tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldTab, newTab) -> {
+                    // If selected tab is index tab and the content has not loaded yet
                     if(newTab.equals(indexTab) && !tabLoaded[1]){
                         try {
                             FXMLLoader indexLoader = new FXMLLoader(Main.class.getResource("panelIndexTab.fxml"));
                             VBox indexTabContent = indexLoader.load();
+                            indexTabController = indexLoader.getController();
                             indexTab.setContent(indexTabContent);
+                            columTabController.indexTabController = indexLoader.getController();
+
+                            // Loading columns from column tab for indexed column
+                            for (Column column : columTabController.columnsData){
+                                IndexedColumn indexedColumn = new IndexedColumn();
+                                indexedColumn.setColumn(column);
+                                indexedColumns.add(indexedColumn);
+                            }
+                            indexTabController.indexedColumnData.setAll(indexedColumns);
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                         tabLoaded[1] = true;
+                        // If the content has already been loaded but the index tab is selected
+                    }else if(newTab.equals(indexTab)){
+                        indexedColumns.clear();
+                        for (Column column : columTabController.columnsData){
+                            IndexedColumn indexedColumn = new IndexedColumn();
+                            indexedColumn.setColumn(column);
+                            indexedColumns.add(indexedColumn);
+                        }
+                        indexTabController.indexedColumnData.setAll(indexedColumns);
                     }
                 });
 
