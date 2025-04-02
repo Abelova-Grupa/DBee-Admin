@@ -229,33 +229,11 @@ public class PanelMain implements Initializable {
     public void newSchemaTab(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelSchemaCreation.fxml"));
         Tab schemaTab = fxmlLoader.load();
+        PanelSchemaCreation schemaCreationController = fxmlLoader.getController();
+        schemaCreationController.setBrowserController(browserController);
         editorController.editorTabs.getTabs().add(schemaTab);
         editorController.editorTabs.getSelectionModel().select(schemaTab);
 
-
-//        Scene scene = new Scene(fxmlLoader.load());
-//        Stage stage = new Stage();
-//        stage.initModality(Modality.APPLICATION_MODAL);
-//
-//        stage.setTitle("DBee Admin - New Schema");
-//        stage.setScene(scene);
-//
-//        stage.setOnShown(event -> {
-//            // Get the screen's bounds (width and height)
-//            double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
-//            double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
-//
-//            // Get the stage width and height
-//            double stageWidth = stage.getWidth();
-//            double stageHeight = stage.getHeight();
-//
-//            // Calculate the center position
-//            stage.setX((screenWidth - stageWidth) / 2);
-//            stage.setY((screenHeight - stageHeight) / 2);
-//        });
-//        scene.getStylesheets().add(Main.class.getResource("styles.css").toExternalForm());
-//
-//        stage.show();
     }
 
     public void openConnectionSettings(ActionEvent actionEvent) throws IOException {

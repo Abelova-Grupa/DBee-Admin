@@ -1,5 +1,6 @@
 package com.abelovagrupa.dbeeadmin.view;
 
+import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.schema.Charset;
 import com.abelovagrupa.dbeeadmin.model.schema.Collation;
@@ -12,6 +13,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -41,6 +43,15 @@ public class PanelSchemaCreation implements Initializable {
     @FXML
     public TextField schemaNameTxtField;
 
+    PanelBrowser browserController;
+
+    public PanelBrowser getBrowserController() {
+        return browserController;
+    }
+
+    public void setBrowserController(PanelBrowser browserController) {
+        this.browserController = browserController;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -351,6 +362,11 @@ public class PanelSchemaCreation implements Initializable {
         try {
             DDLGenerator.createDatabase(new Schema(schemaName,charset,collation,null,0,0L),true);
             AlertManager.showConfirmationDialog("Success","Schema created",null);
+            Schema createdSchema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelSchemaTree.fxml"));
+            TreeView<String> schemaView = browserController.loadSchemaView(loader,schemaName);
+            browserController.vboxBrowser.getChildren().add(schemaView);
+
         } catch (SQLException e) {
             AlertManager.showErrorDialog("Error","Exception while creating schema",e.toString());
         }
