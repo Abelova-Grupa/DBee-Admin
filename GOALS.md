@@ -35,7 +35,7 @@ This document contains a list of objectives that must be accomplished in order t
 
 #### Primary keys
 - [x] Simple PK creation (during table creation)
-- [ ] Composite PK creation
+- [x] Composite PK creation
 
 #### Foreign keys
 
@@ -50,11 +50,4 @@ This document contains a list of objectives that must be accomplished in order t
 - [ ] Index removal
 - [ ] Index rebuilding
   
-#### Indexed columns
-
-- [X] IC creation
-- [ ] IC altering
-- [ ] IC removal
-- [ ] Unique IC
-- [ ] Composite IC
   
