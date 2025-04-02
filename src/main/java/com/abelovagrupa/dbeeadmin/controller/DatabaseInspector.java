@@ -545,7 +545,18 @@ public class DatabaseInspector {
                 IndexStorageType storageType = IndexStorageType.valueOf(storageTypeString.toUpperCase());
                 int keyBlockSize = rs.getInt("PACKED");
 //                String parser = rs.getString("Parser");
-                boolean visible = "YES".equals(rs.getString("VISIBLE"));
+
+                // Get visibility while remaining MariaDB/MySQL independant
+                boolean visible;
+                try{
+                    // User has MySQL running and column is named VISIBLE
+                    visible = "YES".equals(rs.getString("VISIBLE"));
+                } catch (SQLException e) {
+                    // User has MariaDB running and column is named IGNORED
+                    System.out.println("INFO: Exception thrown while attempting to get VISIBLE column;\n\t" +
+                        "Attempting to get IGNORED column (MariaDB)." );
+                    visible = "NO".equals(rs.getString("IGNORED"));
+                }
                 boolean unique = rs.getInt("NON_UNIQUE") == 0; // 0 means unique, 1 means not unique
 
 
@@ -582,7 +593,19 @@ public class DatabaseInspector {
                 IndexStorageType storageType = IndexStorageType.valueOf(storageTypeString.toUpperCase());
                 int keyBlockSize = rs.getInt("PACKED");
 //                String parser = rs.getString("Parser");
-                boolean visible = "YES".equals(rs.getString("VISIBLE"));
+
+                // Get visibility while remaining MariaDB/MySQL independant
+                boolean visible;
+                try{
+                    // User has MySQL running and column is named VISIBLE
+                    visible = "YES".equals(rs.getString("VISIBLE"));
+                } catch (SQLException e) {
+                    // User has MariaDB running and column is named IGNORED
+                    System.out.println("INFO: Exception thrown while attempting to get VISIBLE column;\n\t" +
+                        "Attempting to get IGNORED column (MariaDB)." );
+                    visible = "NO".equals(rs.getString("IGNORED"));
+                }
+
                 boolean unique = rs.getInt("NON_UNIQUE") == 0; // 0 means unique, 1 means not unique
 
 
