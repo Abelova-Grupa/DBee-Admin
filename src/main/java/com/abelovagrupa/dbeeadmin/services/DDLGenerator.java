@@ -161,6 +161,7 @@ public class DDLGenerator {
 
         // Append optional parameters
         if(c.isPrimaryKey()) sql.append("PRIMARY KEY ");
+        if(c.isNotNull()) sql.append("NOT NULL ");
         if(c.isUnique()) sql.append("UNIQUE ");
         if(c.isAutoIncrement()) sql.append("AUTO_INCREMENT ");
         if(c.isZeroFill()) sql.append("ZEROFILL ");
@@ -496,30 +497,35 @@ public class DDLGenerator {
         StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
         queryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
         queryBuilder.append("ADD ").append(
-                !index.getType().equals(IndexType.INDEX) ? index.getType() : ""
-        ).append(" INDEX ").append(index.getName()).append(" USING ").append(index.getStorageType()).append(" (");
+                !index.getType().equals(IndexType.INDEX) ? index.getType() + " " : " "
+        ).append("INDEX ").append(index.getName()).append(" USING ").append(index.getStorageType()).append(" (");
 
         Comparator<IndexedColumn> indexComparator = new Comparator<IndexedColumn>() {
             @Override
             public int compare(IndexedColumn o1, IndexedColumn o2) {
                 if (o1.getOrderNumber() == o2.getOrderNumber()) return 0;
-                else if (o1.getOrderNumber() < o2.getOrderNumber()) return 1;
-                else return -1;
+                else if (o1.getOrderNumber() < o2.getOrderNumber()) return -1;
+                else return 1;
             }
         };
 
         List<IndexedColumn> sortedIndexedColumns = index.getIndexedColumns();
         sortedIndexedColumns.sort(indexComparator);
+        System.out.println(sortedIndexedColumns);
 
-        for(IndexedColumn indexedColumn : sortedIndexedColumns){
+        for(int i = 0; i < sortedIndexedColumns.size(); i++) {
+            IndexedColumn indexedColumn = sortedIndexedColumns.get(i);
             queryBuilder.append(indexedColumn.getColumn().getName());
             if(indexedColumn.getLength() != 0) queryBuilder.append("(").append(indexedColumn.getLength()).append(")");
-            queryBuilder.append(", ");
+            if(i != sortedIndexedColumns.size() - 1) queryBuilder.append(", ");
         }
-        queryBuilder.append(") ");
-        if(index.getKeyBlockSize() != 0) queryBuilder.append(" KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize()).append(" ");
+
+        queryBuilder.append(")\n ");
+        if(index.getKeyBlockSize() != 0) queryBuilder.append("KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize()).append(" ");
         if(index.getParser() != null && !index.getParser().isEmpty()) queryBuilder.append(" WITH PARSER ").append(index.getParser()).append(" ");
-        queryBuilder.append(index.isVisible() ? "VISIBLE; " : "INVISIBLE; ");
+        queryBuilder.append(index.isVisible() ? "VISIBLE " : "INVISIBLE ");
+        if(index.getComment() != null && !index.getComment().isEmpty()) queryBuilder.append("\nCOMMENT ").append("'").append(index.getComment()).append("';");
+        else queryBuilder.append(";");
 
         String query = queryBuilder.toString();
         if(preview)

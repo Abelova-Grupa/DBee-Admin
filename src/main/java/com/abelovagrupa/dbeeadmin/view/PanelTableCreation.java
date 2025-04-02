@@ -4,6 +4,7 @@ import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
@@ -82,6 +83,21 @@ public class PanelTableCreation implements Initializable {
             indexTab.setClosable(false);
             tableAttributeTabPane.getTabs().add(indexTab);
 
+            FXMLLoader indexLoader = new FXMLLoader(Main.class.getResource("panelIndexTab.fxml"));
+            VBox indexTabContent = indexLoader.load();
+            indexTabController = indexLoader.getController();
+            indexTab.setContent(indexTabContent);
+            columTabController.indexTabController = indexLoader.getController();
+
+            // Loading columns from column tab for indexed column
+            for (Column column : columTabController.columnsData){
+                IndexedColumn indexedColumn = new IndexedColumn();
+                indexedColumn.setColumn(column);
+                indexedColumns.add(indexedColumn);
+            }
+            indexTabController.indexedColumnData.setAll(indexedColumns);
+
+
             // Initialize foreign key tab
             foreignKeyTab = new Tab("Foreign Keys");
             foreignKeyTab.setClosable(false);
@@ -101,28 +117,7 @@ public class PanelTableCreation implements Initializable {
         tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldTab, newTab) -> {
                     // If selected tab is index tab and the content has not loaded yet
-                    if(newTab.equals(indexTab) && !tabLoaded[1]){
-                        try {
-                            FXMLLoader indexLoader = new FXMLLoader(Main.class.getResource("panelIndexTab.fxml"));
-                            VBox indexTabContent = indexLoader.load();
-                            indexTabController = indexLoader.getController();
-                            indexTab.setContent(indexTabContent);
-                            columTabController.indexTabController = indexLoader.getController();
-
-                            // Loading columns from column tab for indexed column
-                            for (Column column : columTabController.columnsData){
-                                IndexedColumn indexedColumn = new IndexedColumn();
-                                indexedColumn.setColumn(column);
-                                indexedColumns.add(indexedColumn);
-                            }
-                            indexTabController.indexedColumnData.setAll(indexedColumns);
-
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        tabLoaded[1] = true;
-                        // If the content has already been loaded but the index tab is selected
-                    }else if(newTab.equals(indexTab)){
+                    if(newTab.equals(indexTab)){
                         indexedColumns.clear();
                         for (Column column : columTabController.columnsData){
                             IndexedColumn indexedColumn = new IndexedColumn();
@@ -173,13 +168,41 @@ public class PanelTableCreation implements Initializable {
         if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(columnsTab)){
             // Creating the table if it doesn't exist
             List<Column> tableColumns = columTabController.getTableColumns();
-            System.out.println(tableColumns);
             Table createdTable = createTable(tableColumns);
 
         }
+        else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(indexTab)){
+            List<Index> tableIndexes = indexTabController.getTableIndexes();
+            createIndexes(tableIndexes);
+        }
     }
 
-    public Table createTable(List<Column> columns){
+    private void createIndexes(List<Index> tableIndexes){
+        String tableName = txtTableName.getText();
+        if(tableName.isBlank() || tableName.contains(" ")){
+            AlertManager.showErrorDialog("Error","Table name is not valid",null);
+            return;
+        }
+
+        String schemaName = cbSchema.getSelectionModel().getSelectedItem();
+        if(schemaName == null){
+            AlertManager.showErrorDialog("Error","Schema was not selected",null);
+            return;
+        }
+        Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
+        Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
+
+        for(Index index : tableIndexes){
+            try {
+                DDLGenerator.addIndex(schema,table,index,true);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    private Table createTable(List<Column> columns){
         String tableName = txtTableName.getText();
         if(tableName.isBlank()){
             AlertManager.showErrorDialog("Error","Table name cannot be empty",null);

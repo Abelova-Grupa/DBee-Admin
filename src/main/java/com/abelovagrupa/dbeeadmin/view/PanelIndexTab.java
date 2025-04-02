@@ -1,25 +1,19 @@
 package com.abelovagrupa.dbeeadmin.view;
 
-import com.abelovagrupa.dbeeadmin.model.index.Index;
-import com.abelovagrupa.dbeeadmin.model.index.IndexType;
-import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
-import com.abelovagrupa.dbeeadmin.model.index.Order;
+import com.abelovagrupa.dbeeadmin.model.index.*;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class PanelIndexTab implements Initializable {
 
@@ -50,13 +44,30 @@ public class PanelIndexTab implements Initializable {
     @FXML
     TableColumn<IndexedColumn,Integer> indexedColumnLength;
 
+    // Index options
+
+    @FXML
+    ComboBox<IndexStorageType> cbStorageType;
+
+    @FXML
+    TextField keyBlockSizeTxtField;
+
+    @FXML
+    TextField parserTxtField;
+
+    @FXML
+    CheckBox checkBoxVisible;
+
+    @FXML
+    TextArea optionTxtArea;
+
     ObservableList<Index> indexData = FXCollections.observableArrayList(new Index());
 
     ObservableList<IndexedColumn> indexedColumnData = FXCollections.observableArrayList();
 
     Index selectedIndex;
 
-    PanelColumnTab columnTabController;
+    Index primaryIndex;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -95,6 +106,7 @@ public class PanelIndexTab implements Initializable {
         indexTable.getSelectionModel().selectedItemProperty().addListener((_, oldSelection, newSelection) -> {
             if(newSelection == null) return;
             selectedIndex = newSelection;
+
             // Creating a list of indexedColumns on first selection
             if(selectedIndex.getIndexedColumns() == null){
                 selectedIndex.setIndexedColumns(new LinkedList<>());
@@ -121,7 +133,46 @@ public class PanelIndexTab implements Initializable {
                     tableColumn.setCheckedColumnProperty(false);
                 }
             }
+            // Loading index options
+            // Loading combo box with index storage types for index options
+            ObservableList<IndexStorageType> indexStorageTypes = FXCollections.observableArrayList(IndexStorageType.values());
+            // This will keep the first null combo box option
+            cbStorageType.getItems().addAll(indexStorageTypes);
+            cbStorageType.setOnAction(event -> {
+                IndexStorageType indexStorageType = cbStorageType.getSelectionModel().getSelectedItem();
+                selectedIndex.setStorageType(indexStorageType);
+            });
+            // Setting up change listeners on index option components
+            keyBlockSizeTxtField.focusedProperty().addListener((obs,oldVal,newVal) -> {
+                if(newVal) return;
+                if(selectedIndex.getKeyBlockSize() != Integer.parseInt(keyBlockSizeTxtField.getText())){
+                    selectedIndex.setKeyBlockSize(Integer.parseInt(keyBlockSizeTxtField.getText()));
+                }
+            });
+            parserTxtField.focusedProperty().addListener((obs,oldVal,newVal) -> {
+                // If the focus is lost check if the input is different from selected index attribute
+                if(newVal) return;
+                if(!selectedIndex.getParser().equals(parserTxtField.getText())){
+                    selectedIndex.setParser(parserTxtField.getText());
+                }
 
+            });
+            checkBoxVisible.setOnAction(event -> {
+                selectedIndex.setVisible(checkBoxVisible.isSelected());
+            });
+            optionTxtArea.focusedProperty().addListener((obs,oldVal,newVal) -> {
+                if(newVal) return;
+                if(!selectedIndex.getComment().equals(optionTxtArea.getText())){
+                    selectedIndex.setComment(optionTxtArea.getText());
+                }
+            });
+
+            // Loading data from selected index into index options
+            cbStorageType.getSelectionModel().select(selectedIndex.getStorageType());
+            keyBlockSizeTxtField.setText(String.valueOf(selectedIndex.getKeyBlockSize()));
+            parserTxtField.setText(selectedIndex.getParser());
+            checkBoxVisible.setSelected(selectedIndex.isVisible());
+            optionTxtArea.setText(selectedIndex.getComment());
         });
 
         // Setting up checkbox for checking columns of an index
@@ -140,6 +191,7 @@ public class PanelIndexTab implements Initializable {
                             //If the checkBox is at true add new indexed column to index
                             if(newValue){
                                 selectedIndex.getIndexedColumns().add(indexedColumn);
+                                System.out.println(selectedIndex.getIndexedColumns());
                                 indexedColumn.setIndex(selectedIndex);
                             }else {
                                 selectedIndex.getIndexedColumns().remove(indexedColumn);
@@ -252,4 +304,14 @@ public class PanelIndexTab implements Initializable {
         }
         return false;
     }
+
+    public List<Index> getTableIndexes(){
+        //Removing empty row(last table row)
+        List<Index> indexes = new ArrayList<>(indexData);
+        indexes.removeLast();
+        indexes.removeIf(s -> s.getName().equals("PRIMARY") && s.getType().equals(IndexType.PRIMARY));
+        System.out.println(indexes);
+        return indexData;
+    }
+
 }

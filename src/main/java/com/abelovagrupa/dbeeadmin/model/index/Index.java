@@ -16,6 +16,7 @@ public class Index {
     private boolean visible;
     private List<IndexedColumn> indexedColumns;
     private boolean unique;
+    private String comment;
 
     // Index table properties
     private StringProperty nameProperty;
@@ -124,6 +125,14 @@ public class Index {
         this.unique = unique;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return "Index{" +
@@ -135,6 +144,7 @@ public class Index {
                 ", visible=" + visible +
                 ", indexedColumns=" + indexedColumns +
                 ", unique=" + unique +
+                ", comment=" + comment +
                 '}';
     }
 
@@ -143,7 +153,15 @@ public class Index {
         if (this == o) return true;
         if (!(o instanceof Index index)) return false;
 
-        return getKeyBlockSize() == index.getKeyBlockSize() && isVisible() == index.isVisible() && isUnique() == index.isUnique() && Objects.equals(getName(), index.getName()) && getType() == index.getType() && getStorageType() == index.getStorageType() && Objects.equals(getParser(), index.getParser()) && Objects.equals(getIndexedColumns(), index.getIndexedColumns());
+        return getKeyBlockSize() == index.getKeyBlockSize() &&
+                isVisible() == index.isVisible() &&
+                isUnique() == index.isUnique() &&
+                Objects.equals(getName(), index.getName()) &&
+                getType() == index.getType() &&
+                getStorageType() == index.getStorageType() &&
+                Objects.equals(getParser(), index.getParser()) &&
+                Objects.equals(getComment(),index.getComment()) &&
+                Objects.equals(getIndexedColumns(), index.getIndexedColumns());
     }
 
     @Override
