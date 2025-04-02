@@ -89,9 +89,35 @@ public class PanelScript implements Initializable {
         }
     }
 
+    // DRZI VODU
+    public static boolean hasMultipleSemicolons(String input) {
+        int semicolonCount = 0;
+        for (char c : input.toCharArray()) {
+            if (c == ';') {
+                semicolonCount++;
+                if (semicolonCount > 1) return true;
+            }
+        }
+
+        // Return false if semicolon appears once or not at all
+        return false;
+    }
+
     public void runScript() {
         if(codeArea.getText() == null || codeArea.getText().isEmpty()) return;
-        Pair<ResultSet, Integer> result = QueryExecutor.executeBatch(codeArea.getText());
+
+        // Drzi vodu
+        Pair<ResultSet, Integer> result;
+        if(hasMultipleSemicolons(codeArea.getText())) {
+           result  = QueryExecutor.executeBatch(codeArea.getText());
+        } else {
+           result = QueryExecutor.executeQuery(codeArea.getText());
+        }
+
+
+
+
+
         printHistory((result.getSecond() != null) ? result.getSecond() : 0, result.getFirst() != null);
         try {
             printResultSetToTable(result.getFirst());

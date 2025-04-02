@@ -3,6 +3,13 @@
 
 Cross-platform visual database design and administration tool
 
+## Requirements 📝
++ [Java Runtime Environment](https://www.java.com/en/download/manual.jsp) (*That you have already installed for Minecraft*)
++ [MySQL](https://www.mysql.com/) or [MariaDB](https://mariadb.org/)
++ [mysqldump](https://dev.mysql.com/doc/refman/8.4/en/mysqldump.html)
+
+> Please note that your RDBMS must be configured with a privileged user.
+
 ## Tech Stack ⚙️
 + UI: **JavaFX**, **CSS** 
 + Logic: **Java**
