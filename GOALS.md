@@ -45,14 +45,14 @@ This document contains a list of objectives that must be accomplished in order t
 
 #### Indexes
 
-- [ ] Index creation
+- [x] Index creation
 - [ ] Index altering
 - [ ] Index removal
 - [ ] Index rebuilding
   
 #### Indexed columns
 
-- [ ] IC creation
+- [X] IC creation
 - [ ] IC altering
 - [ ] IC removal
 - [ ] Unique IC
