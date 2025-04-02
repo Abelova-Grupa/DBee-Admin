@@ -3,6 +3,9 @@ package com.abelovagrupa.dbeeadmin.model.foreignkey;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.List;
 import java.util.Objects;
@@ -17,6 +20,15 @@ public class ForeignKey {
     private List<Column> referencedColumns;
     private Action onDeleteAction;
     private Action onUpdateAction;
+
+    // Foreign key table properties
+    private StringProperty nameProperty;
+    private StringProperty referencedTableProperty;
+
+    // Foreign key columns table properties
+    private BooleanProperty checkedColumnProperty;
+    private StringProperty columnNameProperty;
+    private StringProperty referencedColumnProperty;
 
     public ForeignKey() {
     }
@@ -34,10 +46,14 @@ public class ForeignKey {
     }
 
     public String getName() {
-        return name;
+        if(nameProperty != null)
+            return nameProperty.get();
+        else return name;
     }
 
     public void setName(String name) {
+        if(nameProperty != null)
+            nameProperty.set(name);
         this.name = name;
     }
 
@@ -104,6 +120,27 @@ public class ForeignKey {
     public void setOnUpdateAction(Action onUpdateAction) {
         this.onUpdateAction = onUpdateAction;
     }
+
+    // Table properties
+    public StringProperty nameProperty(){
+        if(nameProperty == null){
+            nameProperty = new SimpleStringProperty(this,"name",name);
+        }
+        return nameProperty;
+    }
+
+    public StringProperty referencedTableProperty(){
+        if(referencedTableProperty == null){
+            referencedTableProperty = new SimpleStringProperty(this,"referencedTable",referencedSchema.getName()+"."+referencedTable.getName());
+        }
+        return referencedTableProperty;
+    }
+
+    public void setReferencedTableProperty(String referencedTable){
+        referencedTableProperty().set(referencedTable);
+    }
+
+
 
     @Override
     public String toString() {
