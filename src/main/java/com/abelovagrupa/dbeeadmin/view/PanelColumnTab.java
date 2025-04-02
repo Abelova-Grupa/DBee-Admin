@@ -206,12 +206,15 @@ public class PanelColumnTab implements Initializable{
                                     newColumn.setColumn(column);
                                     newColumn.setIndex(primaryIndex);
                                     primaryIndex.getIndexedColumns().add(newColumn);
-                                    indexTabController.indexTable.getItems().add(primaryIndex);
+                                    indexTabController.primaryIndex = primaryIndex;
+                                    int indexTableSize = indexTabController.indexTable.getItems().size() - 1;
+                                    indexTabController.indexTable.getItems().set(indexTableSize,primaryIndex);
                                     indexTabController.indexTable.getItems().add(new Index());
                                 }else if(indexTabController != null){
                                     IndexedColumn newColumn = new IndexedColumn();
                                     newColumn.setColumn(column);
-                                    //Not implemented yet
+                                    indexTabController.primaryIndex.getIndexedColumns().add(newColumn);
+                                    newColumn.setIndex(indexTabController.primaryIndex);
                                 }
 
                             }
