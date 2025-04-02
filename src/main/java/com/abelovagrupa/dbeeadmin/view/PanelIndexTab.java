@@ -152,6 +152,10 @@ public class PanelIndexTab implements Initializable {
             parserTxtField.focusedProperty().addListener((obs,oldVal,newVal) -> {
                 // If the focus is lost check if the input is different from selected index attribute
                 if(newVal) return;
+                if(selectedIndex.getParser() == null && parserTxtField.getText() == null) return;
+                if(selectedIndex.getParser() == null && parserTxtField.getText() != null){
+                    selectedIndex.setParser(parserTxtField.getText());
+                }
                 if(!selectedIndex.getParser().equals(parserTxtField.getText())){
                     selectedIndex.setParser(parserTxtField.getText());
                 }
@@ -162,6 +166,10 @@ public class PanelIndexTab implements Initializable {
             });
             optionTxtArea.focusedProperty().addListener((obs,oldVal,newVal) -> {
                 if(newVal) return;
+                if(selectedIndex.getComment() == null && optionTxtArea.getText() == null) return;
+                if(selectedIndex.getComment() == null && optionTxtArea.getText() != null){
+                    selectedIndex.setComment(optionTxtArea.getText());
+                }
                 if(!selectedIndex.getComment().equals(optionTxtArea.getText())){
                     selectedIndex.setComment(optionTxtArea.getText());
                 }
@@ -191,7 +199,6 @@ public class PanelIndexTab implements Initializable {
                             //If the checkBox is at true add new indexed column to index
                             if(newValue){
                                 selectedIndex.getIndexedColumns().add(indexedColumn);
-                                System.out.println(selectedIndex.getIndexedColumns());
                                 indexedColumn.setIndex(selectedIndex);
                             }else {
                                 selectedIndex.getIndexedColumns().remove(indexedColumn);
@@ -310,8 +317,7 @@ public class PanelIndexTab implements Initializable {
         List<Index> indexes = new ArrayList<>(indexData);
         indexes.removeLast();
         indexes.removeIf(s -> s.getName().equals("PRIMARY") && s.getType().equals(IndexType.PRIMARY));
-        System.out.println(indexes);
-        return indexData;
+        return indexes;
     }
 
 }

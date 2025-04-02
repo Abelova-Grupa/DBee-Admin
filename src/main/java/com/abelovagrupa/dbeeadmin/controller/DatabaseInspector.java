@@ -545,7 +545,7 @@ public class DatabaseInspector {
                 IndexStorageType storageType = IndexStorageType.valueOf(storageTypeString.toUpperCase());
                 int keyBlockSize = rs.getInt("PACKED");
 //                String parser = rs.getString("Parser");
-                boolean visible = "NO".equals(rs.getString("IGNORED"));
+                boolean visible = "YES".equals(rs.getString("VISIBLE"));
                 boolean unique = rs.getInt("NON_UNIQUE") == 0; // 0 means unique, 1 means not unique
 
 
@@ -582,7 +582,7 @@ public class DatabaseInspector {
                 IndexStorageType storageType = IndexStorageType.valueOf(storageTypeString.toUpperCase());
                 int keyBlockSize = rs.getInt("PACKED");
 //                String parser = rs.getString("Parser");
-                boolean visible = "NO".equals(rs.getString("IGNORED"));
+                boolean visible = "YES".equals(rs.getString("VISIBLE"));
                 boolean unique = rs.getInt("NON_UNIQUE") == 0; // 0 means unique, 1 means not unique
 
 
