@@ -35,6 +35,11 @@ public class Column {
     private  StringProperty defaultValueProperty;
     private  ObjectProperty<DataType> typeProperty;
 
+    // Foreign key column table properties
+    private StringProperty columnNameProperty;
+    private StringProperty referencedColumnProperty;
+
+
     public Column() {
     }
 
@@ -307,7 +312,16 @@ public class Column {
         this.comment = comment;
     }
 
+    public StringProperty columnNameProperty(){
+        if(columnNameProperty == null){
+            columnNameProperty = new SimpleStringProperty(this,"columnName",name);
+        }
+        return columnNameProperty;
+    }
 
+    public void setColumnNameProperty(String columnName){
+        columnNameProperty().set(columnName);
+    }
 
     @Override
     public String toString() {

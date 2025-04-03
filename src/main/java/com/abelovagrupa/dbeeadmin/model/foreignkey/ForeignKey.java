@@ -28,19 +28,18 @@ public class ForeignKey {
     private StringProperty referencedTableProperty;
 
     // Foreign key columns table properties
-    private BooleanProperty checkedColumnProperty;
-    private StringProperty columnNameProperty;
-    private StringProperty referencedColumnProperty;
+    // Other properties are placed in column model
 
     public ForeignKey() {
     }
 
-    public ForeignKey(String name, Schema referencingSchema, Table referencingTable, Schema referencedSchema, Table referencedTable, Action onDeleteAction, Action onUpdateAction) {
+    public ForeignKey(String name, Schema referencingSchema, Table referencingTable, Schema referencedSchema, Table referencedTable, List<Pair<Column,Column>> columnPairs, Action onDeleteAction, Action onUpdateAction) {
         this.name = name;
         this.referencingSchema = referencingSchema;
         this.referencingTable = referencingTable;
         this.referencedSchema = referencedSchema;
         this.referencedTable = referencedTable;
+        this.columnPairs = columnPairs;
         this.onDeleteAction = onDeleteAction;
         this.onUpdateAction = onUpdateAction;
     }
@@ -117,6 +116,14 @@ public class ForeignKey {
         }
     }
 
+    public List<Pair<Column, Column>> getColumnPairs() {
+        return columnPairs;
+    }
+
+    public void setColumnPairs(List<Pair<Column, Column>> columnPairs) {
+        this.columnPairs = columnPairs;
+    }
+
     public Action getOnDeleteAction() {
         return onDeleteAction;
     }
@@ -152,16 +159,7 @@ public class ForeignKey {
         referencedTableProperty().set(referencedTable);
     }
 
-    public BooleanProperty checkedColumnProperty(){
-        if(checkedColumnProperty == null){
-            checkedColumnProperty = new SimpleBooleanProperty(this,"checkedColumn",false);
-        }
-        return checkedColumnProperty;
-    }
 
-    public void setCheckedColumnProperty(boolean checked){
-        checkedColumnProperty().set(checked);
-    }
 
     @Override
     public String toString() {

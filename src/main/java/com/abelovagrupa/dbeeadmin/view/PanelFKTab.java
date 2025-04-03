@@ -2,11 +2,14 @@ package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
+import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -28,10 +31,10 @@ public class PanelFKTab implements Initializable {
     TableColumn<ForeignKey,String> referencedTableFK;
 
     @FXML
-    TableView<Column> foreignKeyColumnsTable;
+    TableView<Pair<Column,Column>> foreignKeyColumnsTable;
 
     @FXML
-    TableColumn<Column,Boolean> foreignKeyColumnChecked;
+    TableColumn<Pair<Column,Column>,Boolean> foreignKeyColumnChecked;
 
     @FXML
     TableColumn<Column,String> foreignKeyColumnName;
@@ -41,7 +44,9 @@ public class PanelFKTab implements Initializable {
 
     ObservableList<ForeignKey> foreignKeyData = FXCollections.observableArrayList(new ForeignKey(),new ForeignKey());
 
-    ObservableList<Column> foreignKeyColumnsData = FXCollections.observableArrayList(new Column(),new Column());
+    ObservableList<Pair<Column,Column>> foreignKeyColumnsData = FXCollections.observableArrayList(new Pair<Column,Column>());
+
+    ForeignKey selectedForeignKey;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -59,17 +64,50 @@ public class PanelFKTab implements Initializable {
         setColumnsResizable(false);
 
         // Setting up properties for foreign key name column of fk table
-        foreignKeyNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        foreignKeyNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         foreignKeyNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         foreignKeyNameColumn.setOnEditCommit(event -> {
             ForeignKey foreignKey = event.getRowValue();
             foreignKey.setName(event.getNewValue());
         });
 
-        
+        foreignKeyColumnChecked.setCellValueFactory(cellData -> cellData.getValue().checkedColumnProperty());
+        foreignKeyColumnChecked.setCellFactory(col ->{
+            return new CheckBoxTableCell<Pair<Column,Column>, Boolean>() {
+                private final CheckBox checkBox = new CheckBox();
+                {
+                    checkBox.setOnAction(event -> {
+                        int row = getIndex();
+                        int tableSize = foreignKeyColumnsTable.getItems().size();
+                        if (row >= 0 && row < tableSize) {
+                            Pair<Column,Column> foreignKeyColumnPair = foreignKeyColumnsTable.getItems().get(row);
+                            boolean newValue = checkBox.isSelected();
+                            foreignKeyColumnPair.setCheckedColumnProperty(newValue);
+                            //If the checkBox is at true add new indexed column to index
+                            if(newValue){
+                                selectedForeignKey.getColumnPairs().add(foreignKeyColumnPair);
+                            }else {
+                                selectedForeignKey.getColumnPairs().remove(foreignKeyColumnPair);
+                            }
 
+                        }
+                    });
+                }
 
-        foreignKeyColumnChecked.setCellFactory(CheckBoxTableCell.forTableColumn(foreignKeyColumnChecked));
+                // CheckBox rendering logic
+                @Override
+                public void updateItem(Boolean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        checkBox.setSelected(item != null && item);
+                        setGraphic(checkBox);
+                    }
+                }
+            };
+        });
+
     }
 
     public void setColumnsWidth(){

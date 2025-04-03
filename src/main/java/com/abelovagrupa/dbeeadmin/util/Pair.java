@@ -1,15 +1,25 @@
 package com.abelovagrupa.dbeeadmin.util;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import java.util.Objects;
 
 public class Pair<F, S> {
     private F first;
     private S second;
 
+    // Foreign key table properties
+    private BooleanProperty checkedColumnProperty;
+
     // Private constructor to enforce factory method creation
-    private Pair(F first, S second) {
+    public Pair(F first, S second) {
         this.first = first;
         this.second = second;
+    }
+
+    public Pair(){
+
     }
 
     public static <F, S> Pair<F, S> of(F first, S second) {
@@ -57,4 +67,16 @@ public class Pair<F, S> {
         result = 31 * result + (second != null ? second.hashCode() : 0);
         return result;
     }
+
+    public BooleanProperty checkedColumnProperty(){
+        if(checkedColumnProperty == null){
+            checkedColumnProperty = new SimpleBooleanProperty(this,"checkedColumn",false);
+        }
+        return checkedColumnProperty;
+    }
+
+    public void setCheckedColumnProperty(boolean checked){
+        checkedColumnProperty().set(checked);
+    }
+
 }
