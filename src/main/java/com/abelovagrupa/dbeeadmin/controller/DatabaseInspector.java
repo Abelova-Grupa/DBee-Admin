@@ -257,6 +257,29 @@ public class DatabaseInspector {
         return column;
     }
 
+
+    public List<String> getColumnNames(Schema schema, Table table){
+        List<String> columnNames = new LinkedList<>();
+        String query = "SELECT COLUMN_NAME " +
+                "FROM INFORMATION_SCHEMA.COLUMNS " +
+                "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?;";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setString(1, schema.getName());
+            stmt.setString(2, table.getName());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String columnName = rs.getString("COLUMN_NAME");
+                    columnNames.add(columnName);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println();
+        }
+        return columnNames;
+    }
     /**
      * Retrieves a list of current users databases.
      * @return List of databases from current connection.

@@ -35,6 +35,11 @@ public class Column {
     private  StringProperty defaultValueProperty;
     private  ObjectProperty<DataType> typeProperty;
 
+    // Foreign key column table properties
+    private StringProperty columnNameProperty;
+    private StringProperty referencedColumnProperty;
+
+
     public Column() {
     }
 
@@ -306,6 +311,8 @@ public class Column {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+
 
 
 

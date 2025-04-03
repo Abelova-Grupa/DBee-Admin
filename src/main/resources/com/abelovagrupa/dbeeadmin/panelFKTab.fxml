@@ -15,7 +15,7 @@
 
             <TableView fx:id="foreignKeyTable" GridPane.columnIndex="0">
                 <columns>
-                    <TableColumn fx:id="foreignKeyNameColumn" text="Foreign Key Name" />
+                    <TableColumn fx:id="fkNameColumn" text="Foreign Key Name" />
                     <TableColumn fx:id="referencedTableFK" text="Referenced Table" />
                 </columns>
             </TableView>
@@ -23,7 +23,7 @@
                 <columns>
                     <TableColumn fx:id="foreignKeyColumnChecked"/>
                     <TableColumn fx:id="foreignKeyColumnName" text="Column" />
-                    <TableColumn fx:id="referencedColumnNameFK" text="Referenced Column" />
+                    <TableColumn fx:id="referencedColumnFK" text="Referenced Column" />
                 </columns>
             </TableView>
             <ScrollPane  hbarPolicy="NEVER" pannable="true" prefHeight="500.0" GridPane.columnIndex="2">

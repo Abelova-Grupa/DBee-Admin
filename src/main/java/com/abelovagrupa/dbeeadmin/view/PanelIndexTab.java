@@ -104,7 +104,7 @@ public class PanelIndexTab implements Initializable {
 
         // Setting up selection listener on index table
         indexTable.getSelectionModel().selectedItemProperty().addListener((_, oldSelection, newSelection) -> {
-            if(newSelection == null) return;
+            if(newSelection == null || newSelection == oldSelection) return;
             selectedIndex = newSelection;
 
             // Creating a list of indexedColumns on first selection

@@ -3,7 +3,13 @@ package com.abelovagrupa.dbeeadmin.model.foreignkey;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.util.Pair;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,33 +17,42 @@ public class ForeignKey {
     private String name;
     private Schema referencingSchema;
     private Table referencingTable;
-    private List<Column> referencingColumns;
+    private List<ForeignKeyColumns> columnPairs ;
     private Schema referencedSchema;
     private Table referencedTable;
-    private List<Column> referencedColumns;
     private Action onDeleteAction;
     private Action onUpdateAction;
+
+    // Foreign key table properties
+    private StringProperty nameProperty;
+    private StringProperty referencedTableProperty;
+
+    // Foreign key columns table properties
+    // Other properties are placed in column model
 
     public ForeignKey() {
     }
 
-    public ForeignKey(String name, Schema referencingSchema, Table referencingTable, List<Column> referencingColumns, Schema referencedSchema, Table referencedTable, List<Column> referencedColumns, Action onDeleteAction, Action onUpdateAction) {
+    public ForeignKey(String name, Schema referencingSchema, Table referencingTable, Schema referencedSchema, Table referencedTable, List<ForeignKeyColumns> columnPairs, Action onDeleteAction, Action onUpdateAction) {
         this.name = name;
         this.referencingSchema = referencingSchema;
         this.referencingTable = referencingTable;
-        this.referencingColumns = referencingColumns;
         this.referencedSchema = referencedSchema;
         this.referencedTable = referencedTable;
-        this.referencedColumns = referencedColumns;
+        this.columnPairs = columnPairs;
         this.onDeleteAction = onDeleteAction;
         this.onUpdateAction = onUpdateAction;
     }
 
     public String getName() {
-        return name;
+        if(nameProperty != null)
+            return nameProperty.get();
+        else return name;
     }
 
     public void setName(String name) {
+        if(nameProperty != null)
+            nameProperty.set(name);
         this.name = name;
     }
 
@@ -58,11 +73,17 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencingColumns() {
+        List<Column> referencingColumns = new LinkedList<>();
+        for(Pair<Column,Column> pair : columnPairs){
+            referencingColumns.add(pair.getFirst());
+        }
         return referencingColumns;
     }
 
     public void setReferencingColumns(List<Column> referencingColumns) {
-        this.referencingColumns = referencingColumns;
+        for(int i = 0; i < referencingColumns.size(); i++){
+            columnPairs.get(i).setFirst(referencingColumns.get(i));
+        }
     }
 
     public Schema getReferencedSchema() {
@@ -82,11 +103,25 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencedColumns() {
+        List<Column> referencedColumns = new LinkedList<>();
+        for(Pair<Column,Column> pair : columnPairs){
+            referencedColumns.add(pair.getSecond());
+        }
         return referencedColumns;
     }
 
     public void setReferencedColumns(List<Column> referencedColumns) {
-        this.referencedColumns = referencedColumns;
+        for(int i = 0; i < referencedColumns.size(); i++){
+            columnPairs.get(i).setSecond(referencedColumns.get(i));
+        }
+    }
+
+    public List<ForeignKeyColumns> getColumnPairs() {
+        return columnPairs;
+    }
+
+    public void setColumnPairs(List<ForeignKeyColumns> columnPairs) {
+        this.columnPairs = columnPairs;
     }
 
     public Action getOnDeleteAction() {
@@ -105,14 +140,32 @@ public class ForeignKey {
         this.onUpdateAction = onUpdateAction;
     }
 
+    // Table properties
+    public StringProperty nameProperty(){
+        if(nameProperty == null){
+            nameProperty = new SimpleStringProperty(this,"name",name);
+        }
+        return nameProperty;
+    }
+
+    public StringProperty referencedTableProperty(){
+        if(referencedTableProperty == null){
+            referencedTableProperty = new SimpleStringProperty(this,"referencedTable","");
+        }
+        return referencedTableProperty;
+    }
+
+    public void setReferencedTableProperty(String referencedTable){
+        referencedTableProperty().set(referencedTable);
+    }
+
     @Override
     public String toString() {
         return "ForeignKey{" +
                 "name='" + name + '\'' +
-                ", referencingColumns=" + referencingColumns +
                 ", referencedSchema=" + referencedSchema +
                 ", referencedTable=" + referencedTable +
-                ", referencedColumns=" + referencedColumns +
+                ", columnPairs" + columnPairs +
                 ", onDeleteAction=" + onDeleteAction +
                 ", onUpdateAction=" + onUpdateAction +
                 '}';
@@ -128,6 +181,6 @@ public class ForeignKey {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, referencingColumns, referencedSchema, referencedTable, referencedColumns, onDeleteAction, onUpdateAction);
+        return Objects.hash(name, referencedSchema, referencedTable,columnPairs,onDeleteAction, onUpdateAction);
     }
 }
