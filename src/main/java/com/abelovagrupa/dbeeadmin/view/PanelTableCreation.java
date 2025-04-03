@@ -9,6 +9,7 @@ import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
+import com.abelovagrupa.dbeeadmin.services.ProgramState;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -97,7 +98,6 @@ public class PanelTableCreation implements Initializable {
             }
             indexTabController.indexedColumnData.setAll(indexedColumns);
 
-
             // Initialize foreign key tab
             foreignKeyTab = new Tab("Foreign Keys");
             foreignKeyTab.setClosable(false);
@@ -134,6 +134,7 @@ public class PanelTableCreation implements Initializable {
                         try {
                             FXMLLoader fkLoader = new FXMLLoader(Main.class.getResource("panelFKTab.fxml"));
                             VBox foreignKeyTabContent = fkLoader.load();
+                            foreignKeyTabController = fkLoader.getController();
                             foreignKeyTab.setContent(foreignKeyTabContent);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -148,6 +149,7 @@ public class PanelTableCreation implements Initializable {
                         try {
                             FXMLLoader triggerLoader = new FXMLLoader(Main.class.getResource("panelTriggerTab.fxml"));
                             HBox triggerTabContent = triggerLoader.load();
+                            triggerTabController = triggerLoader.getController();
                             triggerTab.setContent(triggerTabContent);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -227,6 +229,8 @@ public class PanelTableCreation implements Initializable {
             return null;
         }
         Schema tableSchema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
+        ProgramState.getInstance().setSelectedSchema(tableSchema);
+
         Table newTable = new Table();
         newTable.setName(tableName);
         tableSchema.getTables().add(newTable);
@@ -234,6 +238,7 @@ public class PanelTableCreation implements Initializable {
         newTable.setColumns(columns);
         try {
             DDLGenerator.createTable(newTable,true);
+            ProgramState.getInstance().setSelectedTable(DatabaseInspector.getInstance().getTableByName(tableSchema,tableName));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -312,16 +312,9 @@ public class Column {
         this.comment = comment;
     }
 
-    public StringProperty columnNameProperty(){
-        if(columnNameProperty == null){
-            columnNameProperty = new SimpleStringProperty(this,"columnName",name);
-        }
-        return columnNameProperty;
-    }
 
-    public void setColumnNameProperty(String columnName){
-        columnNameProperty().set(columnName);
-    }
+
+
 
     @Override
     public String toString() {

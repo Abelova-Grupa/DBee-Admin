@@ -2,15 +2,15 @@ package com.abelovagrupa.dbeeadmin.util;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.Objects;
 
 public class Pair<F, S> {
     private F first;
     private S second;
-
     // Foreign key table properties
-    private BooleanProperty checkedColumnProperty;
 
     // Private constructor to enforce factory method creation
     public Pair(F first, S second) {
@@ -68,15 +68,7 @@ public class Pair<F, S> {
         return result;
     }
 
-    public BooleanProperty checkedColumnProperty(){
-        if(checkedColumnProperty == null){
-            checkedColumnProperty = new SimpleBooleanProperty(this,"checkedColumn",false);
-        }
-        return checkedColumnProperty;
-    }
 
-    public void setCheckedColumnProperty(boolean checked){
-        checkedColumnProperty().set(checked);
-    }
+
 
 }

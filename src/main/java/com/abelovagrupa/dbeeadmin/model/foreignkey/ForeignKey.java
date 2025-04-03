@@ -17,7 +17,7 @@ public class ForeignKey {
     private String name;
     private Schema referencingSchema;
     private Table referencingTable;
-    private List<Pair<Column,Column>> columnPairs ;
+    private List<ForeignKeyColumns> columnPairs ;
     private Schema referencedSchema;
     private Table referencedTable;
     private Action onDeleteAction;
@@ -33,7 +33,7 @@ public class ForeignKey {
     public ForeignKey() {
     }
 
-    public ForeignKey(String name, Schema referencingSchema, Table referencingTable, Schema referencedSchema, Table referencedTable, List<Pair<Column,Column>> columnPairs, Action onDeleteAction, Action onUpdateAction) {
+    public ForeignKey(String name, Schema referencingSchema, Table referencingTable, Schema referencedSchema, Table referencedTable, List<ForeignKeyColumns> columnPairs, Action onDeleteAction, Action onUpdateAction) {
         this.name = name;
         this.referencingSchema = referencingSchema;
         this.referencingTable = referencingTable;
@@ -116,11 +116,11 @@ public class ForeignKey {
         }
     }
 
-    public List<Pair<Column, Column>> getColumnPairs() {
+    public List<ForeignKeyColumns> getColumnPairs() {
         return columnPairs;
     }
 
-    public void setColumnPairs(List<Pair<Column, Column>> columnPairs) {
+    public void setColumnPairs(List<ForeignKeyColumns> columnPairs) {
         this.columnPairs = columnPairs;
     }
 
@@ -150,7 +150,7 @@ public class ForeignKey {
 
     public StringProperty referencedTableProperty(){
         if(referencedTableProperty == null){
-            referencedTableProperty = new SimpleStringProperty(this,"referencedTable",referencedSchema.getName()+"."+referencedTable.getName());
+            referencedTableProperty = new SimpleStringProperty(this,"referencedTable","");
         }
         return referencedTableProperty;
     }
@@ -158,8 +158,6 @@ public class ForeignKey {
     public void setReferencedTableProperty(String referencedTable){
         referencedTableProperty().set(referencedTable);
     }
-
-
 
     @Override
     public String toString() {
