@@ -4,9 +4,12 @@ import com.abelovagrupa.dbeeadmin.model.TableAttributes;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ProgramState {
 
+    private static final Logger logger = LogManager.getRootLogger();
 
     private static ProgramState instance = null;
 
@@ -16,7 +19,7 @@ public class ProgramState {
     private TableAttributes selectedAttribute;
 
     private ProgramState() {
-        System.out.println("Initializing program state.");
+        logger.info("Program state initialized.");
     }
 
     public static ProgramState getInstance() {

@@ -2,6 +2,9 @@ package com.abelovagrupa.dbeeadmin.connection;
 
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,6 +15,8 @@ import java.sql.SQLException;
 public class DatabaseConnection {
 
     // TODO: Split url to host & port
+
+    private static final Logger logger = LogManager.getRootLogger();
 
     private static DatabaseConnection instance;
     // Connection cannot be final, in case that a user wants to switch username or url of connection
@@ -28,7 +33,7 @@ public class DatabaseConnection {
             assert dbUrl != null;
             assert dbUsername != null;
             setConnection(dbUrl,dbUsername,dbPassword);
-            System.out.println("Database connection established.");
+            logger.info("Database connection established.");
 //        } catch (SQLException  | AssertionError e ) {
 //            throw new RuntimeException(e);
         }catch(Exception e){
@@ -62,7 +67,7 @@ public class DatabaseConnection {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                System.out.println("Database connection closed.");
+                logger.info("Database connection closed.");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -80,7 +85,7 @@ public class DatabaseConnection {
     public void setConnectionParameters(String dbUrl, String dbUsername, String dbPassword) throws IOException {
         // TODO: Create a session
         String filePath = "src/main/resources/com/abelovagrupa/dbeeadmin/.env";
-        System.out.println("Connection parameters set.");
+        logger.info("Connection parameters saved.");
         // System.out.println("Writing to file: " + filePath);
         BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filePath, false));
         fileWriter.write("DB_URL=" + dbUrl + "\n");
@@ -121,7 +126,6 @@ public class DatabaseConnection {
 
         else
             setConnection(dbUrl, dbUsername, dbPassword);
-        System.out.println(dbUrl);
     }
 
 }
