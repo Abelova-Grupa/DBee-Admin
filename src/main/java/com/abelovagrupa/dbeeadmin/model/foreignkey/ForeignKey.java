@@ -17,7 +17,9 @@ public class ForeignKey {
     private String name;
     private Schema referencingSchema;
     private Table referencingTable;
-    private List<ForeignKeyColumns> columnPairs ;
+    private List<ForeignKeyColumns> columnPairs;
+    private List<Column> referencingColumns;
+    private List<Column> referencedColumns;
     private Schema referencedSchema;
     private Table referencedTable;
     private Action onDeleteAction;
@@ -73,7 +75,6 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencingColumns() {
-        List<Column> referencingColumns = new LinkedList<>();
         for(Pair<Column,Column> pair : columnPairs){
             referencingColumns.add(pair.getFirst());
         }
@@ -81,7 +82,11 @@ public class ForeignKey {
     }
 
     public void setReferencingColumns(List<Column> referencingColumns) {
+        this.referencingColumns = referencingColumns;
         for(int i = 0; i < referencingColumns.size(); i++){
+            if(columnPairs.get(i) == null){
+                columnPairs.set(i, new ForeignKeyColumns());
+            }
             columnPairs.get(i).setFirst(referencingColumns.get(i));
         }
     }
@@ -103,7 +108,6 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencedColumns() {
-        List<Column> referencedColumns = new LinkedList<>();
         for(Pair<Column,Column> pair : columnPairs){
             referencedColumns.add(pair.getSecond());
         }
@@ -111,7 +115,11 @@ public class ForeignKey {
     }
 
     public void setReferencedColumns(List<Column> referencedColumns) {
+        this.referencedColumns = referencedColumns;
         for(int i = 0; i < referencedColumns.size(); i++){
+            if(columnPairs.get(i) == null){
+                columnPairs.set(i,new ForeignKeyColumns());
+            }
             columnPairs.get(i).setSecond(referencedColumns.get(i));
         }
     }

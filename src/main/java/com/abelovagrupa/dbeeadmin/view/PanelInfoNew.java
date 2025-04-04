@@ -188,7 +188,7 @@ public class PanelInfoNew implements Initializable {
 
         // Build referenced cols string
         StringBuilder refedColsBuilder = new StringBuilder();
-        for(var col : foreignKey.getReferencingColumns()) {
+        for(var col : foreignKey.getReferencedColumns()) {
             refedColsBuilder.append(col.getName()).append(", ");
         }
 
