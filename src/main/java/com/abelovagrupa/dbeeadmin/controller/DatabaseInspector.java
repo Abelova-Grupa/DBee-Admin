@@ -16,6 +16,8 @@ import com.abelovagrupa.dbeeadmin.model.trigger.Event;
 import com.abelovagrupa.dbeeadmin.model.trigger.Timing;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import com.abelovagrupa.dbeeadmin.model.view.View;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -24,7 +26,7 @@ import java.util.*;
 public class DatabaseInspector {
 
 
-    // TODO: Singleton? Static? New Thread?
+    private static final Logger logger = LogManager.getRootLogger();
 
     private final Connection connection;
 
@@ -59,7 +61,7 @@ public class DatabaseInspector {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error retrieving database names: " + e.getMessage());
+            logger.error("Error retrieving database name: {}", e.getMessage());
         }
 
         return databaseNames;
@@ -80,7 +82,7 @@ public class DatabaseInspector {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error retrieving table names: " + e.getMessage());
+            logger.error("Error retrieving table names: {}", e.getMessage());
         }
         return tableNames;
     }
@@ -108,7 +110,7 @@ public class DatabaseInspector {
             }
 
         }catch(SQLException ex){
-            System.err.println("Error retrieving tables: "+ ex.getMessage());
+            logger.error("Error retrieving tables: {}", ex.getMessage());
         }
         return tables;
     }
@@ -133,7 +135,7 @@ public class DatabaseInspector {
 
 
         }catch(SQLException e){
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
         return table;
     }
@@ -192,7 +194,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         return columns;
@@ -251,7 +253,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         return column;
@@ -275,7 +277,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
         return columnNames;
     }
@@ -402,7 +404,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
         return foreignKeys;
     }
@@ -577,8 +579,7 @@ public class DatabaseInspector {
                     visible = "YES".equals(rs.getString("VISIBLE"));
                 } catch (SQLException e) {
                     // User has MariaDB running and column is named IGNORED
-                    System.out.println("INFO: Exception thrown while attempting to get VISIBLE column;\n\t" +
-                        "Attempting to get IGNORED column (MariaDB)." );
+                    logger.warn("Exception thrown while attempting to get VISIBLE column; Attempting to get IGNORED column (MariaDB)." );
                     visible = "NO".equals(rs.getString("IGNORED"));
                 }
                 boolean unique = rs.getInt("NON_UNIQUE") == 0; // 0 means unique, 1 means not unique
@@ -625,8 +626,7 @@ public class DatabaseInspector {
                     visible = "YES".equals(rs.getString("VISIBLE"));
                 } catch (SQLException e) {
                     // User has MariaDB running and column is named IGNORED
-                    System.out.println("INFO: Exception thrown while attempting to get VISIBLE column;\n\t" +
-                        "Attempting to get IGNORED column (MariaDB)." );
+                    logger.warn("INFO: Exception thrown while attempting to get VISIBLE column; Attempting to get IGNORED column (MariaDB)." );
                     visible = "NO".equals(rs.getString("IGNORED"));
                 }
 
@@ -707,7 +707,7 @@ public class DatabaseInspector {
                 triggers.add(trigger);
             }
         } catch (SQLException ex) {
-            System.err.println("Error retrieving triggers: " + ex.getMessage());
+            logger.error("Error retrieving triggers: {}", ex.getMessage());
         }
         return triggers;
     }
@@ -755,7 +755,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving trigger: " + e.getMessage());
+            logger.error("Error retrieving trigger: {}", e.getMessage());
         }
 
         return trigger;
@@ -776,7 +776,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving views: " + e.getMessage());
+            logger.error("Error retrieving view names: {}", e.getMessage());
         }
 
         return viewNames;
@@ -801,7 +801,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving views: " + e.getMessage());
+            logger.error("Error retrieving views: {}", e.getMessage());
         }
 
         return views;

@@ -26,6 +26,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,6 +35,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class PanelBrowser implements Initializable {
+
+    public static final Logger logger = LogManager.getRootLogger();
 
     private final int TREE_CELL_HEIGHT = 30;
 
@@ -389,7 +393,7 @@ public class PanelBrowser implements Initializable {
 
                         }
                     } catch (NullPointerException e) {
-                        System.err.println("No parent value for selected item...");
+                        logger.warn("No parent value for selected item...");
                     }
                 }
             });

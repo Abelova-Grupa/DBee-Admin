@@ -5,6 +5,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -13,8 +15,9 @@ import java.lang.reflect.Method;
  * Utility class responsible for importing and exporting files.
  */
 public class FileProcessor {
-
-
+    
+    public static final Logger logger = LogManager.getRootLogger();
+    
     /**
      * Method that provides user with a file chooser dialog and reads SQL from the chosen file.
      * @return SQL code read from the file.
@@ -91,7 +94,7 @@ public class FileProcessor {
             // If a file was selected, save the TableView data to CSV
             saveTableViewToCSV(tableView, selectedFile.getAbsolutePath());
         } else {
-            System.err.println("No file selected.");
+            logger.error("No file selected.");
         }
     }
 
@@ -120,7 +123,7 @@ public class FileProcessor {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write(csvContent.toString());
         } catch (IOException e) {
-            System.err.println("Error saving the CSV file.");
+            logger.error("Error saving the CSV file.");
         }
     }
 

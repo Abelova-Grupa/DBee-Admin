@@ -511,7 +511,7 @@ public class DDLGenerator {
 
         List<IndexedColumn> sortedIndexedColumns = index.getIndexedColumns();
         sortedIndexedColumns.sort(indexComparator);
-        System.out.println(sortedIndexedColumns);
+//        System.out.println(sortedIndexedColumns);
 
         for(int i = 0; i < sortedIndexedColumns.size(); i++) {
             IndexedColumn indexedColumn = sortedIndexedColumns.get(i);
