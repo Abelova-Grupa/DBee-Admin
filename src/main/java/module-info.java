@@ -9,7 +9,8 @@ module com.abelovagrupa.dbeeadmin {
     requires java.dotenv;
     requires java.desktop;
     requires annotations;
-    requires log4j.api;
+    requires org.apache.logging.log4j;
+    requires org.apache.logging.log4j.core;
 
 
     opens com.abelovagrupa.dbeeadmin to javafx.fxml;
