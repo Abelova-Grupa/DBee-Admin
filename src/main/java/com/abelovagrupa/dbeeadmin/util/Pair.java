@@ -1,19 +1,13 @@
 package com.abelovagrupa.dbeeadmin.util;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
 import java.util.Objects;
 
 public class Pair<F, S> {
     private F first;
     private S second;
-    // Foreign key table properties
 
     // Private constructor to enforce factory method creation
-    public Pair(F first, S second) {
+    private Pair(F first, S second) {
         this.first = first;
         this.second = second;
     }

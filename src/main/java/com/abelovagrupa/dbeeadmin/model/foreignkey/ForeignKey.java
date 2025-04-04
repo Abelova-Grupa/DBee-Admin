@@ -4,8 +4,6 @@ import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.util.Pair;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -17,20 +15,20 @@ public class ForeignKey {
     private String name;
     private Schema referencingSchema;
     private Table referencingTable;
-    private List<ForeignKeyColumns> columnPairs;
-    private List<Column> referencingColumns;
-    private List<Column> referencedColumns;
     private Schema referencedSchema;
     private Table referencedTable;
     private Action onDeleteAction;
     private Action onUpdateAction;
 
+    // columnPairs is a list of pairs where each pair is <referencingColumn,referenced Column>
+    // These column pairs are specially used in ForeignKeyColumns table in foreign key tab
+    private List<ForeignKeyColumns> columnPairs;
+    private List<Column> referencingColumns;
+    private List<Column> referencedColumns;
+
     // Foreign key table properties
     private StringProperty nameProperty;
     private StringProperty referencedTableProperty;
-
-    // Foreign key columns table properties
-    // Other properties are placed in column model
 
     public ForeignKey() {
     }
@@ -75,7 +73,7 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencingColumns() {
-        for(Pair<Column,Column> pair : columnPairs){
+        for(Pair<Column,Column> pair : getColumnPairs()){
             referencingColumns.add(pair.getFirst());
         }
         return referencingColumns;
@@ -84,10 +82,10 @@ public class ForeignKey {
     public void setReferencingColumns(List<Column> referencingColumns) {
         this.referencingColumns = referencingColumns;
         for(int i = 0; i < referencingColumns.size(); i++){
-            if(columnPairs.get(i) == null){
-                columnPairs.set(i, new ForeignKeyColumns());
+            if(getColumnPairs().get(i) == null){
+                getColumnPairs().set(i, new ForeignKeyColumns());
             }
-            columnPairs.get(i).setFirst(referencingColumns.get(i));
+            getColumnPairs().get(i).setFirst(referencingColumns.get(i));
         }
     }
 
@@ -108,23 +106,28 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencedColumns() {
-        for(Pair<Column,Column> pair : columnPairs){
+        for(Pair<Column,Column> pair : getColumnPairs()){
             referencedColumns.add(pair.getSecond());
         }
         return referencedColumns;
     }
 
     public void setReferencedColumns(List<Column> referencedColumns) {
+        // When setting the referenced column list, set the second elements in list of pairs
         this.referencedColumns = referencedColumns;
         for(int i = 0; i < referencedColumns.size(); i++){
-            if(columnPairs.get(i) == null){
-                columnPairs.set(i,new ForeignKeyColumns());
+            if(getColumnPairs().get(i) == null){
+                getColumnPairs().set(i,new ForeignKeyColumns());
             }
-            columnPairs.get(i).setSecond(referencedColumns.get(i));
+            getColumnPairs().get(i).setSecond(referencedColumns.get(i));
         }
     }
 
     public List<ForeignKeyColumns> getColumnPairs() {
+        // Singleton list of referencing/ed columns for one foreign key
+        if(columnPairs == null){
+            columnPairs = new LinkedList<>();
+        }
         return columnPairs;
     }
 

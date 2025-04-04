@@ -4,6 +4,7 @@ import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
@@ -66,7 +67,8 @@ public class PanelTableCreation implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            tabLoaded = new boolean[]{true,false,false,false};
+            // TabLoaded array indicates if the certain tabs of tableCreation tabPane are loaded
+            tabLoaded = new boolean[]{true,true,false,false};
             // Initialize column tab
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
             VBox columnsTabContent = loader.load();
@@ -84,19 +86,11 @@ public class PanelTableCreation implements Initializable {
             indexTab.setClosable(false);
             tableAttributeTabPane.getTabs().add(indexTab);
 
+            // Loading index tab content
             FXMLLoader indexLoader = new FXMLLoader(Main.class.getResource("panelIndexTab.fxml"));
             VBox indexTabContent = indexLoader.load();
             indexTabController = indexLoader.getController();
             indexTab.setContent(indexTabContent);
-            columTabController.indexTabController = indexLoader.getController();
-
-            // Loading columns from column tab for indexed column
-            for (Column column : columTabController.columnsData){
-                IndexedColumn indexedColumn = new IndexedColumn();
-                indexedColumn.setColumn(column);
-                indexedColumns.add(indexedColumn);
-            }
-            indexTabController.indexedColumnData.setAll(indexedColumns);
 
             // Initialize foreign key tab
             foreignKeyTab = new Tab("Foreign Keys");
@@ -115,8 +109,8 @@ public class PanelTableCreation implements Initializable {
         // Implementing lazy loading, tabs other than column tab will load its content
         // only if they are selected for the first time
         tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldTab, newTab) -> {
-                    // If selected tab is index tab and the content has not loaded yet
+                (_, _, newTab) -> {
+                    // If selected tab is index tab load all columns from column tab
                     if(newTab.equals(indexTab)){
                         indexedColumns.clear();
                         for (Column column : columTabController.columnsData){
@@ -127,39 +121,49 @@ public class PanelTableCreation implements Initializable {
                         indexTabController.indexedColumnData.setAll(indexedColumns);
                     }
                 });
-
+        // Implementing lazy loading of the foreign key tab on first selection
         tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldTab, newTab) -> {
-                    if(newTab.equals(foreignKeyTab) && !tabLoaded[2]){
+                (_, _, newTab) -> {
+                    if(!newTab.equals(foreignKeyTab)) return;
+                    if(!tabLoaded[2]){
                         try {
                             FXMLLoader fkLoader = new FXMLLoader(Main.class.getResource("panelFKTab.fxml"));
                             VBox foreignKeyTabContent = fkLoader.load();
                             foreignKeyTabController = fkLoader.getController();
                             foreignKeyTab.setContent(foreignKeyTabContent);
+                            tabLoaded[2] = true;
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                        tabLoaded[2] = true;
+                    }
+                    if(foreignKeyTabController.selectedTable != null){
+                        foreignKeyTabController.foreignKeyColumnsData.clear();
+                        for(int i=0; i < foreignKeyTabController.selectedTable.getColumns().size();i++){
+                            Column column = foreignKeyTabController.selectedTable.getColumns().get(i);
+                            ForeignKeyColumns newPair = new ForeignKeyColumns();
+                            newPair.setFirst(column);
+                            foreignKeyTabController.foreignKeyColumnsData.add(newPair);
+                            foreignKeyTabController.foreignKeyColumnsTable.getItems().get(i).setColumnNameProperty(column.getName());
+                        }
                     }
                 });
-
+        // Implementing lazy loading of trigger tab on first selection
         tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldTab, newTab) -> {
+                (_, _, newTab) -> {
                     if(newTab.equals(triggerTab) && !tabLoaded[3]){
                         try {
                             FXMLLoader triggerLoader = new FXMLLoader(Main.class.getResource("panelTriggerTab.fxml"));
                             HBox triggerTabContent = triggerLoader.load();
                             triggerTabController = triggerLoader.getController();
                             triggerTab.setContent(triggerTabContent);
+                            tabLoaded[3] = true;
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                        tabLoaded[3] = true;
                     }
                 });
 
         // Filling comboBox with engine values
-        // Resource heavy?
         cbSchema.getItems().addAll(DatabaseInspector.getInstance().getDatabaseNames());
 
 

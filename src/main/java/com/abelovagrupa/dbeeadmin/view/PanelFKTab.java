@@ -31,32 +31,34 @@ public class PanelFKTab implements Initializable {
     TableView<ForeignKey> foreignKeyTable;
 
     @FXML
-    TableColumn<ForeignKey,String> fkNameColumn;
+    TableColumn<ForeignKey,String> fkNameTableColumn;
 
     @FXML
-    TableColumn<ForeignKey,String> referencedTableFK;
+    TableColumn<ForeignKey,String> fkReferencedTableColumn;
 
     @FXML
     TableView<ForeignKeyColumns> foreignKeyColumnsTable;
 
     @FXML
-    TableColumn<ForeignKeyColumns,Boolean> foreignKeyColumnChecked;
+    TableColumn<ForeignKeyColumns,Boolean> fkcheckedTableColumn;
 
     @FXML
-    TableColumn<ForeignKeyColumns,String> foreignKeyColumnName;
+    TableColumn<ForeignKeyColumns,String> fkColumnNameTableColumn;
 
     @FXML
-    TableColumn<ForeignKeyColumns,String> referencedColumnFK;
+    TableColumn<ForeignKeyColumns,String> fkReferencedColumnTableColumn;
 
     ObservableList<ForeignKey> foreignKeyData = FXCollections.observableArrayList(new ForeignKey(),new ForeignKey());
 
-    ObservableList<ForeignKeyColumns> foreignKeyColumnsData = FXCollections.observableArrayList(new LinkedList<ForeignKeyColumns>());
+    ObservableList<ForeignKeyColumns> foreignKeyColumnsData = FXCollections.observableArrayList(new ForeignKeyColumns());
 
     Schema selectedSchema = ProgramState.getInstance().getSelectedSchema();
 
     Table selectedTable = ProgramState.getInstance().getSelectedTable();
 
     ForeignKey selectedForeignKey;
+
+    ObservableList<String> cbReferencedColumns = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -73,38 +75,49 @@ public class PanelFKTab implements Initializable {
         setColumnsReorderable(false);
         setColumnsResizable(false);
 
+
+
         // Setting up properties for foreign key name column of fk table
-        fkNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
-        fkNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        fkNameColumn.setOnEditCommit(event -> {
+        fkNameTableColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        fkNameTableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        fkNameTableColumn.setOnEditCommit(event -> {
             ForeignKey foreignKey = event.getRowValue();
             foreignKey.setName(event.getNewValue());
         });
 
-        List<String> schemaTablesNames;
+        // Filling up referencedTable comboBox with values based on selected schema
         ObservableList<String> cbReferencedTable = FXCollections.observableArrayList();
         if(selectedSchema != null){
-            schemaTablesNames = DatabaseInspector.getInstance().getTableNames(selectedSchema);
+            List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(selectedSchema);
             for(String schemaTableName : schemaTablesNames){
                 cbReferencedTable.add(selectedSchema.getName()+"."+schemaTableName);
             }
         }
-        referencedTableFK.setCellValueFactory(cellData -> cellData.getValue().referencedTableProperty());
-        referencedTableFK.setCellFactory(ComboBoxTableCell.forTableColumn(cbReferencedTable));
-        referencedTableFK.setOnEditCommit(event -> {
+        // Setting up properties for referenced table column of fk table
+        fkReferencedTableColumn.setCellValueFactory(cellData -> cellData.getValue().referencedTableProperty());
+        fkReferencedTableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbReferencedTable));
+        fkReferencedTableColumn.setOnEditCommit(event -> {
             if(event.getNewValue() == null || event.getNewValue().isEmpty()) return;
             ForeignKey foreignKey = event.getRowValue();
-            foreignKey.referencedTableProperty().set(event.getNewValue());
+            // Adding referenced schema to foreign key
             Schema schema = DatabaseInspector.getInstance().getDatabaseByName(event.getNewValue().split("\\.")[0]);
             foreignKey.setReferencedSchema(schema);
             selectedSchema = schema;
-            Table table = DatabaseInspector.getInstance().getTableByName(schema,event.getNewValue().split("\\.")[1]);
-            foreignKey.setReferencedTable(table);
-            selectedTable = table;
+
+            // Adding referenced table to foreign key
+            Table referencedTable = DatabaseInspector.getInstance().getTableByName(schema,event.getNewValue().split("\\.")[1]);
+            foreignKey.setReferencedTable(referencedTable);
+            selectedTable = referencedTable;
+            // Setting table property (String)
+            foreignKey.setReferencedTableProperty(event.getNewValue());
+
+            List<String> referencedColumnNames = referencedTable.getColumns().stream().map(Column::getName).toList();
+            cbReferencedColumns.setAll(referencedColumnNames);
         });
 
-        foreignKeyColumnChecked.setCellValueFactory(cellData -> cellData.getValue().checkedColumnProperty());
-        foreignKeyColumnChecked.setCellFactory(col ->{
+        // Setting up properties of foreign key column checkbox in foreign key columns table
+        fkcheckedTableColumn.setCellValueFactory(cellData -> cellData.getValue().checkedColumnProperty());
+        fkcheckedTableColumn.setCellFactory(col ->{
             return new CheckBoxTableCell<ForeignKeyColumns, Boolean>() {
                 private final CheckBox checkBox = new CheckBox();
                 {
@@ -140,19 +153,19 @@ public class PanelFKTab implements Initializable {
             };
         });
 
-        foreignKeyColumnName.setCellValueFactory(cellData -> cellData.getValue().columnNameProperty());
-        foreignKeyColumnName.setCellFactory(TextFieldTableCell.forTableColumn());
-        foreignKeyColumnName.setOnEditCommit(event -> {
+        // Setting up properties of foreign key column name of foreign key columns table
+        fkColumnNameTableColumn.setCellValueFactory(cellData -> cellData.getValue().columnNameProperty());
+        fkColumnNameTableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        fkColumnNameTableColumn.setOnEditCommit(event -> {
             Column column = DatabaseInspector.getInstance().getColumnByName(selectedTable,event.getNewValue());
             Pair<Column,Column> selectedPair = foreignKeyColumnsData.get(event.getTablePosition().getRow());
             selectedPair.setFirst(column);
         });
 
-        ObservableList<String> cbReferencedColumns = FXCollections.observableArrayList();
 
-        referencedColumnFK.setCellValueFactory(cellData -> cellData.getValue().referencedColumnProperty());
-        referencedColumnFK.setCellFactory(ComboBoxTableCell.forTableColumn(cbReferencedColumns));
-        referencedColumnFK.setOnEditCommit(event -> {
+        fkReferencedColumnTableColumn.setCellValueFactory(cellData -> cellData.getValue().referencedColumnProperty());
+        fkReferencedColumnTableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbReferencedColumns));
+        fkReferencedColumnTableColumn.setOnEditCommit(event -> {
             Column column = DatabaseInspector.getInstance().getColumnByName(selectedTable,event.getNewValue());
             Pair<Column,Column> selectedPair = foreignKeyColumnsData.get(event.getTablePosition().getRow());
             selectedPair.setSecond(column);
@@ -163,8 +176,12 @@ public class PanelFKTab implements Initializable {
             if(newSelection == null || oldSelection == newSelection) return;
             selectedForeignKey = newSelection;
 
-            if(selectedForeignKey.getColumnPairs() == null){
+            if(selectedForeignKey.getColumnPairs() == null) {
                 selectedForeignKey.setColumnPairs(new LinkedList<ForeignKeyColumns>());
+            }
+
+            if(!selectedForeignKey.referencedTableProperty().get().isEmpty()){
+                Table referencedTable = ProgramState.getInstance().getSelectedTable();
 
                 for(int i=0; i < selectedTable.getColumns().size();i++){
                     Column column = selectedTable.getColumns().get(i);
@@ -173,8 +190,11 @@ public class PanelFKTab implements Initializable {
                     foreignKeyColumnsData.add(newPair);
                     foreignKeyColumnsTable.getItems().get(i).setColumnNameProperty(column.getName());
                 }
-            }
-            if(selectedForeignKey.referencedTableProperty().get().isEmpty()){
+
+                List<String> referencedColumnNames = referencedTable.getColumns().stream().map(Column::getName).toList();
+                cbReferencedColumns.setAll(referencedColumnNames);
+
+            }else {
                 cbReferencedColumns.setAll();
             }
 
@@ -192,19 +212,17 @@ public class PanelFKTab implements Initializable {
                 foreignKeyTable.getItems().add(new ForeignKey());
             });
         });
-
-
     }
 
     public void setColumnsWidth(){
         ReadOnlyDoubleProperty foreignKeyTableWidthProperty = foreignKeyTable.widthProperty();
-        fkNameColumn.prefWidthProperty().bind(foreignKeyTableWidthProperty.multiply(0.4));
-        referencedTableFK.prefWidthProperty().bind(foreignKeyTableWidthProperty.multiply(0.6));
+        fkNameTableColumn.prefWidthProperty().bind(foreignKeyTableWidthProperty.multiply(0.4));
+        fkReferencedTableColumn.prefWidthProperty().bind(foreignKeyTableWidthProperty.multiply(0.6));
 
         ReadOnlyDoubleProperty foreignKeyColumnsTableWidthProperty = foreignKeyColumnsTable.widthProperty();
-        foreignKeyColumnChecked.prefWidthProperty().bind(foreignKeyColumnsTableWidthProperty.multiply(0.075));
-        foreignKeyColumnName.prefWidthProperty().bind(foreignKeyColumnsTableWidthProperty.multiply(0.3));
-        referencedColumnFK.prefWidthProperty().bind(foreignKeyColumnsTableWidthProperty.multiply(0.625));
+        fkcheckedTableColumn.prefWidthProperty().bind(foreignKeyColumnsTableWidthProperty.multiply(0.075));
+        fkColumnNameTableColumn.prefWidthProperty().bind(foreignKeyColumnsTableWidthProperty.multiply(0.3));
+        fkReferencedColumnTableColumn.prefWidthProperty().bind(foreignKeyColumnsTableWidthProperty.multiply(0.625));
     }
 
     public void setColumnsReorderable(boolean isReorderable){
