@@ -3,6 +3,8 @@ package com.abelovagrupa.dbeeadmin.services;
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -10,6 +12,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class QueryExecutor {
+
+    public static final Logger logger = LogManager.getRootLogger();
 
     public static Pair<ResultSet, Integer> executeBatch(String sql) {
         DatabaseConnection.getInstance().setCurrentSchema(ProgramState.getInstance().getSelectedSchema());
@@ -61,16 +65,16 @@ public class QueryExecutor {
             try {
                 connection.rollback();
             } catch (SQLException rollbackEx) {
-                System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                logger.error("Error during rollback {}", rollbackEx.getMessage());
             }
-            System.err.println("Error executing SQL query: " + e.getMessage());
+            logger.error("Error executing SQL query: {}", e.getMessage());
             AlertManager.showErrorDialog(null, "Error executing SQL query:", e.getMessage());
         } finally {
             DatabaseConnection.getInstance().setCurrentSchema(null);
             try {
                 DatabaseConnection.getInstance().getConnection().setAutoCommit(true);
             } catch (SQLException e) {
-                System.err.println("Something extremely dire and profoundly fucked happened.");
+                logger.fatal("Something extremely dire and profoundly fucked happened.");
             }
         }
 
@@ -99,7 +103,7 @@ public class QueryExecutor {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error executing SQL query: " + e.getMessage());
+            logger.error("Error executing SQL query: {}", e.getMessage());
             AlertManager.showErrorDialog(null, "Error executing SQL query:", e.getMessage());
         }
         DatabaseConnection.getInstance().setCurrentSchema(null);

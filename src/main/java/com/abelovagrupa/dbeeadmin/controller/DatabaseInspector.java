@@ -62,7 +62,7 @@ public class DatabaseInspector {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error retrieving database names: " + e.getMessage());
+            logger.error("Error retrieving database name: {}", e.getMessage());
         }
 
         return databaseNames;
@@ -83,7 +83,7 @@ public class DatabaseInspector {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error retrieving table names: " + e.getMessage());
+            logger.error("Error retrieving table names: {}", e.getMessage());
         }
         return tableNames;
     }
@@ -111,7 +111,7 @@ public class DatabaseInspector {
             }
 
         }catch(SQLException ex){
-            System.err.println("Error retrieving tables: "+ ex.getMessage());
+            logger.error("Error retrieving tables: {}", ex.getMessage());
         }
         return tables;
     }
@@ -136,7 +136,7 @@ public class DatabaseInspector {
 
 
         }catch(SQLException e){
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
         return table;
     }
@@ -195,7 +195,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         return columns;
@@ -254,7 +254,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         return column;
@@ -278,8 +278,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println();
+            logger.error(e.getMessage());
         }
         return columnNames;
     }
@@ -406,7 +405,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
         return foreignKeys;
     }
@@ -709,7 +708,7 @@ public class DatabaseInspector {
                 triggers.add(trigger);
             }
         } catch (SQLException ex) {
-            System.err.println("Error retrieving triggers: " + ex.getMessage());
+            logger.error("Error retrieving triggers: {}", ex.getMessage());
         }
         return triggers;
     }
@@ -757,7 +756,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving trigger: " + e.getMessage());
+            logger.error("Error retrieving trigger: {}", e.getMessage());
         }
 
         return trigger;
@@ -778,7 +777,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving views: " + e.getMessage());
+            logger.error("Error retrieving view names: {}", e.getMessage());
         }
 
         return viewNames;
@@ -803,7 +802,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving views: " + e.getMessage());
+            logger.error("Error retrieving views: {}", e.getMessage());
         }
 
         return views;

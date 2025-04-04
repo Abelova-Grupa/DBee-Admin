@@ -38,7 +38,7 @@ public class DatabaseConnection {
 //            throw new RuntimeException(e);
         }catch(Exception e){
             //Catches exception that is caused by no .env file
-            System.err.println(e.getMessage());
+            logger.error("Couldn't read the .env file");
             connection = null;
         }
     }
