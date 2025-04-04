@@ -7,8 +7,30 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.List;
+
 public class ForeignKeyColumns extends Pair<Column,Column>{
 
+    private Column referencingColumn;
+    private Column referencedColumn;
+
+    public Column getReferencingColumn() {
+        return referencingColumn;
+    }
+
+    public void setReferencingColumn(Column referencingColumn) {
+        this.referencingColumn = referencingColumn;
+    }
+
+    public Column getReferencedColumn() {
+        return referencedColumn;
+    }
+
+    public void setReferencedColumn(Column referencedColumn) {
+        this.referencedColumn = referencedColumn;
+    }
+
+    // Table properties
     private BooleanProperty checkedColumnProperty;
     private StringProperty columnNameProperty;
     private StringProperty referencedColumnProperty;

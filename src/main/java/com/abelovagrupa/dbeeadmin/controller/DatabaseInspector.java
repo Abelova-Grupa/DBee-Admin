@@ -5,6 +5,7 @@ import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.Action;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
 import com.abelovagrupa.dbeeadmin.model.index.*;
 import com.abelovagrupa.dbeeadmin.model.schema.Charset;
 import com.abelovagrupa.dbeeadmin.model.schema.Collation;
@@ -474,7 +475,8 @@ public class DatabaseInspector {
             ps.setString(3,foreignKey.getName());
 
             ResultSet columnsRs = ps.executeQuery();
-
+            
+            foreignKey.setColumnPairs(new LinkedList<ForeignKeyColumns>());
             foreignKey.setReferencingColumns(new LinkedList<>());
             foreignKey.setReferencedColumns(new LinkedList<>());
 
@@ -489,6 +491,7 @@ public class DatabaseInspector {
                         .add(getColumnByName(foreignKey.getReferencedTable(), s)));
 
             }
+
         }catch (SQLException ex){
             throw new RuntimeException(ex);
         }
