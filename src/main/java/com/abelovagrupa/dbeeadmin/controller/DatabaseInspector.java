@@ -18,7 +18,6 @@ import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import com.abelovagrupa.dbeeadmin.model.view.View;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.*;
 
@@ -276,8 +275,7 @@ public class DatabaseInspector {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println();
+            System.err.println(e.getMessage());
         }
         return columnNames;
     }
@@ -808,12 +806,4 @@ public class DatabaseInspector {
 
         return views;
     }
-
-//    public static void main(String[] args) {
-//        DatabaseInspector di = new DatabaseInspector();
-//        Schema schema = di.getDatabaseByName("veslanje");
-//        Table table = di.getTableByName(schema,"klub_takmicenje");
-//        System.out.println(di.getForeignKeys(schema,table));
-//    }
-
 }
