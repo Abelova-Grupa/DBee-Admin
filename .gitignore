@@ -5,6 +5,7 @@ target/
 *.env
 
 test/
+logs/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
