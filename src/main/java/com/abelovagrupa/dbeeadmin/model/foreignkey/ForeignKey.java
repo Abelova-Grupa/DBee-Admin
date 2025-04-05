@@ -73,6 +73,9 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencingColumns() {
+        if(referencingColumns == null){
+            referencingColumns = new LinkedList<>();
+        }
         for(Pair<Column,Column> pair : getColumnPairs()){
             referencingColumns.add(pair.getFirst());
         }
@@ -106,6 +109,9 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencedColumns() {
+        if(referencedColumns == null){
+            referencedColumns = new LinkedList<>();
+        }
         for(Pair<Column,Column> pair : getColumnPairs()){
             referencedColumns.add(pair.getSecond());
         }
