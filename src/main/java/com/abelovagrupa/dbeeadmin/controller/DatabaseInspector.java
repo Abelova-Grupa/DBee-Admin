@@ -626,7 +626,7 @@ public class DatabaseInspector {
                     visible = "YES".equals(rs.getString("VISIBLE"));
                 } catch (SQLException e) {
                     // User has MariaDB running and column is named IGNORED
-                    logger.warn("INFO: Exception thrown while attempting to get VISIBLE column; Attempting to get IGNORED column (MariaDB)." );
+                    logger.warn("Exception thrown while attempting to get VISIBLE column; Attempting to get IGNORED column (MariaDB)." );
                     visible = "NO".equals(rs.getString("IGNORED"));
                 }
 
