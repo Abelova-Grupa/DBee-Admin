@@ -4,6 +4,8 @@ import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexType;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
@@ -21,6 +23,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -74,8 +77,6 @@ public class PanelFKTab implements Initializable {
         setColumnsWidth();
         setColumnsReorderable(false);
         setColumnsResizable(false);
-
-
 
         // Setting up properties for foreign key name column of fk table
         fkNameTableColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -131,10 +132,11 @@ public class PanelFKTab implements Initializable {
                             //If the checkBox is at true add new indexed column to index
                             if(newValue){
                                 selectedForeignKey.getColumnPairs().add(foreignKeyColumnPair);
+                                selectedForeignKey.getReferencingColumns().add(foreignKeyColumnPair.getFirst());
+                                selectedForeignKey.getReferencedColumns().add(foreignKeyColumnPair.getSecond());
                             }else {
                                 selectedForeignKey.getColumnPairs().remove(foreignKeyColumnPair);
                             }
-
                         }
                     });
                 }
@@ -250,5 +252,12 @@ public class PanelFKTab implements Initializable {
         for(TableColumn<?,?> column : foreignKeyColumnsTable.getColumns()){
             column.setResizable(isResizable);
         }
+    }
+
+    public List<ForeignKey> getTableForeignKeys(){
+        //Removing empty row(last table row)
+        List<ForeignKey> foreignKeys = new ArrayList<>(foreignKeyData);
+        foreignKeys.removeLast();
+        return foreignKeys;
     }
 }

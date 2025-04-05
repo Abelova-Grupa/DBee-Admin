@@ -4,6 +4,7 @@ import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
@@ -180,6 +181,32 @@ public class PanelTableCreation implements Initializable {
         else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(indexTab)){
             List<Index> tableIndexes = indexTabController.getTableIndexes();
             createIndexes(tableIndexes);
+        }else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(foreignKeyTab)){
+            List<ForeignKey> tableForeignKeys = foreignKeyTabController.getTableForeignKeys();
+            createForeignKeys(tableForeignKeys);
+        }
+    }
+
+    private void createForeignKeys(List<ForeignKey> tableForeignKeys) {
+        String tableName = txtTableName.getText();
+        if(tableName.isBlank() || tableName.contains(" ")){
+            AlertManager.showErrorDialog("Error","Table name is not valid",null);
+            return;
+        }
+        String schemaName = cbSchema.getSelectionModel().getSelectedItem();
+        if(schemaName == null){
+            AlertManager.showErrorDialog("Error","Schema was not selected",null);
+            return;
+        }
+        Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
+        Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
+
+        for(ForeignKey foreignKey : tableForeignKeys){
+            try {
+                DDLGenerator.addForeignKey(schema,table,foreignKey,true);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
