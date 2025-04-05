@@ -15,14 +15,17 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -61,6 +64,7 @@ public class PanelBrowser implements Initializable {
 
     @FXML
     BorderPane browserHeader;
+    private ContextMenu contextMenu;
 
     public List<PanelSchemaTree> getSchemaControllers() {
         return schemaControllers;
@@ -317,19 +321,32 @@ public class PanelBrowser implements Initializable {
 
                             // Do SELECT on double click
                             if(event.getClickCount() == 2) {
-                                try {
-                                    mainController.resultsController.printResultSetToTable(
-                                            QueryExecutor.executeQuery(
-                                                    "SELECT * FROM " + selectedSchemaName + "." + selectedTable.getName()
-                                            ).getFirst()
-                                    );
-                                } catch (SQLException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                displaySelectedTable(selectedTable);
                             }
 
-                        }
+                            if(event.getButton() == MouseButton.SECONDARY) {
+                                // Table context menu
 
+                                if(contextMenu != null && contextMenu.isShowing())
+                                    contextMenu.hide();
+
+                                contextMenu = new ContextMenu();
+                                MenuItem viewTable = new MenuItem("View Data (SELECT *)");
+                                MenuItem editTable = new MenuItem("Edit Table");
+                                MenuItem deleteTable = new MenuItem("Delete Table");
+                                MenuItem addColumn = new MenuItem("Add Column");
+                                MenuItem generateTableSQL = new MenuItem("Generate Table SQL");
+
+                                viewTable.setOnAction(tblClick -> displaySelectedTable(selectedTable));
+//                                editTable.setOnAction(tblClick -> System.out.println("Editing table..."));
+//                                deleteTable.setOnAction(tblClick -> System.out.println("Deleting table..."));
+//                                addColumn.setOnAction(tblClick -> System.out.println("Adding column to table..."));
+//                                generateTableSQL.setOnAction(tblClick -> System.out.println("Generating SQL for table..."));
+
+                                contextMenu.getItems().addAll(viewTable, editTable, deleteTable, addColumn, generateTableSQL);
+                                contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                            }
+                        }
                     }
 //                        // If view branch is selected
 //                        if (getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem, viewBranch))) {
@@ -367,6 +384,24 @@ public class PanelBrowser implements Initializable {
                             if (selectedColumn != null) {
                                 // Display column in info panel
                                 infoController.setSelected(selectedColumn);
+
+                                // Context menu
+                                if(event.getButton() == MouseButton.SECONDARY) {
+
+                                    if(contextMenu != null && contextMenu.isShowing())
+                                        contextMenu.hide();
+
+                                    contextMenu = new ContextMenu();
+                                    MenuItem edit = new MenuItem("Edit column");
+                                    MenuItem delete = new MenuItem("Delete column");
+
+                                    // TODO: Implement column CM
+                                    edit.setOnAction(tblClick -> System.out.println("Editing..."));
+                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+
+                                    contextMenu.getItems().addAll(edit, delete);
+                                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                }
                             }
                         }
 
@@ -378,6 +413,25 @@ public class PanelBrowser implements Initializable {
                             Index selectedIndex = DatabaseInspector.getInstance().getIndexByName(schema, table, indexName);
                             if (selectedIndex != null) {
                                 infoController.setSelected(selectedIndex);
+
+                                // Context menu
+                                if(event.getButton() == MouseButton.SECONDARY) {
+
+                                    if(contextMenu != null && contextMenu.isShowing())
+                                        contextMenu.hide();
+
+                                    contextMenu = new ContextMenu();
+                                    MenuItem edit = new MenuItem("Edit index");
+                                    MenuItem delete = new MenuItem("Delete index");
+
+                                    // TODO: Implement index CM
+                                    edit.setOnAction(tblClick -> System.out.println("Editing..."));
+                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+
+                                    contextMenu.getItems().addAll(edit, delete);
+                                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                }
+
                             }
 
                         }
@@ -389,6 +443,24 @@ public class PanelBrowser implements Initializable {
                             if (selectedForeignKey != null) {
                                 // TODO: Foreign Keys
                                 infoController.setSelected(selectedForeignKey);
+
+                                // Context menu
+                                if(event.getButton() == MouseButton.SECONDARY) {
+
+                                    if(contextMenu != null && contextMenu.isShowing())
+                                        contextMenu.hide();
+
+                                    contextMenu = new ContextMenu();
+                                    MenuItem edit = new MenuItem("Edit foreign key");
+                                    MenuItem delete = new MenuItem("Delete foreign key");
+
+                                    // TODO: Implement FK CM
+                                    edit.setOnAction(tblClick -> System.out.println("Editing..."));
+                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+
+                                    contextMenu.getItems().addAll(edit, delete);
+                                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                }
                             }
 
                         }
@@ -400,6 +472,19 @@ public class PanelBrowser implements Initializable {
 
             return schemaView;
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void displaySelectedTable(Table selectedTable) {
+        try {
+            mainController.resultsController.printResultSetToTable(
+                    QueryExecutor.executeQuery(
+                            "SELECT * FROM " + selectedSchemaName + "." + selectedTable.getName()
+                    ).getFirst()
+            );
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
