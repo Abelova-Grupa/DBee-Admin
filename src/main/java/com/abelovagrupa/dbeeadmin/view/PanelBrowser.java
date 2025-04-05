@@ -15,6 +15,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -24,6 +25,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -62,6 +64,7 @@ public class PanelBrowser implements Initializable {
 
     @FXML
     BorderPane browserHeader;
+    private ContextMenu contextMenu;
 
     public List<PanelSchemaTree> getSchemaControllers() {
         return schemaControllers;
@@ -323,7 +326,11 @@ public class PanelBrowser implements Initializable {
 
                             if(event.getButton() == MouseButton.SECONDARY) {
                                 // Table context menu
-                                ContextMenu contextMenu = new ContextMenu();
+
+                                if(contextMenu != null && contextMenu.isShowing())
+                                    contextMenu.hide();
+
+                                contextMenu = new ContextMenu();
                                 MenuItem viewTable = new MenuItem("View Data (SELECT *)");
                                 MenuItem editTable = new MenuItem("Edit Table");
                                 MenuItem deleteTable = new MenuItem("Delete Table");
