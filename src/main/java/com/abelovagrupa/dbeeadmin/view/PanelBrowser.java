@@ -384,6 +384,24 @@ public class PanelBrowser implements Initializable {
                             if (selectedColumn != null) {
                                 // Display column in info panel
                                 infoController.setSelected(selectedColumn);
+
+                                // Context menu
+                                if(event.getButton() == MouseButton.SECONDARY) {
+
+                                    if(contextMenu != null && contextMenu.isShowing())
+                                        contextMenu.hide();
+
+                                    contextMenu = new ContextMenu();
+                                    MenuItem edit = new MenuItem("Edit column");
+                                    MenuItem delete = new MenuItem("Delete column");
+
+                                    // TODO: Implement column CM
+                                    edit.setOnAction(tblClick -> System.out.println("Editing..."));
+                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+
+                                    contextMenu.getItems().addAll(edit, delete);
+                                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                }
                             }
                         }
 
