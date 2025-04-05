@@ -443,6 +443,24 @@ public class PanelBrowser implements Initializable {
                             if (selectedForeignKey != null) {
                                 // TODO: Foreign Keys
                                 infoController.setSelected(selectedForeignKey);
+
+                                // Context menu
+                                if(event.getButton() == MouseButton.SECONDARY) {
+
+                                    if(contextMenu != null && contextMenu.isShowing())
+                                        contextMenu.hide();
+
+                                    contextMenu = new ContextMenu();
+                                    MenuItem edit = new MenuItem("Edit foreign key");
+                                    MenuItem delete = new MenuItem("Delete foreign key");
+
+                                    // TODO: Implement FK CM
+                                    edit.setOnAction(tblClick -> System.out.println("Editing..."));
+                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+
+                                    contextMenu.getItems().addAll(edit, delete);
+                                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                }
                             }
 
                         }
