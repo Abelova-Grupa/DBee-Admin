@@ -87,7 +87,7 @@ public class PanelFKTab implements Initializable {
 
         // Filling up referencedTable comboBox with values based on selected schema
         ObservableList<String> cbReferencedTable = FXCollections.observableArrayList();
-        if(selectedSchema != null){
+        if(selectedTable != null){
             List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(selectedSchema);
             for(String schemaTableName : schemaTablesNames){
                 cbReferencedTable.add(selectedSchema.getName()+"."+schemaTableName);
@@ -154,6 +154,7 @@ public class PanelFKTab implements Initializable {
         });
 
         // Setting up properties of foreign key column name of foreign key columns table
+        fkcheckedTableColumn.setEditable(false);
         fkColumnNameTableColumn.setCellValueFactory(cellData -> cellData.getValue().columnNameProperty());
         fkColumnNameTableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         fkColumnNameTableColumn.setOnEditCommit(event -> {
@@ -167,8 +168,9 @@ public class PanelFKTab implements Initializable {
         fkReferencedColumnTableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbReferencedColumns));
         fkReferencedColumnTableColumn.setOnEditCommit(event -> {
             Column column = DatabaseInspector.getInstance().getColumnByName(selectedTable,event.getNewValue());
-            Pair<Column,Column> selectedPair = foreignKeyColumnsData.get(event.getTablePosition().getRow());
+            ForeignKeyColumns selectedPair = foreignKeyColumnsData.get(event.getTablePosition().getRow());
             selectedPair.setSecond(column);
+            selectedPair.setReferencedColumnProperty(column.getName());
         });
 
         //Selection listeners
@@ -178,6 +180,12 @@ public class PanelFKTab implements Initializable {
 
             if(selectedForeignKey.getColumnPairs() == null) {
                 selectedForeignKey.setColumnPairs(new LinkedList<ForeignKeyColumns>());
+            }
+
+            List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(selectedSchema);
+            cbReferencedTable.clear();
+            for(String schemaTableName : schemaTablesNames){
+                cbReferencedTable.add(selectedSchema.getName()+"."+schemaTableName);
             }
 
             if(!selectedForeignKey.referencedTableProperty().get().isEmpty()){
