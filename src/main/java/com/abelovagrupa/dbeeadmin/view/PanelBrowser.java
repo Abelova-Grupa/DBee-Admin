@@ -413,6 +413,25 @@ public class PanelBrowser implements Initializable {
                             Index selectedIndex = DatabaseInspector.getInstance().getIndexByName(schema, table, indexName);
                             if (selectedIndex != null) {
                                 infoController.setSelected(selectedIndex);
+
+                                // Context menu
+                                if(event.getButton() == MouseButton.SECONDARY) {
+
+                                    if(contextMenu != null && contextMenu.isShowing())
+                                        contextMenu.hide();
+
+                                    contextMenu = new ContextMenu();
+                                    MenuItem edit = new MenuItem("Edit index");
+                                    MenuItem delete = new MenuItem("Delete index");
+
+                                    // TODO: Implement index CM
+                                    edit.setOnAction(tblClick -> System.out.println("Editing..."));
+                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+
+                                    contextMenu.getItems().addAll(edit, delete);
+                                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                }
+
                             }
 
                         }
