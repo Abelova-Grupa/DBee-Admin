@@ -331,10 +331,8 @@ public class PanelBrowser implements Initializable {
                                     return;
                                 }
                             }
-
                             if(event.getButton() == MouseButton.SECONDARY) {
                                 // Table context menu
-
                                 contextMenu = new ContextMenu();
                                 MenuItem viewTable = new MenuItem("View Data (SELECT *)");
                                 MenuItem editTable = new MenuItem("Edit Table");
@@ -393,11 +391,11 @@ public class PanelBrowser implements Initializable {
                                 infoController.setSelected(selectedColumn);
 
                                 // Context menu
-                                if(event.getButton() == MouseButton.SECONDARY) {
-
+                                if(event.getButton() == MouseButton.PRIMARY){
                                     if(contextMenu != null && contextMenu.isShowing())
                                         contextMenu.hide();
-
+                                }
+                                if(event.getButton() == MouseButton.SECONDARY) {
                                     contextMenu = new ContextMenu();
                                     MenuItem edit = new MenuItem("Edit column");
                                     MenuItem delete = new MenuItem("Delete column");
@@ -422,11 +420,11 @@ public class PanelBrowser implements Initializable {
                                 infoController.setSelected(selectedIndex);
 
                                 // Context menu
-                                if(event.getButton() == MouseButton.SECONDARY) {
-
+                                if(event.getButton() == MouseButton.PRIMARY){
                                     if(contextMenu != null && contextMenu.isShowing())
                                         contextMenu.hide();
-
+                                }
+                                if(event.getButton() == MouseButton.SECONDARY) {
                                     contextMenu = new ContextMenu();
                                     MenuItem edit = new MenuItem("Edit index");
                                     MenuItem delete = new MenuItem("Delete index");
@@ -452,10 +450,13 @@ public class PanelBrowser implements Initializable {
                                 infoController.setSelected(selectedForeignKey);
 
                                 // Context menu
-                                if(event.getButton() == MouseButton.SECONDARY) {
-
+                                if(event.getButton() == MouseButton.PRIMARY){
                                     if(contextMenu != null && contextMenu.isShowing())
                                         contextMenu.hide();
+                                }
+                                if(event.getButton() == MouseButton.SECONDARY) {
+
+
 
                                     contextMenu = new ContextMenu();
                                     MenuItem edit = new MenuItem("Edit foreign key");
