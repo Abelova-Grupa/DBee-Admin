@@ -324,11 +324,16 @@ public class PanelBrowser implements Initializable {
                                 displaySelectedTable(selectedTable);
                             }
 
+                            // Right click creates context menu while primary click closes it
+                            if(event.getButton() == MouseButton.PRIMARY){
+                                if(contextMenu != null && contextMenu.isShowing()){
+                                    contextMenu.hide();
+                                    return;
+                                }
+                            }
+
                             if(event.getButton() == MouseButton.SECONDARY) {
                                 // Table context menu
-
-                                if(contextMenu != null && contextMenu.isShowing())
-                                    contextMenu.hide();
 
                                 contextMenu = new ContextMenu();
                                 MenuItem viewTable = new MenuItem("View Data (SELECT *)");
@@ -346,6 +351,8 @@ public class PanelBrowser implements Initializable {
                                 contextMenu.getItems().addAll(viewTable, editTable, deleteTable, addColumn, generateTableSQL);
                                 contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
                             }
+
+
                         }
                     }
 //                        // If view branch is selected
