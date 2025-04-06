@@ -1,6 +1,7 @@
 module com.abelovagrupa.dbeeadmin {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.web;
     requires org.fxmisc.richtext;
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
