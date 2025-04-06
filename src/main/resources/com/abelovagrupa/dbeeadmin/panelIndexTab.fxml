@@ -16,14 +16,18 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelIndexTab">
+<VBox maxHeight="Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelIndexTab">
     <children>
-        <GridPane>
+        <GridPane VBox.vgrow="ALWAYS">
             <columnConstraints>
                 <ColumnConstraints percentWidth="40" />
                 <ColumnConstraints percentWidth="40" />
                 <ColumnConstraints percentWidth="20" />
             </columnConstraints>
+
+            <rowConstraints>
+                <RowConstraints vgrow="ALWAYS"/>
+            </rowConstraints>
 
             <TableView fx:id="indexTable" GridPane.columnIndex="0">
                 <columns>
