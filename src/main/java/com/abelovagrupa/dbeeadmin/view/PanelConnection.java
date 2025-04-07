@@ -74,8 +74,12 @@ public class PanelConnection implements Initializable {
 //        AlertManager.showInformationDialog(null, null, "Not implemented yet.");
         // TODO: Better exception handling and displaying
         String dbUrl = DatabaseConnection.getInstance().generateDbUrl(txtHost.getText(),txtPort.getText());
-        DatabaseConnection.getInstance().setConnection(dbUrl,txtUsername.getText(),pwdPassword.getText());
-        AlertManager.showInformationDialog("DB-Admin",null,"Connection established");
+        DatabaseConnection.getInstance().setConnectionToFile(dbUrl,txtUsername.getText(),pwdPassword.getText());
+        if(DatabaseConnection.getInstance().getConnection() != null){
+            AlertManager.showInformationDialog("DB-Admin",null,"Connection established. You may close this window now.");
+        }
+        else
+            AlertManager.showErrorDialog(null, null, "Connection refused.");
     }
 
     public void testConnection(ActionEvent actionEvent) {

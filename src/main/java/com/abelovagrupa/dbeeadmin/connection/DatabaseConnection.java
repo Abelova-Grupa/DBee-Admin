@@ -63,6 +63,16 @@ public class DatabaseConnection {
         }
     }
 
+    public void setConnectionToFile(String dbUrl, String dbUsername, String dbPassword){
+        try {
+            connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+            setConnectionParameters(dbUrl,dbUsername,dbPassword);
+        } catch (SQLException | IOException e) {
+            logger.error("Connection refused.");
+            connection=null;
+        }
+    }
+
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
