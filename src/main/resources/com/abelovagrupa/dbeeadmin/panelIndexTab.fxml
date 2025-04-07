@@ -16,127 +16,142 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelIndexTab">
-    <children>
-        <GridPane>
-            <columnConstraints>
-                <ColumnConstraints percentWidth="40" />
-                <ColumnConstraints percentWidth="40" />
-                <ColumnConstraints percentWidth="20" />
-            </columnConstraints>
+<VBox maxHeight="Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0"
+      xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.abelovagrupa.dbeeadmin.view.PanelIndexTab">
+    <GridPane VBox.vgrow="ALWAYS">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="40"/>
+            <ColumnConstraints percentWidth="40"/>
+            <ColumnConstraints percentWidth="20"/>
+        </columnConstraints>
 
-            <TableView fx:id="indexTable" GridPane.columnIndex="0">
-                <columns>
-                    <TableColumn fx:id="indexNameColumn" text="Index Name" />
-                    <TableColumn fx:id="indexTypeColumn" text="Type" />
-                </columns>
-            </TableView>
+        <rowConstraints>
+            <RowConstraints vgrow="ALWAYS"/>
+        </rowConstraints>
 
-            <TableView fx:id="indexColumnTable" GridPane.columnIndex="1">
-                <columns>
-                    <!--TODO: Think of a better name for columns-->
-                    <TableColumn fx:id="indexedColumnsCheckColumn" />
-                    <TableColumn fx:id="indexedColumnsNameColumn" text="Column" />
-                    <TableColumn fx:id="indexedColumnsNoColumn" text="#" />
-                    <TableColumn fx:id="indexedColumnOrderColumn" text="Order" />
-                    <TableColumn fx:id="indexedColumnLength" text="Length" />
-                </columns>
-            </TableView>
-            <ScrollPane hbarPolicy="NEVER" pannable="true" prefHeight="200.0" GridPane.columnIndex="2">
-                <content>
-                    <VBox prefHeight="397.0" prefWidth="250.0" spacing="10">
-                  <BorderPane prefHeight="18.0" prefWidth="217.0">
-                     <left>
+        <TableView fx:id="indexTable" GridPane.columnIndex="0">
+            <columns>
+                <TableColumn fx:id="indexNameColumn" text="Index Name"/>
+                <TableColumn fx:id="indexTypeColumn" text="Type"/>
+            </columns>
+        </TableView>
+
+        <TableView fx:id="indexColumnTable" GridPane.columnIndex="1">
+            <columns>
+                <!--TODO: Think of a better name for columns-->
+                <TableColumn fx:id="indexedColumnsCheckColumn"/>
+                <TableColumn fx:id="indexedColumnsNameColumn" text="Column"/>
+                <TableColumn fx:id="indexedColumnsNoColumn" text="#"/>
+                <TableColumn fx:id="indexedColumnOrderColumn" text="Order"/>
+                <TableColumn fx:id="indexedColumnLength" text="Length"/>
+            </columns>
+        </TableView>
+        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="400.0" prefWidth="210.0"
+                    vbarPolicy="NEVER" GridPane.columnIndex="2">
+            <VBox maxHeight="Infinity" maxWidth="1.7976931348623157E308" prefHeight="399.0" prefWidth="240.0"
+                  spacing="10">
+                <BorderPane prefHeight="18.0" prefWidth="217.0">
+                    <left>
                         <Label text="Index Options:" BorderPane.alignment="CENTER">
-                           <padding>
-                              <Insets left="5.0" />
-                           </padding></Label>
-                     </left>
-                     <center>
-                        <Pane prefHeight="28.0" prefWidth="418.0" BorderPane.alignment="CENTER" >
-                           <children>
-                              <Pane layoutX="3.0" layoutY="-1.0" prefHeight="28.0" prefWidth="149.0"/>
-                           </children>
-                        </Pane>
-                     </center>
-                  </BorderPane>
-                  <BorderPane prefHeight="27.0" prefWidth="153.0">
-                     <left>
-                        <Label text="Storage Type:" BorderPane.alignment="CENTER">
-                           <padding>
-                              <Insets left="5.0" />
-                           </padding></Label>
-                     </left>
-                     <center>
-                        <ComboBox prefWidth="150.0" BorderPane.alignment="CENTER" fx:id="cbStorageType">
-                           <BorderPane.margin>
-                              <Insets left="10.0" />
-                           </BorderPane.margin></ComboBox>
-                     </center>
-                  </BorderPane>
-                  <BorderPane prefHeight="83.0" prefWidth="250.0">
-                     <left>
-                        <Label text="Key Block Size:" BorderPane.alignment="CENTER">
-                           <padding>
-                              <Insets left="5.0" />
-                           </padding></Label>
-                     </left>
-                     <center>
-                        <TextField prefHeight="28.0" prefWidth="140.0" BorderPane.alignment="CENTER" fx:id="keyBlockSizeTxtField">
-                           <BorderPane.margin>
-                              <Insets left="10.0" />
-                           </BorderPane.margin></TextField>
-                     </center>
-                  </BorderPane>
-                  <BorderPane prefHeight="96.0" prefWidth="250.0">
-                     <left>
-                        <Label text="Parser:" BorderPane.alignment="CENTER">
-                           <padding>
-                              <Insets left="5.0" />
-                           </padding></Label>
-                     </left>
-                     <center>
-                        <TextField BorderPane.alignment="CENTER" fx:id="parserTxtField">
-                           <BorderPane.margin>
-                              <Insets left="10.0" />
-                           </BorderPane.margin></TextField>
-                     </center>
-                  </BorderPane>
-                  <BorderPane prefHeight="103.0" prefWidth="250.0">
-                     <left>
-                        <CheckBox mnemonicParsing="false" text="Visible" BorderPane.alignment="CENTER" fx:id="checkBoxVisible">
-                           <BorderPane.margin>
-                              <Insets left="10.0" />
-                           </BorderPane.margin></CheckBox>
-                     </left>
-                  </BorderPane>
-                  <BorderPane prefHeight="18.0" prefWidth="217.0">
-                     <left>
-                        <Label text="Index Comment:" BorderPane.alignment="CENTER">
-                           <padding>
-                              <Insets left="5.0" />
-                           </padding>
+                            <padding>
+                                <Insets left="5.0"/>
+                            </padding>
                         </Label>
-                     </left>
-                     <center>
+                    </left>
+                    <center>
                         <Pane prefHeight="28.0" prefWidth="418.0" BorderPane.alignment="CENTER">
-                           <children>
-                              <Pane layoutX="3.0" layoutY="-1.0" prefHeight="28.0" prefWidth="149.0" />
-                           </children>
+                            <Pane layoutX="3.0" layoutY="-1.0" prefHeight="28.0" prefWidth="107.0"/>
                         </Pane>
-                     </center>
-                  </BorderPane>
-                        <TextArea prefHeight="247.0" prefWidth="240.0" fx:id="optionTxtArea">
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin></TextArea>
-                    </VBox>
-                </content>
-            </ScrollPane>
-         <rowConstraints>
-            <RowConstraints />
-         </rowConstraints>
-        </GridPane>
+                    </center>
+                </BorderPane>
+                <BorderPane prefHeight="27.0" prefWidth="153.0">
+                    <left>
+                        <Label text="Storage Type:" BorderPane.alignment="CENTER">
+                            <padding>
+                                <Insets left="5.0"/>
+                            </padding>
+                        </Label>
+                    </left>
+                    <center>
+                        <ComboBox fx:id="cbStorageType" prefHeight="25.0" prefWidth="142.0"
+                                  BorderPane.alignment="CENTER">
+                            <BorderPane.margin>
+                                <Insets left="10.0"/>
+                            </BorderPane.margin>
+                        </ComboBox>
+                    </center>
+                </BorderPane>
+                <BorderPane prefHeight="35.0" prefWidth="200.0">
+                    <left>
+                        <Label text="Key Block Size:" BorderPane.alignment="CENTER">
+                            <padding>
+                                <Insets left="5.0"/>
+                            </padding>
+                        </Label>
+                    </left>
+                    <center>
+                        <TextField fx:id="keyBlockSizeTxtField" prefHeight="28.0" prefWidth="140.0"
+                                   BorderPane.alignment="CENTER">
+                            <BorderPane.margin>
+                                <Insets left="10.0" right="5.0"/>
+                            </BorderPane.margin>
+                        </TextField>
+                    </center>
+                </BorderPane>
+                <BorderPane prefHeight="29.0" prefWidth="200.0">
+                    <left>
+                        <Label text="Parser:" BorderPane.alignment="CENTER">
+                            <padding>
+                                <Insets left="5.0"/>
+                            </padding>
+                        </Label>
+                    </left>
+                    <center>
+                        <TextField fx:id="parserTxtField" BorderPane.alignment="CENTER">
+                            <BorderPane.margin>
+                                <Insets left="10.0" right="5.0"/>
+                            </BorderPane.margin>
+                        </TextField>
+                    </center>
+                </BorderPane>
+                <BorderPane minWidth="-Infinity" prefHeight="54.0" prefWidth="240.0">
+                    <left>
+                        <CheckBox fx:id="checkBoxVisible" mnemonicParsing="false" text="Visible"
+                                  BorderPane.alignment="CENTER">
+                            <BorderPane.margin>
+                                <Insets left="10.0"/>
+                            </BorderPane.margin>
+                        </CheckBox>
+                    </left>
+                </BorderPane>
+                <BorderPane prefHeight="87.0" prefWidth="240.0" VBox.vgrow="ALWAYS">
+                    <center>
+                        <Pane prefHeight="20.0" prefWidth="240.0" BorderPane.alignment="CENTER"/>
+                    </center>
+                </BorderPane>
+                <VBox prefHeight="197.0" prefWidth="240.0" VBox.vgrow="ALWAYS">
+                    <BorderPane prefHeight="18.0" prefWidth="217.0" VBox.vgrow="NEVER">
+                        <center>
+                            <Pane prefHeight="28.0" prefWidth="418.0" BorderPane.alignment="CENTER"/>
+                        </center>
+                        <left>
+                            <Label text="Index Comment:" BorderPane.alignment="CENTER">
+                                <padding>
+                                    <Insets left="5.0"/>
+                                </padding>
+                            </Label>
+                        </left>
+                    </BorderPane>
+                    <BorderPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                        <center>
+                            <TextArea fx:id="optionTxtArea" prefHeight="166.0" prefWidth="240.0"
+                                      BorderPane.alignment="CENTER"/>
+                        </center>
+                    </BorderPane>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </GridPane>
 
-    </children>
 </VBox>
