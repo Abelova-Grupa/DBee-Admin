@@ -2,10 +2,9 @@ package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.Action;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
-import com.abelovagrupa.dbeeadmin.model.index.Index;
-import com.abelovagrupa.dbeeadmin.model.index.IndexType;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
@@ -15,16 +14,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -51,17 +47,32 @@ public class PanelFKTab implements Initializable {
     @FXML
     TableColumn<ForeignKeyColumns,String> fkReferencedColumnTableColumn;
 
-    ObservableList<ForeignKey> foreignKeyData = FXCollections.observableArrayList(new ForeignKey(),new ForeignKey());
+    // Foreign key options
+    @FXML
+    ComboBox<Action> cbOnUpdate;
+
+    @FXML
+    ComboBox<Action> cbOnDelete;
+
+    @FXML
+    TextArea fkCommentTxtArea;
+
+    ObservableList<ForeignKey> foreignKeyData = FXCollections.observableArrayList(new ForeignKey());
 
     ObservableList<ForeignKeyColumns> foreignKeyColumnsData = FXCollections.observableArrayList(new ForeignKeyColumns());
 
-    Schema selectedSchema = ProgramState.getInstance().getSelectedSchema();
+    ObservableList<String> cbReferencedTable = FXCollections.observableArrayList();
 
-    Table selectedTable = ProgramState.getInstance().getSelectedTable();
+    ObservableList<String> cbReferencedColumns = FXCollections.observableArrayList();
+
+    Schema foreignKeySchema = ProgramState.getInstance().getSelectedSchema();
+
+    Table referencingTable = ProgramState.getInstance().getSelectedTable();
+
+    Table referencedTable;
 
     ForeignKey selectedForeignKey;
 
-    ObservableList<String> cbReferencedColumns = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -86,32 +97,27 @@ public class PanelFKTab implements Initializable {
             foreignKey.setName(event.getNewValue());
         });
 
-        // Filling up referencedTable comboBox with values based on selected schema
-        ObservableList<String> cbReferencedTable = FXCollections.observableArrayList();
-        if(selectedTable != null){
-            List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(selectedSchema);
-            for(String schemaTableName : schemaTablesNames){
-                cbReferencedTable.add(selectedSchema.getName()+"."+schemaTableName);
-            }
-        }
         // Setting up properties for referenced table column of fk table
         fkReferencedTableColumn.setCellValueFactory(cellData -> cellData.getValue().referencedTableProperty());
         fkReferencedTableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbReferencedTable));
         fkReferencedTableColumn.setOnEditCommit(event -> {
             if(event.getNewValue() == null || event.getNewValue().isEmpty()) return;
             ForeignKey foreignKey = event.getRowValue();
+            foreignKey.setReferencingTable(referencingTable);
+
             // Adding referenced schema to foreign key
-            Schema schema = DatabaseInspector.getInstance().getDatabaseByName(event.getNewValue().split("\\.")[0]);
-            foreignKey.setReferencedSchema(schema);
-            selectedSchema = schema;
+            Schema referencedSchema = DatabaseInspector.getInstance().getDatabaseByName(event.getNewValue().split("\\.")[0]);
+            foreignKey.setReferencedSchema(referencedSchema);
+            foreignKeySchema = referencedSchema;
 
             // Adding referenced table to foreign key
-            Table referencedTable = DatabaseInspector.getInstance().getTableByName(schema,event.getNewValue().split("\\.")[1]);
+            referencedTable = DatabaseInspector.getInstance().getTableByName(referencedSchema,event.getNewValue().split("\\.")[1]);
             foreignKey.setReferencedTable(referencedTable);
-            selectedTable = referencedTable;
+
             // Setting table property (String)
             foreignKey.setReferencedTableProperty(event.getNewValue());
 
+            // Filling up referenced columns in foreign key columns table after choosing a referenced table
             List<String> referencedColumnNames = referencedTable.getColumns().stream().map(Column::getName).toList();
             cbReferencedColumns.setAll(referencedColumnNames);
         });
@@ -132,10 +138,12 @@ public class PanelFKTab implements Initializable {
                             //If the checkBox is at true add new indexed column to index
                             if(newValue){
                                 selectedForeignKey.getColumnPairs().add(foreignKeyColumnPair);
-                                selectedForeignKey.getReferencingColumns().add(foreignKeyColumnPair.getFirst());
-                                selectedForeignKey.getReferencedColumns().add(foreignKeyColumnPair.getSecond());
+//                                selectedForeignKey.getReferencingColumns().add(foreignKeyColumnPair.getFirst());
+//                                selectedForeignKey.getReferencedColumns().add(foreignKeyColumnPair.getSecond());
                             }else {
                                 selectedForeignKey.getColumnPairs().remove(foreignKeyColumnPair);
+//                                selectedForeignKey.getReferencingColumns().remove(foreignKeyColumnPair.getFirst());
+//                                selectedForeignKey.getReferencedColumns().remove(foreignKeyColumnPair.getSecond());
                             }
                         }
                     });
@@ -156,20 +164,19 @@ public class PanelFKTab implements Initializable {
         });
 
         // Setting up properties of foreign key column name of foreign key columns table
-        fkcheckedTableColumn.setEditable(false);
+        fkColumnNameTableColumn.setEditable(false);
         fkColumnNameTableColumn.setCellValueFactory(cellData -> cellData.getValue().columnNameProperty());
         fkColumnNameTableColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         fkColumnNameTableColumn.setOnEditCommit(event -> {
-            Column column = DatabaseInspector.getInstance().getColumnByName(selectedTable,event.getNewValue());
+            Column column = DatabaseInspector.getInstance().getColumnByName(referencingTable,event.getNewValue());
             Pair<Column,Column> selectedPair = foreignKeyColumnsData.get(event.getTablePosition().getRow());
             selectedPair.setFirst(column);
         });
 
-
         fkReferencedColumnTableColumn.setCellValueFactory(cellData -> cellData.getValue().referencedColumnProperty());
         fkReferencedColumnTableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbReferencedColumns));
         fkReferencedColumnTableColumn.setOnEditCommit(event -> {
-            Column column = DatabaseInspector.getInstance().getColumnByName(selectedTable,event.getNewValue());
+            Column column = DatabaseInspector.getInstance().getColumnByName(referencedTable,event.getNewValue());
             ForeignKeyColumns selectedPair = foreignKeyColumnsData.get(event.getTablePosition().getRow());
             selectedPair.setSecond(column);
             selectedPair.setReferencedColumnProperty(column.getName());
@@ -180,36 +187,7 @@ public class PanelFKTab implements Initializable {
             if(newSelection == null || oldSelection == newSelection) return;
             selectedForeignKey = newSelection;
 
-            if(selectedForeignKey.getColumnPairs() == null) {
-                selectedForeignKey.setColumnPairs(new LinkedList<ForeignKeyColumns>());
-            }
-
-            List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(selectedSchema);
-            cbReferencedTable.clear();
-            for(String schemaTableName : schemaTablesNames){
-                cbReferencedTable.add(selectedSchema.getName()+"."+schemaTableName);
-            }
-
-            if(!selectedForeignKey.referencedTableProperty().get().isEmpty()){
-                Table referencedTable = ProgramState.getInstance().getSelectedTable();
-
-                for(int i=0; i < selectedTable.getColumns().size();i++){
-                    Column column = selectedTable.getColumns().get(i);
-                    ForeignKeyColumns newPair = new ForeignKeyColumns();
-                    newPair.setFirst(column);
-                    foreignKeyColumnsData.add(newPair);
-                    foreignKeyColumnsTable.getItems().get(i).setColumnNameProperty(column.getName());
-                }
-
-                List<String> referencedColumnNames = referencedTable.getColumns().stream().map(Column::getName).toList();
-                cbReferencedColumns.setAll(referencedColumnNames);
-
-            }else {
-                cbReferencedColumns.setAll();
-            }
-
             int index = foreignKeyTable.getItems().indexOf(newSelection);
-
             newSelection.nameProperty().addListener((_,oldVal,newVal) -> {
                 int lastIndex = foreignKeyTable.getItems().size() - 1;
                 if(index != lastIndex) return;
@@ -221,6 +199,36 @@ public class PanelFKTab implements Initializable {
                 if(index != lastIndex) return;
                 foreignKeyTable.getItems().add(new ForeignKey());
             });
+        });
+
+        // Filling onUpdate and onDelete combo boxes with Action enum
+        ObservableList<Action> actions = FXCollections.observableArrayList(Action.values());
+        cbOnUpdate.setItems(actions);
+        cbOnDelete.setItems(actions);
+        cbOnUpdate.setOnAction(event -> {
+            Action action = cbOnUpdate.getSelectionModel().getSelectedItem();
+            if(selectedForeignKey != null){
+                selectedForeignKey.setOnUpdateAction(action);
+            }
+        });
+        cbOnDelete.setOnAction(event -> {
+            Action action = cbOnDelete.getSelectionModel().getSelectedItem();
+            if(selectedForeignKey != null){
+                selectedForeignKey.setOnDeleteAction(action);
+            }
+        });
+
+        // Setting up change listener on fk comment text field
+        fkCommentTxtArea.focusedProperty().addListener((obs,oldVal,newVal) -> {
+            // If the focus is lost check if the input is different from selected fk attribute
+            if(newVal || selectedForeignKey == null) return;
+            if(selectedForeignKey.getComment() == null && fkCommentTxtArea.getText() == null) return;
+            if(selectedForeignKey.getComment() == null && fkCommentTxtArea.getText() != null) {
+                selectedForeignKey.setComment(fkCommentTxtArea.getText());
+            }
+            if(!selectedForeignKey.getComment().equals(fkCommentTxtArea.getText())){
+                selectedForeignKey.setComment(fkCommentTxtArea.getText());
+            }
         });
     }
 

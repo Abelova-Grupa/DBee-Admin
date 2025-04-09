@@ -15,6 +15,7 @@ import java.sql.SQLException;
 public class DatabaseConnection {
 
     // TODO: Split url to host & port
+    // TODO: Create a method that creates the initial .env file
 
     private static final Logger logger = LogManager.getRootLogger();
 

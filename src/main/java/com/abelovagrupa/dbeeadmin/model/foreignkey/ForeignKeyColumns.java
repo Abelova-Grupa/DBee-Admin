@@ -14,6 +14,15 @@ public class ForeignKeyColumns extends Pair<Column,Column>{
     private StringProperty columnNameProperty;
     private StringProperty referencedColumnProperty;
 
+    public ForeignKeyColumns(Column referencingColumn, Column referencedColumn){
+        this.first = referencingColumn;
+        this.second = referencedColumn;
+    }
+
+    public ForeignKeyColumns(){
+
+    }
+
     public BooleanProperty checkedColumnProperty(){
         if(checkedColumnProperty == null){
             checkedColumnProperty = new SimpleBooleanProperty(this,"checkedColumn",false);

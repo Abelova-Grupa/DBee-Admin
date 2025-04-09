@@ -3,8 +3,8 @@ package com.abelovagrupa.dbeeadmin.util;
 import java.util.Objects;
 
 public class Pair<F, S> {
-    private F first;
-    private S second;
+    protected F first;
+    protected S second;
 
     // Private constructor to enforce factory method creation
     private Pair(F first, S second) {

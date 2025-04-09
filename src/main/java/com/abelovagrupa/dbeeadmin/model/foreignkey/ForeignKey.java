@@ -19,6 +19,7 @@ public class ForeignKey {
     private Table referencedTable;
     private Action onDeleteAction;
     private Action onUpdateAction;
+    private String comment;
 
     // columnPairs is a list of pairs where each pair is <referencingColumn,referenced Column>
     // These column pairs are specially used in ForeignKeyColumns table in foreign key tab
@@ -33,7 +34,7 @@ public class ForeignKey {
     public ForeignKey() {
     }
 
-    public ForeignKey(String name, Schema referencingSchema, Table referencingTable, Schema referencedSchema, Table referencedTable, List<ForeignKeyColumns> columnPairs, Action onDeleteAction, Action onUpdateAction) {
+    public ForeignKey(String name, Schema referencingSchema, Table referencingTable, Schema referencedSchema, Table referencedTable, List<ForeignKeyColumns> columnPairs, Action onDeleteAction, Action onUpdateAction,String comment) {
         this.name = name;
         this.referencingSchema = referencingSchema;
         this.referencingTable = referencingTable;
@@ -42,6 +43,7 @@ public class ForeignKey {
         this.columnPairs = columnPairs;
         this.onDeleteAction = onDeleteAction;
         this.onUpdateAction = onUpdateAction;
+        this.comment = comment;
     }
 
     public String getName() {
@@ -73,22 +75,21 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencingColumns() {
-        if(referencingColumns == null){
-            referencingColumns = new LinkedList<>();
-        }
+        List<Column> referencingColumns = new LinkedList<>();
         for(Pair<Column,Column> pair : getColumnPairs()){
             referencingColumns.add(pair.getFirst());
         }
-        return referencingColumns;
+        this.referencingColumns = referencingColumns;
+        return this.referencingColumns;
     }
 
     public void setReferencingColumns(List<Column> referencingColumns) {
         this.referencingColumns = referencingColumns;
-        for(int i = 0; i < referencingColumns.size(); i++){
+        for(int i = 0; i < this.referencingColumns.size(); i++){
             if(getColumnPairs().get(i) == null){
                 getColumnPairs().set(i, new ForeignKeyColumns());
             }
-            getColumnPairs().get(i).setFirst(referencingColumns.get(i));
+            getColumnPairs().get(i).setFirst(this.referencingColumns.get(i));
         }
     }
 
@@ -109,13 +110,12 @@ public class ForeignKey {
     }
 
     public List<Column> getReferencedColumns() {
-        if(referencedColumns == null){
-            referencedColumns = new LinkedList<>();
-        }
+        List<Column> referencedColumns = new LinkedList<>();
         for(Pair<Column,Column> pair : getColumnPairs()){
             referencedColumns.add(pair.getSecond());
         }
-        return referencedColumns;
+        this.referencedColumns = referencedColumns;
+        return this.referencedColumns;
     }
 
     public void setReferencedColumns(List<Column> referencedColumns) {
@@ -157,6 +157,14 @@ public class ForeignKey {
         this.onUpdateAction = onUpdateAction;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     // Table properties
     public StringProperty nameProperty(){
         if(nameProperty == null){
@@ -185,19 +193,19 @@ public class ForeignKey {
                 ", columnPairs" + columnPairs +
                 ", onDeleteAction=" + onDeleteAction +
                 ", onUpdateAction=" + onUpdateAction +
+                ", comment" + comment +
                 '}';
     }
 
     @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ForeignKey that)) return false;
-
-        return Objects.equals(getName(), that.getName()) && Objects.equals(getReferencingSchema(), that.getReferencingSchema()) && Objects.equals(getReferencingTable(), that.getReferencingTable()) && Objects.equals(getReferencingColumns(), that.getReferencingColumns()) && Objects.equals(getReferencedSchema(), that.getReferencedSchema()) && Objects.equals(getReferencedTable(), that.getReferencedTable()) && Objects.equals(getReferencedColumns(), that.getReferencedColumns()) && getOnDeleteAction() == that.getOnDeleteAction() && getOnUpdateAction() == that.getOnUpdateAction();
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ForeignKey that = (ForeignKey) o;
+        return Objects.equals(name, that.name) && Objects.equals(referencingSchema, that.referencingSchema) && Objects.equals(referencingTable, that.referencingTable) && Objects.equals(referencedSchema, that.referencedSchema) && Objects.equals(referencedTable, that.referencedTable) && onDeleteAction == that.onDeleteAction && onUpdateAction == that.onUpdateAction && Objects.equals(comment, that.comment) && Objects.equals(columnPairs, that.columnPairs) && Objects.equals(referencingColumns, that.referencingColumns) && Objects.equals(referencedColumns, that.referencedColumns);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, referencedSchema, referencedTable,columnPairs,onDeleteAction, onUpdateAction);
+        return Objects.hash(name, referencingSchema, referencingTable, referencedSchema, referencedTable, onDeleteAction, onUpdateAction, comment, columnPairs, referencingColumns, referencedColumns);
     }
 }
