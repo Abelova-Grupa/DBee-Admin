@@ -404,16 +404,18 @@ public class DDLGenerator {
             queryBuilder.append(referencingColumn.getName());
             queryBuilder.append(", ");
         }
+        queryBuilder.delete(queryBuilder.length() - 2,queryBuilder.length() -1);
         queryBuilder.append(")\n");
-        queryBuilder.append("REFERENCES ").append(foreignKey.getReferencedSchema()).append(".").append(foreignKey.getReferencedTable());
+        queryBuilder.append("REFERENCES ").append(foreignKey.getReferencedSchema().getName()).append(".").append(foreignKey.getReferencedTable().getName());
         queryBuilder.append(" (");
         for (Column referencedColumn : foreignKey.getReferencedColumns()){
             queryBuilder.append(referencedColumn.getName());
             queryBuilder.append(", ");
         }
+        queryBuilder.delete(queryBuilder.length() - 2,queryBuilder.length() -1);
         queryBuilder.append(")\n");
-        queryBuilder.append("ON DELETE ").append(foreignKey.getOnDeleteAction().toString().replace("_","")).append("\n");
-        queryBuilder.append("ON UPDATE ").append(foreignKey.getOnUpdateAction().toString().replace("_",""));
+        queryBuilder.append("ON DELETE ").append(foreignKey.getOnDeleteAction().toString().replace("_"," ")).append("\n");
+        queryBuilder.append("ON UPDATE ").append(foreignKey.getOnUpdateAction().toString().replace("_"," "));
         queryBuilder.append(";");
 
         String query = queryBuilder.toString();

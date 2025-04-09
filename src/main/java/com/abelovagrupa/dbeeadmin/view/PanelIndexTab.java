@@ -127,11 +127,7 @@ public class PanelIndexTab implements Initializable {
 
             // Loading indexed columns of a selected index
             for(IndexedColumn tableColumn : indexedColumnData){
-                if(selectedIndex.getIndexedColumns().contains(tableColumn)){
-                    tableColumn.setCheckedColumnProperty(true);
-                }else {
-                    tableColumn.setCheckedColumnProperty(false);
-                }
+                tableColumn.setCheckedColumnProperty(selectedIndex.getIndexedColumns().contains(tableColumn));
             }
             // Loading index options
             // Loading combo box with index storage types for index options

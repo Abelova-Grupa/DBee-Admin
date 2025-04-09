@@ -16,6 +16,7 @@ import com.abelovagrupa.dbeeadmin.model.trigger.Event;
 import com.abelovagrupa.dbeeadmin.model.trigger.Timing;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import com.abelovagrupa.dbeeadmin.model.view.View;
+import com.abelovagrupa.dbeeadmin.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -475,20 +476,22 @@ public class DatabaseInspector {
             ps.setString(3,foreignKey.getName());
 
             ResultSet columnsRs = ps.executeQuery();
-            
-            foreignKey.setColumnPairs(new LinkedList<ForeignKeyColumns>());
-            foreignKey.setReferencingColumns(new LinkedList<>());
-            foreignKey.setReferencedColumns(new LinkedList<>());
 
             while(columnsRs.next()){
-                Optional<String> referencingColumn = Optional.ofNullable(columnsRs.getString("COLUMN_NAME"));
-                Optional<String> referencedColumn = Optional.ofNullable(columnsRs.getString("REFERENCED_COLUMN_NAME"));
+                Optional<String> referencingColumnStr = Optional.ofNullable(columnsRs.getString("COLUMN_NAME"));
+                Optional<String> referencedColumnStr = Optional.ofNullable(columnsRs.getString("REFERENCED_COLUMN_NAME"));
 
-                referencingColumn.ifPresent(s -> foreignKey.getReferencingColumns()
-                        .add(getColumnByName(foreignKey.getReferencingTable(), s)));
+                if(referencingColumnStr.isPresent() && referencedColumnStr.isPresent()){
+                    Column referencingColumn = getColumnByName(foreignKey.getReferencingTable(), referencingColumnStr.get());
+                    Column referencedColumn = getColumnByName(foreignKey.getReferencedTable(), referencedColumnStr.get());
+                    foreignKey.getColumnPairs().add(new ForeignKeyColumns(referencingColumn,referencedColumn));
+                }
 
-                referencedColumn.ifPresent(s -> foreignKey.getReferencedColumns()
-                        .add(getColumnByName(foreignKey.getReferencedTable(), s)));
+//                referencingColumnStr.ifPresent(s -> foreignKey.getReferencingColumns()
+//                        .add(getColumnByName(foreignKey.getReferencingTable(), s)));
+//
+//                referencedColumnStr.ifPresent(s -> foreignKey.getReferencedColumns()
+//                        .add(getColumnByName(foreignKey.getReferencedTable(), s)));
 
             }
 

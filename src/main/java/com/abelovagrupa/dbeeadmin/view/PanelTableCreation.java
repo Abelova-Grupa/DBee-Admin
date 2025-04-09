@@ -68,7 +68,7 @@ public class PanelTableCreation implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            // TabLoaded array indicates if the certain tabs of tableCreation tabPane are loaded
+            // TabLoaded array indicates if the certain tabs of tableAttributeTabPane tabPane are loaded
             tabLoaded = new boolean[]{true,true,false,false};
             // Initialize column tab
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
@@ -112,15 +112,14 @@ public class PanelTableCreation implements Initializable {
         tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (_, _, newTab) -> {
                     // If selected tab is index tab load all columns from column tab
-                    if(newTab.equals(indexTab)){
-                        indexedColumns.clear();
-                        for (Column column : columTabController.columnsData){
-                            IndexedColumn indexedColumn = new IndexedColumn();
-                            indexedColumn.setColumn(column);
-                            indexedColumns.add(indexedColumn);
-                        }
-                        indexTabController.indexedColumnData.setAll(indexedColumns);
+                    if(!newTab.equals(indexTab)) return;
+                    indexedColumns.clear();
+                    for (Column column : columTabController.columnsData){
+                        IndexedColumn indexedColumn = new IndexedColumn();
+                        indexedColumn.setColumn(column);
+                        indexedColumns.add(indexedColumn);
                     }
+                    indexTabController.indexedColumnData.setAll(indexedColumns);
                 });
         // Implementing lazy loading of the foreign key tab on first selection
         tableAttributeTabPane.getSelectionModel().selectedItemProperty().addListener(
@@ -137,10 +136,19 @@ public class PanelTableCreation implements Initializable {
                             throw new RuntimeException(e);
                         }
                     }
-                    if(foreignKeyTabController.selectedTable != null){
+                    if(columTabController.columnsData.size() > foreignKeyTabController.foreignKeyColumnsData.size()
+                            && ProgramState.getInstance().getSelectedSchema() != null && ProgramState.getInstance().getSelectedTable() != null){
+                        // If a table and schema are selected fill comboBox and referencing columns
                         foreignKeyTabController.foreignKeyColumnsData.clear();
-                        for(int i=0; i < foreignKeyTabController.selectedTable.getColumns().size();i++){
-                            Column column = foreignKeyTabController.selectedTable.getColumns().get(i);
+
+                        List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(ProgramState.getInstance().getSelectedSchema());
+                        foreignKeyTabController.cbReferencedTable.clear();
+                        for(String schemaTableName : schemaTablesNames){
+                            foreignKeyTabController.cbReferencedTable.add(ProgramState.getInstance().getSelectedSchema().getName()+"."+schemaTableName);
+                        }
+
+                        for(int i=0; i < ProgramState.getInstance().getSelectedTable().getColumns().size();i++){
+                            Column column = ProgramState.getInstance().getSelectedTable().getColumns().get(i);
                             ForeignKeyColumns newPair = new ForeignKeyColumns();
                             newPair.setFirst(column);
                             foreignKeyTabController.foreignKeyColumnsData.add(newPair);
@@ -166,8 +174,6 @@ public class PanelTableCreation implements Initializable {
 
         // Filling comboBox with engine values
         cbSchema.getItems().addAll(DatabaseInspector.getInstance().getDatabaseNames());
-
-
     }
 
     public void handleTableChange(){
@@ -176,11 +182,11 @@ public class PanelTableCreation implements Initializable {
             // Creating the table if it doesn't exist
             List<Column> tableColumns = columTabController.getTableColumns();
             Table createdTable = createTable(tableColumns);
-
         }
         else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(indexTab)){
             List<Index> tableIndexes = indexTabController.getTableIndexes();
             createIndexes(tableIndexes);
+
         }else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(foreignKeyTab)){
             List<ForeignKey> tableForeignKeys = foreignKeyTabController.getTableForeignKeys();
             createForeignKeys(tableForeignKeys);
@@ -203,6 +209,9 @@ public class PanelTableCreation implements Initializable {
 
         for(ForeignKey foreignKey : tableForeignKeys){
             try {
+                System.out.println(foreignKey.getColumnPairs());
+                System.out.println(foreignKey.getReferencingColumns());
+                System.out.println(foreignKey.getReferencedColumns());
                 DDLGenerator.addForeignKey(schema,table,foreignKey,true);
             } catch (SQLException e) {
                 throw new RuntimeException(e);

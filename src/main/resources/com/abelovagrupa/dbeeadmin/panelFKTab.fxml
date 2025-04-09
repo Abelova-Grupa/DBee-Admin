@@ -14,113 +14,113 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelFKTab">
-    <children>
-        <GridPane maxHeight="Infinity" VBox.vgrow="ALWAYS">
-            <columnConstraints>
-                <ColumnConstraints percentWidth="40" />
-                <ColumnConstraints percentWidth="40" />
-                <ColumnConstraints percentWidth="20" />
-            </columnConstraints>
+<VBox maxHeight="Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1210.0"
+      xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.abelovagrupa.dbeeadmin.view.PanelFKTab">
+    <GridPane maxHeight="Infinity" VBox.vgrow="ALWAYS">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="40"/>
+            <ColumnConstraints percentWidth="40"/>
+            <ColumnConstraints percentWidth="20"/>
+        </columnConstraints>
 
-            <rowConstraints>
-                <RowConstraints vgrow="ALWAYS" />
-            </rowConstraints>
+        <rowConstraints>
+            <RowConstraints vgrow="ALWAYS"/>
+        </rowConstraints>
 
-            <TableView fx:id="foreignKeyTable" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                <columns>
-                    <TableColumn fx:id="fkNameTableColumn" text="Foreign Key Name" />
-                    <TableColumn fx:id="fkReferencedTableColumn" text="Referenced Table" />
-                </columns>
-            </TableView>
+        <TableView fx:id="foreignKeyTable" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <columns>
+                <TableColumn fx:id="fkNameTableColumn" text="Foreign Key Name"/>
+                <TableColumn fx:id="fkReferencedTableColumn" text="Referenced Table"/>
+            </columns>
+        </TableView>
 
-            <TableView fx:id="foreignKeyColumnsTable" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                <columns>
-                    <TableColumn fx:id="fkcheckedTableColumn" />
-                    <TableColumn fx:id="fkColumnNameTableColumn" text="Column" />
-                    <TableColumn fx:id="fkReferencedColumnTableColumn" text="Referenced Column" />
-                </columns>
-            </TableView>
+        <TableView fx:id="foreignKeyColumnsTable" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <columns>
+                <TableColumn fx:id="fkcheckedTableColumn"/>
+                <TableColumn fx:id="fkColumnNameTableColumn" text="Column"/>
+                <TableColumn fx:id="fkReferencedColumnTableColumn" text="Referenced Column"/>
+            </columns>
+        </TableView>
 
-            <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefHeight="400.0" GridPane.columnIndex="2" GridPane.rowIndex="0" VBox.vgrow="ALWAYS">
-                <content>
-                   <VBox prefHeight="499.0" prefWidth="229.0">
-                      <children>
-                         <BorderPane prefHeight="30.0" prefWidth="229.0">
-                            <left>
-                               <Label text="Foreign Key Options:" BorderPane.alignment="CENTER">
-                              <BorderPane.margin>
-                                 <Insets bottom="5.0" left="5.0" />
-                              </BorderPane.margin></Label>
-                            </left>
-                            <center>
-                               <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-                            </center>
-                         </BorderPane>
-                         <BorderPane prefHeight="30.0" prefWidth="227.0">
-                            <right>
-                               <ComboBox prefHeight="25.0" prefWidth="115.0" BorderPane.alignment="CENTER">
-                                  <BorderPane.margin>
-                                     <Insets right="20.0" />
-                                  </BorderPane.margin>
-                               </ComboBox>
-                            </right>
-                            <center>
-                               <Label prefHeight="17.0" prefWidth="65.0" text="On Update:" BorderPane.alignment="CENTER">
-                                  <BorderPane.margin>
-                                     <Insets left="20.0" />
-                                  </BorderPane.margin>
-                               </Label>
-                            </center>
-                         </BorderPane>
-                         <BorderPane prefHeight="30.0" prefWidth="229.0">
-                            <right>
-                               <ComboBox prefHeight="25.0" prefWidth="115.0" BorderPane.alignment="CENTER">
-                                  <BorderPane.margin>
-                                     <Insets right="20.0" />
-                                  </BorderPane.margin>
-                               </ComboBox>
-                            </right>
-                            <center>
-                               <Label text="On Delete:" BorderPane.alignment="CENTER">
-                                  <BorderPane.margin>
-                                     <Insets left="20.0" />
-                                  </BorderPane.margin>
-                               </Label>
-                            </center>
-                        <VBox.margin>
-                           <Insets top="5.0" />
-                        </VBox.margin>
-                         </BorderPane>
-                     <BorderPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefHeight="400.0"
+                    GridPane.columnIndex="2" GridPane.rowIndex="0" VBox.vgrow="ALWAYS">
+            <VBox prefHeight="499.0" prefWidth="229.0">
+                <BorderPane prefHeight="30.0" prefWidth="229.0">
+                    <left>
+                        <Label text="Foreign Key Options:" BorderPane.alignment="CENTER">
+                            <BorderPane.margin>
+                                <Insets bottom="5.0" left="5.0"/>
+                            </BorderPane.margin>
+                        </Label>
+                    </left>
+                    <center>
+                        <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+                    </center>
+                </BorderPane>
+                <BorderPane prefHeight="30.0" prefWidth="227.0">
+                    <right>
+                        <ComboBox prefHeight="25.0" prefWidth="115.0" BorderPane.alignment="CENTER"
+                                  fx:id="cbOnUpdate">
+                            <BorderPane.margin>
+                                <Insets right="20.0"/>
+                            </BorderPane.margin>
+                        </ComboBox>
+                    </right>
+                    <center>
+                        <Label prefHeight="17.0" prefWidth="65.0" text="On Update:"
+                               BorderPane.alignment="CENTER">
+                            <BorderPane.margin>
+                                <Insets left="20.0"/>
+                            </BorderPane.margin>
+                        </Label>
+                    </center>
+                </BorderPane>
+                <BorderPane prefHeight="30.0" prefWidth="229.0">
+                    <right>
+                        <ComboBox prefHeight="25.0" prefWidth="115.0" BorderPane.alignment="CENTER" fx:id="cbOnDelete">
+                            <BorderPane.margin>
+                                <Insets right="20.0"/>
+                            </BorderPane.margin>
+                        </ComboBox>
+                    </right>
+                    <center>
+                        <Label text="On Delete:" BorderPane.alignment="CENTER">
+                            <BorderPane.margin>
+                                <Insets left="20.0"/>
+                            </BorderPane.margin>
+                        </Label>
+                    </center>
+                    <VBox.margin>
+                        <Insets top="5.0"/>
+                    </VBox.margin>
+                </BorderPane>
+                <BorderPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                    <center>
+                        <Pane prefHeight="128.0" prefWidth="229.0" BorderPane.alignment="CENTER"/>
+                    </center>
+                </BorderPane>
+                <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+                    <BorderPane prefHeight="30.0" prefWidth="229.0">
+                        <left>
+                            <Label text="Foreign Key Comment:" BorderPane.alignment="CENTER">
+                                <BorderPane.margin>
+                                    <Insets bottom="5.0" left="5.0"/>
+                                </BorderPane.margin>
+                            </Label>
+                        </left>
                         <center>
-                               <Pane prefHeight="128.0" prefWidth="229.0" BorderPane.alignment="CENTER" />
+                            <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
                         </center>
-                     </BorderPane>
-                     <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
-                        <children>
-                               <BorderPane prefHeight="30.0" prefWidth="229.0">
-                                  <left>
-                                     <Label text="Foreign Key Comment:" BorderPane.alignment="CENTER">
-                                    <BorderPane.margin>
-                                       <Insets bottom="5.0" left="5.0" />
-                                    </BorderPane.margin></Label>
-                                  </left>
-                                  <center>
-                                     <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-                                  </center>
-                               </BorderPane>
-                           <BorderPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-                              <center>
-                                     <TextArea prefHeight="207.0" prefWidth="229.0" BorderPane.alignment="CENTER" />
-                              </center>
-                           </BorderPane>
-                        </children>
-                     </VBox>
-                      </children>
-                   </VBox>
-                </content>
-            </ScrollPane>
-        </GridPane>
-    </children>
+                    </BorderPane>
+                    <BorderPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                        <center>
+                            <TextArea prefHeight="207.0" prefWidth="229.0" BorderPane.alignment="CENTER"
+                                      fx:id="fkCommentTxtArea"/>
+                        </center>
+                    </BorderPane>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </GridPane>
 </VBox>
