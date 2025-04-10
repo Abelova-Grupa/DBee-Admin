@@ -227,7 +227,7 @@ public class PanelBrowser implements Initializable {
                             // Adding "Columns" branch for each table which has a dummy branch
                             TreeItem<String> tableNode = new TreeItem<>(tableName, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
                             TreeItem<String> columnBranch = new TreeItem<>("Columns", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
-                            TreeItem<String> columnDummy = new TreeItem<>("Column Dummy");
+                            TreeItem<String> columnDummy = new TreeItem<>("Loading columns...");
                             columnBranch.getChildren().add(columnDummy);
 
                             // Same logic applies to column expansion listener
@@ -273,7 +273,7 @@ public class PanelBrowser implements Initializable {
 
                             // Adding index branch with dummy child
                             TreeItem<String> indexBranch = new TreeItem<>("Indexes", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/indexes.png").toExternalForm())));
-                            TreeItem<String> indexDummy = new TreeItem<>("Index dummy");
+                            TreeItem<String> indexDummy = new TreeItem<>("Loading indexes...");
                             indexBranch.getChildren().add(indexDummy);
 
                             // Same logic applies for index expansion listener
@@ -317,7 +317,7 @@ public class PanelBrowser implements Initializable {
 
                             // Adding foreign key branch with dummy child
                             TreeItem<String> foreignKeyBranch = new TreeItem<>("Foreign Keys", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/foreignkeys.png").toExternalForm())));
-                            TreeItem<String> foreignKeyDummy = new TreeItem<>("ForeignKeyDummy");
+                            TreeItem<String> foreignKeyDummy = new TreeItem<>("Loading foreign keys...");
                             foreignKeyBranch.getChildren().add(foreignKeyDummy);
 
                             // Same logic as before for this listener
