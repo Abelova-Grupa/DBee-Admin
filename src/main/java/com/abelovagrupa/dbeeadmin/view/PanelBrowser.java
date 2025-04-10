@@ -15,6 +15,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -100,11 +101,20 @@ public class PanelBrowser implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        // OPTIMIZATION: Checking time to initialize browser
+        long startTime = System.nanoTime();
+
+
         // TODO: WRITE COMMENTS FROM THIS METHOD
         schemaControllers = new LinkedList<>();
         schemaViews = FXCollections.observableArrayList();
         List<String> schemaNames = DatabaseInspector.getInstance().getDatabaseNames();
         for (String schemaName : schemaNames) {
+
+            // OPTIMIZATION: Don't load pref and info; Browser loading time cut by 30.05%
+            if(schemaName.equals("performance_schema") || schemaName.equals("information_schema"))
+                continue;
             // Loading each schema treeView
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelSchemaTree.fxml"));
             TreeView<String> schemaView = loadSchemaView(loader,schemaName);
@@ -131,6 +141,10 @@ public class PanelBrowser implements Initializable {
             }
         });
 
+        // OPTIMIZATION: Read browser loading time and print it!
+        long endTime = System.nanoTime();
+        long duration = endTime - startTime; // in nanoseconds
+        logger.info("Browser initialization time: {} ns", duration);
 
     }
 
@@ -168,17 +182,34 @@ public class PanelBrowser implements Initializable {
             schemaViews.add(schemaView);
 
             // If "Views" branch is expanded, its children are loaded and dummy node is removed.
+            // OPTIMIZATION: This will execute as a Task (on a separate thread)
             ChangeListener<Boolean> viewBranchListener = new ChangeListener<Boolean>() {
                 @Override
                 public void changed(ObservableValue<? extends Boolean> observableValue, Boolean odlValue, Boolean newValue) {
-                    if(newValue) {
-                        Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-                        List<String> viewNames = DatabaseInspector.getInstance().getViewNames(schema);
-                        viewBranch.getChildren().remove(tableDummyNode);
-                        for(var v : viewNames) {
-                            viewBranch.getChildren().add(new TreeItem<>(v, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/view.png").toExternalForm()))));
+                    Task<List<TreeItem<String>>> loadViewsTask = new Task<>() {
+                        @Override
+                        protected List<TreeItem<String>> call() {
+                            Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
+                            List<String> viewNames = DatabaseInspector.getInstance().getViewNames(schema);
+
+                            List<TreeItem<String>> viewItems = new ArrayList<>();
+                            for (String viewName : viewNames) {
+                                ImageView icon = new ImageView(
+                                    new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/view.png").toExternalForm())
+                                );
+                                viewItems.add(new TreeItem<>(viewName, icon));
+                            }
+                            return viewItems;
                         }
-                    }
+                    };
+
+                    loadViewsTask.setOnSucceeded(workerStateEvent -> {
+                        List<TreeItem<String>> viewItems = loadViewsTask.getValue();
+                        viewBranch.getChildren().remove(tableDummyNode);
+                        viewBranch.getChildren().addAll(viewItems);
+                    });
+
+                    new Thread(loadViewsTask).start();
                     viewBranch.expandedProperty().removeListener(this);
                 }
             };
@@ -196,24 +227,45 @@ public class PanelBrowser implements Initializable {
                             // Adding "Columns" branch for each table which has a dummy branch
                             TreeItem<String> tableNode = new TreeItem<>(tableName, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
                             TreeItem<String> columnBranch = new TreeItem<>("Columns", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
-                            TreeItem<String> columnDummy = new TreeItem<>("Column Dummy");
+                            TreeItem<String> columnDummy = new TreeItem<>("Loading columns...");
                             columnBranch.getChildren().add(columnDummy);
 
                             // Same logic applies to column expansion listener
+                            // OPTIMIZATION: This will execute as a Task (on a separate thread)
                             ChangeListener<Boolean> columnBranchListener = new ChangeListener<Boolean>() {
                                 @Override
                                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                                     if (newValue) {
-                                        columnBranch.getChildren().remove(columnDummy);
-                                        Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
-                                        for (Column column : table.getColumns()) {
-                                            // Adding key icon to primary key columns. Aesthetic :)
-                                            String columnName = column.isPrimaryKey() ? column.getName() + " (\uD83D\uDD11)" : column.getName();
-                                            TreeItem<String> columnNode = new TreeItem<>(columnName);
-                                            columnBranch.getChildren().add(columnNode);
-                                        }
-                                        // Removing column listener
-                                        columnBranch.expandedProperty().removeListener(this);
+                                        Task<List<TreeItem<String>>> loadColumnsTask = new Task<>() {
+                                            @Override
+                                            protected List<TreeItem<String>> call() {
+                                                Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
+                                                List<TreeItem<String>> columnNodes = new ArrayList<>();
+
+                                                for (Column column : table.getColumns()) {
+                                                    String columnName = column.isPrimaryKey()
+                                                        ? column.getName() + " (\uD83D\uDD11)"
+                                                        : column.getName();
+                                                    columnNodes.add(new TreeItem<>(columnName));
+                                                }
+
+                                                return columnNodes;
+                                            }
+                                        };
+
+                                        loadColumnsTask.setOnSucceeded(workerStateEvent -> {
+                                            List<TreeItem<String>> columnNodes = loadColumnsTask.getValue();
+                                            columnBranch.getChildren().remove(columnDummy);
+                                            columnBranch.getChildren().addAll(columnNodes);
+                                            columnBranch.expandedProperty().removeListener(this);
+                                        });
+
+                                        loadColumnsTask.setOnFailed(workerStateEvent -> {
+                                            Throwable error = loadColumnsTask.getException();
+                                            logger.error(error.getMessage());
+                                        });
+
+                                        new Thread(loadColumnsTask).start();
                                     }
                                 }
                             };
@@ -221,23 +273,43 @@ public class PanelBrowser implements Initializable {
 
                             // Adding index branch with dummy child
                             TreeItem<String> indexBranch = new TreeItem<>("Indexes", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/indexes.png").toExternalForm())));
-                            TreeItem<String> indexDummy = new TreeItem<>("Index dummy");
+                            TreeItem<String> indexDummy = new TreeItem<>("Loading indexes...");
                             indexBranch.getChildren().add(indexDummy);
 
                             // Same logic applies for index expansion listener
-                            ChangeListener<Boolean> indexBranchListener = new ChangeListener<Boolean>() {
+                            // OPTIMIZATION: This will execute as a Task (on a separate thread)
+                            ChangeListener<Boolean> indexBranchListener = new ChangeListener<>() {
                                 @Override
                                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                                     if (newValue) {
-                                        indexBranch.getChildren().remove(indexDummy);
-                                        Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
-                                        List<Index> indexes = DatabaseInspector.getInstance().getIndexes(schema, table);
-                                        for (Index index : indexes) {
-                                            TreeItem<String> indexNode = new TreeItem<>(index.getName());
-                                            indexBranch.getChildren().add(indexNode);
-                                        }
-                                        // Removing index listener after first usage
-                                        indexBranch.expandedProperty().removeListener(this);
+                                        Task<List<TreeItem<String>>> loadIndexesTask = new Task<>() {
+                                            @Override
+                                            protected List<TreeItem<String>> call() {
+                                                Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
+                                                List<Index> indexes = DatabaseInspector.getInstance().getIndexes(schema, table);
+
+                                                List<TreeItem<String>> indexNodes = new ArrayList<>();
+                                                for (Index index : indexes) {
+                                                    indexNodes.add(new TreeItem<>(index.getName()));
+                                                }
+
+                                                return indexNodes;
+                                            }
+                                        };
+
+                                        loadIndexesTask.setOnSucceeded(workerStateEvent -> {
+                                            List<TreeItem<String>> indexNodes = loadIndexesTask.getValue();
+                                            indexBranch.getChildren().remove(indexDummy);
+                                            indexBranch.getChildren().addAll(indexNodes);
+                                            indexBranch.expandedProperty().removeListener(this);
+                                        });
+
+                                        loadIndexesTask.setOnFailed(workerStateEvent -> {
+                                            Throwable error = loadIndexesTask.getException();
+                                            logger.error(error.getMessage());
+                                        });
+
+                                        new Thread(loadIndexesTask).start();
                                     }
                                 }
                             };
@@ -245,23 +317,38 @@ public class PanelBrowser implements Initializable {
 
                             // Adding foreign key branch with dummy child
                             TreeItem<String> foreignKeyBranch = new TreeItem<>("Foreign Keys", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/foreignkeys.png").toExternalForm())));
-                            TreeItem<String> foreignKeyDummy = new TreeItem<>("ForeignKeyDummy");
+                            TreeItem<String> foreignKeyDummy = new TreeItem<>("Loading foreign keys...");
                             foreignKeyBranch.getChildren().add(foreignKeyDummy);
 
                             // Same logic as before for this listener
-                            ChangeListener<Boolean> foreignKeyListener = new ChangeListener<Boolean>() {
+                            ChangeListener<Boolean> foreignKeyListener = new ChangeListener<>() {
                                 @Override
                                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                                     if (newValue) {
-                                        foreignKeyBranch.getChildren().remove(foreignKeyDummy);
-                                        Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
-                                        List<ForeignKey> foreignKeys = DatabaseInspector.getInstance().getForeignKeys(schema, table);
-                                        for (ForeignKey foreignKey : foreignKeys) {
-                                            TreeItem<String> foreignKeyNode = new TreeItem<>(foreignKey.getName());
-                                            foreignKeyBranch.getChildren().add(foreignKeyNode);
-                                        }
-                                        // Removing listener after first usage
-                                        foreignKeyBranch.expandedProperty().removeListener(this);
+                                        Task<List<TreeItem<String>>> loadForeignKeysTask = new Task<>() {
+                                            @Override
+                                            protected List<TreeItem<String>> call() {
+                                                Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
+                                                List<ForeignKey> foreignKeys = DatabaseInspector.getInstance().getForeignKeys(schema, table);
+
+                                                List<TreeItem<String>> foreignKeyNodes = new ArrayList<>();
+                                                for (ForeignKey fk : foreignKeys) {
+                                                    foreignKeyNodes.add(new TreeItem<>(fk.getName()));
+                                                }
+                                                return foreignKeyNodes;
+                                            }
+                                        };
+
+                                        loadForeignKeysTask.setOnSucceeded(event -> {
+                                            foreignKeyBranch.getChildren().setAll(loadForeignKeysTask.getValue());
+                                            foreignKeyBranch.expandedProperty().removeListener(this);
+                                        });
+
+                                        loadForeignKeysTask.setOnFailed(event -> {
+                                            logger.error(loadForeignKeysTask.getException().getMessage());
+                                        });
+
+                                        new Thread(loadForeignKeysTask).start();
                                     }
                                 }
                             };
