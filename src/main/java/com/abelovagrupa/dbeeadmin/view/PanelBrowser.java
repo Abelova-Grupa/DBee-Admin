@@ -262,7 +262,7 @@ public class PanelBrowser implements Initializable {
 
                                         loadColumnsTask.setOnFailed(workerStateEvent -> {
                                             Throwable error = loadColumnsTask.getException();
-                                            error.printStackTrace(); // or show error dialog
+                                            logger.error(error.getMessage());
                                         });
 
                                         new Thread(loadColumnsTask).start();
@@ -277,19 +277,39 @@ public class PanelBrowser implements Initializable {
                             indexBranch.getChildren().add(indexDummy);
 
                             // Same logic applies for index expansion listener
-                            ChangeListener<Boolean> indexBranchListener = new ChangeListener<Boolean>() {
+                            // OPTIMIZATION: This will execute as a Task (on a separate thread)
+                            ChangeListener<Boolean> indexBranchListener = new ChangeListener<>() {
                                 @Override
                                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                                     if (newValue) {
-                                        indexBranch.getChildren().remove(indexDummy);
-                                        Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
-                                        List<Index> indexes = DatabaseInspector.getInstance().getIndexes(schema, table);
-                                        for (Index index : indexes) {
-                                            TreeItem<String> indexNode = new TreeItem<>(index.getName());
-                                            indexBranch.getChildren().add(indexNode);
-                                        }
-                                        // Removing index listener after first usage
-                                        indexBranch.expandedProperty().removeListener(this);
+                                        Task<List<TreeItem<String>>> loadIndexesTask = new Task<>() {
+                                            @Override
+                                            protected List<TreeItem<String>> call() {
+                                                Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
+                                                List<Index> indexes = DatabaseInspector.getInstance().getIndexes(schema, table);
+
+                                                List<TreeItem<String>> indexNodes = new ArrayList<>();
+                                                for (Index index : indexes) {
+                                                    indexNodes.add(new TreeItem<>(index.getName()));
+                                                }
+
+                                                return indexNodes;
+                                            }
+                                        };
+
+                                        loadIndexesTask.setOnSucceeded(workerStateEvent -> {
+                                            List<TreeItem<String>> indexNodes = loadIndexesTask.getValue();
+                                            indexBranch.getChildren().remove(indexDummy);
+                                            indexBranch.getChildren().addAll(indexNodes);
+                                            indexBranch.expandedProperty().removeListener(this);
+                                        });
+
+                                        loadIndexesTask.setOnFailed(workerStateEvent -> {
+                                            Throwable error = loadIndexesTask.getException();
+                                            logger.error(error.getMessage());
+                                        });
+
+                                        new Thread(loadIndexesTask).start();
                                     }
                                 }
                             };
