@@ -20,6 +20,7 @@ import com.abelovagrupa.dbeeadmin.view.DialogSQLPreview;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -534,6 +535,66 @@ public class DDLGenerator {
             new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
         else executeUpdate(query);
 
+    }
+
+    public static void addIndexes(Schema schema, Table table, List<Index> indexList, boolean preview) {
+        if(schema == null ) throw new IllegalArgumentException("Schema is not set");
+        if(table == null) throw new IllegalArgumentException("Table is not set");
+        if(indexList == null) throw new IllegalArgumentException("Index list is not set");
+
+        StringBuilder allStatements = new StringBuilder("ALTER TABLE ");
+        allStatements.append(schema.getName()).append(".").append(table.getName()).append("\n");
+        for(var index : indexList) {
+
+            StringBuilder queryBuilder = new StringBuilder();
+
+            queryBuilder.append("ADD ").append(
+                !index.getType().equals(IndexType.INDEX) ? index.getType() + " " : ""
+            ).append("INDEX ").append(index.getName()).append(" USING ").append(index.getStorageType()).append(" (");
+
+            Comparator<IndexedColumn> indexComparator = new Comparator<IndexedColumn>() {
+                @Override
+                public int compare(IndexedColumn o1, IndexedColumn o2) {
+                    if (o1.getOrderNumber() == o2.getOrderNumber()) return 0;
+                    else if (o1.getOrderNumber() < o2.getOrderNumber()) return -1;
+                    else return 1;
+                }
+            };
+
+            List<IndexedColumn> unsortedIndexedColumns = index.getIndexedColumns();
+            // Unsupported operation for immutable lists
+            List<IndexedColumn> sortedIndexedColumns = new ArrayList<>(unsortedIndexedColumns);
+            sortedIndexedColumns.sort(indexComparator);
+//        System.out.println(sortedIndexedColumns);
+
+            for (int i = 0; i < sortedIndexedColumns.size(); i++) {
+                IndexedColumn indexedColumn = sortedIndexedColumns.get(i);
+                queryBuilder.append(indexedColumn.getColumn().getName());
+                if (indexedColumn.getLength() != 0)
+                    queryBuilder.append("(").append(indexedColumn.getLength()).append(")");
+                if (i != sortedIndexedColumns.size() - 1) queryBuilder.append(", ");
+            }
+
+            queryBuilder.append(") ");
+            if (index.getKeyBlockSize() != 0)
+                queryBuilder.append("KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize()).append(" ");
+            if (index.getParser() != null && !index.getParser().isEmpty())
+                queryBuilder.append(" WITH PARSER ").append(index.getParser()).append(" ");
+            queryBuilder.append(index.isVisible() ? "VISIBLE " : "INVISIBLE ");
+            if (index.getComment() != null && !index.getComment().isEmpty())
+                queryBuilder.append("\nCOMMENT ").append("'").append(index.getComment()).append("',");
+            else {
+                queryBuilder.setLength(queryBuilder.length() -1);
+                queryBuilder.append(",\n");
+            }
+
+            allStatements.append(queryBuilder);
+        }
+
+        // Cut the last comma
+        allStatements.setLength(allStatements.length() - 2);
+        allStatements.append(';');
+        System.out.println(allStatements.toString());
     }
 
     public static void renameIndex(Schema schema, Table table, Index index, String newName, boolean preview) throws SQLException {
