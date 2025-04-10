@@ -8,7 +8,7 @@
 
 <TreeView xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.abelovagrupa.dbeeadmin.view.PanelSchemaTree"
+            fx:controller="com.abelovagrupa.dbeeadmin.view.schemaview.PanelSchemaTree"
             prefHeight="130.0" prefWidth="250.0" styleClass="tree-view" fx:id="schemaView">
 
 </TreeView>

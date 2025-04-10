@@ -20,5 +20,7 @@ module com.abelovagrupa.dbeeadmin {
     opens com.abelovagrupa.dbeeadmin.model.index to javafx.base;
     opens com.abelovagrupa.dbeeadmin.model.column to javafx.base;
     opens com.abelovagrupa.dbeeadmin.model.foreignkey to javafx.base;
+    opens com.abelovagrupa.dbeeadmin.view.schemaview to javafx.fxml;
+    opens com.abelovagrupa.dbeeadmin.view.schemaview.tableView to javafx.fxml;
 
 }

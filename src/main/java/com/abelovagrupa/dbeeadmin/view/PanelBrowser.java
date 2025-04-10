@@ -7,16 +7,18 @@ import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
-import com.abelovagrupa.dbeeadmin.model.view.View;
+import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
 import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
+import com.abelovagrupa.dbeeadmin.util.Pair;
+import com.abelovagrupa.dbeeadmin.view.schemaview.PanelSchemaTree;
+import com.abelovagrupa.dbeeadmin.view.schemaview.PanelTableTree;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -26,7 +28,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -46,7 +47,7 @@ public class PanelBrowser implements Initializable {
 
     private PanelMain mainController;
 
-    private List<PanelSchemaTree> schemaControllers;
+    private HashMap<String, Pair<TreeView<String>,PanelSchemaTree>> schemaHashMap;
 
     private ObservableList<TreeView<String>> schemaViews;
 
@@ -66,14 +67,6 @@ public class PanelBrowser implements Initializable {
     @FXML
     BorderPane browserHeader;
     private ContextMenu contextMenu;
-
-    public List<PanelSchemaTree> getSchemaControllers() {
-        return schemaControllers;
-    }
-
-    public void setSchemaControllers(List<PanelSchemaTree> schemaControllers) {
-        this.schemaControllers = schemaControllers;
-    }
 
     public PanelMain getMainController() {
         return mainController;
@@ -107,11 +100,10 @@ public class PanelBrowser implements Initializable {
 
 
         // TODO: WRITE COMMENTS FROM THIS METHOD
-        schemaControllers = new LinkedList<>();
+        schemaHashMap = new HashMap<>();
         schemaViews = FXCollections.observableArrayList();
         List<String> schemaNames = DatabaseInspector.getInstance().getDatabaseNames();
         for (String schemaName : schemaNames) {
-
             // OPTIMIZATION: Don't load pref and info; Browser loading time cut by 30.05%
             if(schemaName.equals("performance_schema") || schemaName.equals("information_schema"))
                 continue;
@@ -145,7 +137,7 @@ public class PanelBrowser implements Initializable {
         long endTime = System.nanoTime();
         long duration = endTime - startTime; // in nanoseconds
         logger.info("Browser initialization time: {} ns", duration);
-
+        System.out.println(schemaHashMap);
     }
 
     public TreeView<String> loadSchemaView(FXMLLoader loader, String schemaName) {
@@ -153,8 +145,8 @@ public class PanelBrowser implements Initializable {
         try {
             TreeView<String> schemaView = loader.load();
             schemaView.setPrefHeight(TREE_CELL_HEIGHT);
-            // Adding schema controller to the list
-            schemaControllers.add(loader.getController());
+            // Adding schemaview reference and schema controller to hashmap
+            schemaHashMap.put(schemaName,Pair.of(schemaView,new PanelSchemaTree()));
 
             // Creating a root node with its first children tables, views, stored procedures and functions
             TreeItem<String> schemaNode = new TreeItem<>(schemaName, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database.png").toExternalForm())));
@@ -251,10 +243,9 @@ public class PanelBrowser implements Initializable {
                     Schema selectedSchema = DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName);
                     infoController.setSelected(selectedSchema);
                     ProgramState.getInstance().setSelectedSchema(selectedSchema);
-
-                    if(event.getClickCount() == 2){
-
-                    }
+//                    if(event.getClickCount() == 2){
+//
+//                    }
                 }
 
                 Optional<TreeItem<String>> selectedItemOptional = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
@@ -297,7 +288,7 @@ public class PanelBrowser implements Initializable {
 
                                 viewTable.setOnAction(tblClick -> displaySelectedTable(selectedTable));
 //                                editTable.setOnAction(tblClick -> System.out.println("Editing table..."));
-//                                deleteTable.setOnAction(tblClick -> System.out.println("Deleting table..."));
+                                deleteTable.setOnAction(tblClick -> deleteSelectedTable(selectedTable));
 //                                addColumn.setOnAction(tblClick -> System.out.println("Adding column to table..."));
 //                                generateTableSQL.setOnAction(tblClick -> System.out.println("Generating SQL for table..."));
 
@@ -445,6 +436,10 @@ public class PanelBrowser implements Initializable {
         TreeItem<String> columnDummy = new TreeItem<>("Loading columns...");
         columnBranch.getChildren().add(columnDummy);
 
+        // Adding tableNode to tableNodes hashmap in schemaTreeController to make finding it later faster
+        schemaHashMap.get(schema.getName()).getSecond().
+                getTableNodesHashMap().put(tableName, Pair.of(tableNode,new PanelTableTree()));
+
         // Same logic applies to column expansion listener
         // OPTIMIZATION: This will execute as a Task (on a separate thread)
         ChangeListener<Boolean> columnBranchListener = new ChangeListener<Boolean>() {
@@ -461,7 +456,11 @@ public class PanelBrowser implements Initializable {
                                 String columnName = column.isPrimaryKey()
                                         ? column.getName() + " (\uD83D\uDD11)"
                                         : column.getName();
-                                columnNodes.add(new TreeItem<>(columnName));
+                                TreeItem<String> columnNode = new TreeItem<>(columnName);
+                                columnNodes.add(columnNode);
+                                schemaHashMap.get(schema.getName()).getSecond()
+                                        .getTableNodesHashMap().get(tableName).getSecond()
+                                        .getColumnNodesHashMap().put(columnName,columnNode);
                             }
 
                             return columnNodes;
@@ -505,7 +504,11 @@ public class PanelBrowser implements Initializable {
 
                             List<TreeItem<String>> indexNodes = new ArrayList<>();
                             for (Index index : indexes) {
-                                indexNodes.add(new TreeItem<>(index.getName()));
+                                TreeItem<String> indexNode = new TreeItem<>(index.getName());
+                                indexNodes.add(indexNode);
+                                schemaHashMap.get(schema.getName()).getSecond().
+                                        getTableNodesHashMap().get(tableName).getSecond().
+                                        getIndexNodesHashMap().put(index.getName(),indexNode);
                             }
 
                             return indexNodes;
@@ -548,7 +551,11 @@ public class PanelBrowser implements Initializable {
 
                             List<TreeItem<String>> foreignKeyNodes = new ArrayList<>();
                             for (ForeignKey fk : foreignKeys) {
-                                foreignKeyNodes.add(new TreeItem<>(fk.getName()));
+                                TreeItem<String> foreignKeyNode = new TreeItem<>(fk.getName());
+                                foreignKeyNodes.add(foreignKeyNode);
+                                schemaHashMap.get(schema.getName()).getSecond().
+                                        getTableNodesHashMap().get(tableName).getSecond()
+                                        .getForeignKeyNodesHashMap().put(fk.getName(),foreignKeyNode);
                             }
                             return foreignKeyNodes;
                         }
@@ -587,6 +594,19 @@ public class PanelBrowser implements Initializable {
             logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    private void deleteSelectedTable(Table selectedTable){
+        Optional<TreeItem<String>> selectedTableNode = Optional.of(schemaHashMap.get(selectedTable.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(selectedTable.getName()).getFirst());
+        try {
+            DDLGenerator.dropTable(selectedTable,false);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        TreeItem<String> tableParent = selectedTableNode.get().getParent();
+        tableParent.getChildren().remove(selectedTableNode.get());
+
     }
 
     private void sortAndFilterSchemas(String text) {
