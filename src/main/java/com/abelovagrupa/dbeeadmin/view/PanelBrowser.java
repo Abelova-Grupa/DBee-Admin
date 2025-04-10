@@ -321,19 +321,34 @@ public class PanelBrowser implements Initializable {
                             foreignKeyBranch.getChildren().add(foreignKeyDummy);
 
                             // Same logic as before for this listener
-                            ChangeListener<Boolean> foreignKeyListener = new ChangeListener<Boolean>() {
+                            ChangeListener<Boolean> foreignKeyListener = new ChangeListener<>() {
                                 @Override
                                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                                     if (newValue) {
-                                        foreignKeyBranch.getChildren().remove(foreignKeyDummy);
-                                        Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
-                                        List<ForeignKey> foreignKeys = DatabaseInspector.getInstance().getForeignKeys(schema, table);
-                                        for (ForeignKey foreignKey : foreignKeys) {
-                                            TreeItem<String> foreignKeyNode = new TreeItem<>(foreignKey.getName());
-                                            foreignKeyBranch.getChildren().add(foreignKeyNode);
-                                        }
-                                        // Removing listener after first usage
-                                        foreignKeyBranch.expandedProperty().removeListener(this);
+                                        Task<List<TreeItem<String>>> loadForeignKeysTask = new Task<>() {
+                                            @Override
+                                            protected List<TreeItem<String>> call() {
+                                                Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
+                                                List<ForeignKey> foreignKeys = DatabaseInspector.getInstance().getForeignKeys(schema, table);
+
+                                                List<TreeItem<String>> foreignKeyNodes = new ArrayList<>();
+                                                for (ForeignKey fk : foreignKeys) {
+                                                    foreignKeyNodes.add(new TreeItem<>(fk.getName()));
+                                                }
+                                                return foreignKeyNodes;
+                                            }
+                                        };
+
+                                        loadForeignKeysTask.setOnSucceeded(event -> {
+                                            foreignKeyBranch.getChildren().setAll(loadForeignKeysTask.getValue());
+                                            foreignKeyBranch.expandedProperty().removeListener(this);
+                                        });
+
+                                        loadForeignKeysTask.setOnFailed(event -> {
+                                            logger.error(loadForeignKeysTask.getException().getMessage());
+                                        });
+
+                                        new Thread(loadForeignKeysTask).start();
                                     }
                                 }
                             };
