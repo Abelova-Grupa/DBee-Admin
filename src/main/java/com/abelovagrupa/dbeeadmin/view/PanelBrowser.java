@@ -231,20 +231,41 @@ public class PanelBrowser implements Initializable {
                             columnBranch.getChildren().add(columnDummy);
 
                             // Same logic applies to column expansion listener
+                            // OPTIMIZATION: This will execute as a Task (on a separate thread)
                             ChangeListener<Boolean> columnBranchListener = new ChangeListener<Boolean>() {
                                 @Override
                                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                                     if (newValue) {
-                                        columnBranch.getChildren().remove(columnDummy);
-                                        Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
-                                        for (Column column : table.getColumns()) {
-                                            // Adding key icon to primary key columns. Aesthetic :)
-                                            String columnName = column.isPrimaryKey() ? column.getName() + " (\uD83D\uDD11)" : column.getName();
-                                            TreeItem<String> columnNode = new TreeItem<>(columnName);
-                                            columnBranch.getChildren().add(columnNode);
-                                        }
-                                        // Removing column listener
-                                        columnBranch.expandedProperty().removeListener(this);
+                                        Task<List<TreeItem<String>>> loadColumnsTask = new Task<>() {
+                                            @Override
+                                            protected List<TreeItem<String>> call() {
+                                                Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
+                                                List<TreeItem<String>> columnNodes = new ArrayList<>();
+
+                                                for (Column column : table.getColumns()) {
+                                                    String columnName = column.isPrimaryKey()
+                                                        ? column.getName() + " (\uD83D\uDD11)"
+                                                        : column.getName();
+                                                    columnNodes.add(new TreeItem<>(columnName));
+                                                }
+
+                                                return columnNodes;
+                                            }
+                                        };
+
+                                        loadColumnsTask.setOnSucceeded(workerStateEvent -> {
+                                            List<TreeItem<String>> columnNodes = loadColumnsTask.getValue();
+                                            columnBranch.getChildren().remove(columnDummy);
+                                            columnBranch.getChildren().addAll(columnNodes);
+                                            columnBranch.expandedProperty().removeListener(this);
+                                        });
+
+                                        loadColumnsTask.setOnFailed(workerStateEvent -> {
+                                            Throwable error = loadColumnsTask.getException();
+                                            error.printStackTrace(); // or show error dialog
+                                        });
+
+                                        new Thread(loadColumnsTask).start();
                                     }
                                 }
                             };
