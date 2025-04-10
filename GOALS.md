@@ -39,7 +39,7 @@ This document contains a list of objectives that must be accomplished in order t
 
 #### Foreign keys
 
-- [ ] FK creation
+- [x] FK creation
 - [ ] FK altering
 - [ ] FK removal
 
