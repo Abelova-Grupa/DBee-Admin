@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class PanelTableCreation implements Initializable {
@@ -52,7 +53,7 @@ public class PanelTableCreation implements Initializable {
     Tab foreignKeyTab;
 
     Tab triggerTab;
-
+    //Tab Controllers
     PanelColumnTab columTabController;
 
     PanelIndexTab indexTabController;
@@ -60,10 +61,20 @@ public class PanelTableCreation implements Initializable {
     PanelFKTab foreignKeyTabController;
 
     PanelTriggerTab triggerTabController;
+    // Other controllers
+    PanelBrowser browserController;
 
     ObservableList<IndexedColumn> indexedColumns = FXCollections.observableArrayList();
 
     boolean[] tabLoaded;
+
+    public PanelBrowser getBrowserController() {
+        return browserController;
+    }
+
+    public void setBrowserController(PanelBrowser browserController) {
+        this.browserController = browserController;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -209,10 +220,7 @@ public class PanelTableCreation implements Initializable {
 
         for(ForeignKey foreignKey : tableForeignKeys){
             try {
-                System.out.println(foreignKey.getColumnPairs());
-                System.out.println(foreignKey.getReferencingColumns());
-                System.out.println(foreignKey.getReferencedColumns());
-                DDLGenerator.addForeignKey(schema,table,foreignKey,true);
+                DDLGenerator.addForeignKey(schema,table,foreignKey,false);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -278,7 +286,27 @@ public class PanelTableCreation implements Initializable {
         newTable.setColumns(columns);
         try {
             DDLGenerator.createTable(newTable,true);
-            ProgramState.getInstance().setSelectedTable(DatabaseInspector.getInstance().getTableByName(tableSchema,tableName));
+            Table createdTable = DatabaseInspector.getInstance().getTableByName(tableSchema,newTable.getName());
+            ProgramState.getInstance().setSelectedTable(createdTable);
+            TreeItem<String> newTableNode = getBrowserController().loadTableTreeItem(tableSchema,createdTable.getName());
+            // For now, it works
+            TreeView<String> treeViewToChange = getBrowserController().vboxBrowser.getChildren()
+                    .stream().filter(t -> t instanceof TreeView<?>)
+                    .map(t -> (TreeView<String>) t)
+                    .filter(t -> {
+                        return t.getRoot().getValue().equals(tableSchema.getName());
+                    })
+                    .findFirst().get();
+
+//            TreeView<String> treeViewToChange = (TreeView<String>) getBrowserController().vboxBrowser.getChildren().stream().filter(
+//                    t -> {
+//                        TreeView<String> treeview = (TreeView<String>) t;
+//                        if(treeview.getRoot().getValue().equals(tableSchema.getName())) return true;
+//                        else return false;
+//                    }).findFirst().get();
+            // Schema -> tableBranch("Tables") -> schema tables
+            treeViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

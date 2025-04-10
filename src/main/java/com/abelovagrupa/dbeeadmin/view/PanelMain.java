@@ -217,8 +217,12 @@ public class PanelMain implements Initializable {
     // Event handling methods
 
     public void newTableTab() throws IOException {
+        // Loading fxml and linking controllers
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelTableCreation.fxml"));
         BorderPane tableTabContent = fxmlLoader.load();
+        PanelTableCreation tableCreationController = fxmlLoader.getController();
+        tableCreationController.setBrowserController(browserController);
+        // Creating tab
         Tab tableTab = new Tab("New Table");
         tableTab.setContent(tableTabContent);
         editorController.editorTabs.getTabs().add(tableTab);
@@ -227,10 +231,12 @@ public class PanelMain implements Initializable {
     }
 
     public void newSchemaTab(ActionEvent actionEvent) throws IOException {
+        // Loading fxml and linking controllers
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelSchemaCreation.fxml"));
         Tab schemaTab = fxmlLoader.load();
         PanelSchemaCreation schemaCreationController = fxmlLoader.getController();
         schemaCreationController.setBrowserController(browserController);
+        // Adding tab
         editorController.editorTabs.getTabs().add(schemaTab);
         editorController.editorTabs.getSelectionModel().select(schemaTab);
 
