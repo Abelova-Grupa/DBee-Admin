@@ -15,6 +15,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -181,17 +182,34 @@ public class PanelBrowser implements Initializable {
             schemaViews.add(schemaView);
 
             // If "Views" branch is expanded, its children are loaded and dummy node is removed.
+            // OPTIMIZATION: This will execute as a Task (on a separate thread)
             ChangeListener<Boolean> viewBranchListener = new ChangeListener<Boolean>() {
                 @Override
                 public void changed(ObservableValue<? extends Boolean> observableValue, Boolean odlValue, Boolean newValue) {
-                    if(newValue) {
-                        Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-                        List<String> viewNames = DatabaseInspector.getInstance().getViewNames(schema);
-                        viewBranch.getChildren().remove(tableDummyNode);
-                        for(var v : viewNames) {
-                            viewBranch.getChildren().add(new TreeItem<>(v, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/view.png").toExternalForm()))));
+                    Task<List<TreeItem<String>>> loadViewsTask = new Task<>() {
+                        @Override
+                        protected List<TreeItem<String>> call() {
+                            Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
+                            List<String> viewNames = DatabaseInspector.getInstance().getViewNames(schema);
+
+                            List<TreeItem<String>> viewItems = new ArrayList<>();
+                            for (String viewName : viewNames) {
+                                ImageView icon = new ImageView(
+                                    new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/view.png").toExternalForm())
+                                );
+                                viewItems.add(new TreeItem<>(viewName, icon));
+                            }
+                            return viewItems;
                         }
-                    }
+                    };
+
+                    loadViewsTask.setOnSucceeded(workerStateEvent -> {
+                        List<TreeItem<String>> viewItems = loadViewsTask.getValue();
+                        viewBranch.getChildren().remove(tableDummyNode);
+                        viewBranch.getChildren().addAll(viewItems);
+                    });
+
+                    new Thread(loadViewsTask).start();
                     viewBranch.expandedProperty().removeListener(this);
                 }
             };
