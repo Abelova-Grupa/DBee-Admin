@@ -148,7 +148,6 @@ public class PanelFKTab implements Initializable {
                         }
                     });
                 }
-
                 // CheckBox rendering logic
                 @Override
                 public void updateItem(Boolean item, boolean empty) {
