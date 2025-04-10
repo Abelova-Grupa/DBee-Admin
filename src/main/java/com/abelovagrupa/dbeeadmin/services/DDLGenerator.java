@@ -309,7 +309,7 @@ public class DDLGenerator {
         queryBuilder.append(table.getSchema().getName());
         queryBuilder.append(".");
         queryBuilder.append(table.getName());
-        queryBuilder.append("DROP COLUMN ");
+        queryBuilder.append(" DROP COLUMN ");
         queryBuilder.append(column.getName());
 
         String query = queryBuilder.toString();
@@ -470,7 +470,7 @@ public class DDLGenerator {
 
         StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
         queryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
-        queryBuilder.append("DROP FOREIGN KEY").append(foreignKey.getName()).append(";");
+        queryBuilder.append(" DROP FOREIGN KEY ").append(foreignKey.getName()).append(";");
 
         String query = queryBuilder.toString();
         Connection conn = DatabaseConnection.getInstance().getConnection();

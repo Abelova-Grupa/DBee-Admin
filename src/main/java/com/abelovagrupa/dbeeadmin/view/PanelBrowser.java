@@ -348,7 +348,7 @@ public class PanelBrowser implements Initializable {
 
                                     // TODO: Implement column CM
                                     edit.setOnAction(tblClick -> System.out.println("Editing..."));
-                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+                                    delete.setOnAction(tblClick -> deleteColumn(selectedColumn));
 
                                     contextMenu.getItems().addAll(edit, delete);
                                     contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
@@ -377,7 +377,7 @@ public class PanelBrowser implements Initializable {
 
                                     // TODO: Implement index CM
                                     edit.setOnAction(tblClick -> System.out.println("Editing..."));
-                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+                                    delete.setOnAction(tblClick -> deleteSelectedIndex(selectedIndex));
 
                                     contextMenu.getItems().addAll(edit, delete);
                                     contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
@@ -410,7 +410,7 @@ public class PanelBrowser implements Initializable {
 
                                     // TODO: Implement FK CM
                                     edit.setOnAction(tblClick -> System.out.println("Editing..."));
-                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+                                    delete.setOnAction(tblClick -> deleteSelectedForeignKey(selectedForeignKey));
 
                                     contextMenu.getItems().addAll(edit, delete);
                                     contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
@@ -429,6 +429,8 @@ public class PanelBrowser implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
+
 
     public TreeItem<String> loadTableTreeItem(Schema schema, String tableName) {
         TreeItem<String> tableNode = new TreeItem<>(tableName, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
@@ -597,16 +599,46 @@ public class PanelBrowser implements Initializable {
     }
 
     private void deleteSelectedTable(Table selectedTable){
-        Optional<TreeItem<String>> selectedTableNode = Optional.of(schemaHashMap.get(selectedTable.getSchema().getName()).getSecond()
-                .getTableNodesHashMap().get(selectedTable.getName()).getFirst());
         try {
+            TreeItem<String> selectedTableNode = schemaHashMap.get(selectedTable.getSchema().getName()).getSecond()
+                    .getTableNodesHashMap().get(selectedTable.getName()).getFirst();
+
             DDLGenerator.dropTable(selectedTable,false);
+            TreeItem<String> tableNodeParent = selectedTableNode.getParent();
+            tableNodeParent.getChildren().remove(selectedTableNode);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        TreeItem<String> tableParent = selectedTableNode.get().getParent();
-        tableParent.getChildren().remove(selectedTableNode.get());
+    }
 
+    private void deleteColumn(Column selectedColumn) {
+        try {
+            TreeItem<String> selectedColumnNode = schemaHashMap.get(selectedColumn.getTable().getSchema().getName()).getSecond()
+                    .getTableNodesHashMap().get(selectedColumn.getTable().getName()).getSecond().
+                    getColumnNodesHashMap().get(selectedColumn.getName());
+                DDLGenerator.dropColumn(selectedColumn.getTable(),selectedColumn,false);
+
+            TreeItem<String> columnNodeParent = selectedColumnNode.getParent();
+            columnNodeParent.getChildren().remove(selectedColumnNode);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void deleteSelectedIndex(Index selectedIndex) {
+    }
+
+    private void deleteSelectedForeignKey(ForeignKey selectedForeignKey) {
+        try {
+            TreeItem<String> selectedForeignKeyNode = schemaHashMap.get(selectedForeignKey.getReferencingTable().getSchema().getName()).getSecond()
+                    .getTableNodesHashMap().get(selectedForeignKey.getReferencingTable().getName()).getSecond().
+                    getForeignKeyNodesHashMap().get(selectedForeignKey.getName());
+            DDLGenerator.dropForeignKey(selectedForeignKey.getReferencingSchema(),selectedForeignKey.getReferencingTable(),selectedForeignKey,false);
+            TreeItem<String> foreignKeyNodeParent = selectedForeignKeyNode.getParent();
+            foreignKeyNodeParent.getChildren().remove(selectedForeignKeyNode);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void sortAndFilterSchemas(String text) {
