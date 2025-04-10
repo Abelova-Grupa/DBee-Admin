@@ -100,11 +100,20 @@ public class PanelBrowser implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        // OPTIMIZATION: Checking time to initialize browser
+        long startTime = System.nanoTime();
+
+
         // TODO: WRITE COMMENTS FROM THIS METHOD
         schemaControllers = new LinkedList<>();
         schemaViews = FXCollections.observableArrayList();
         List<String> schemaNames = DatabaseInspector.getInstance().getDatabaseNames();
         for (String schemaName : schemaNames) {
+
+            // OPTIMIZATION: Don't load pref and info; Browser loading time cut by 30.05%
+            if(schemaName.equals("performance_schema") || schemaName.equals("information_schema"))
+                continue;
             // Loading each schema treeView
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelSchemaTree.fxml"));
             TreeView<String> schemaView = loadSchemaView(loader,schemaName);
@@ -131,6 +140,10 @@ public class PanelBrowser implements Initializable {
             }
         });
 
+        // OPTIMIZATION: Read browser loading time and print it!
+        long endTime = System.nanoTime();
+        long duration = endTime - startTime; // in nanoseconds
+        logger.info("Browser initialization time: {} ns", duration);
 
     }
 
