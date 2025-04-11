@@ -232,6 +232,10 @@ public class PanelBrowser implements Initializable {
 
                 // Selecting up active schema
                 if(event.getButton().equals(MouseButton.PRIMARY)){
+                    if(contextMenu != null && contextMenu.isShowing()){
+                        contextMenu.hide();
+                        return;
+                    }
                     // Fetch schema name
                     selectedSchemaName = schemaView.getRoot().getValue();
                     // Display active schema in info panel and set in programState
@@ -241,6 +245,27 @@ public class PanelBrowser implements Initializable {
 //                    if(event.getClickCount() == 2){
 //
 //                    }
+                }
+                if(event.getButton() == MouseButton.SECONDARY) {
+                    // Fetch schema name
+                    selectedSchemaName = schemaView.getRoot().getValue();
+                    // Display active schema in info panel and set in programState
+                    Schema selectedSchema = DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName);
+                    infoController.setSelected(selectedSchema);
+                    ProgramState.getInstance().setSelectedSchema(selectedSchema);
+                    
+                    // Table context menu
+                    contextMenu = new ContextMenu();
+                    MenuItem alterSchema = new MenuItem("Alter Schema");
+                    MenuItem deleteSchema = new MenuItem("Delete Schema");
+
+//                                editTable.setOnAction(tblClick -> System.out.println("Editing table..."));
+                    deleteSchema.setOnAction(tblClick -> deleteSelectedSchema(selectedSchema));
+//                                addColumn.setOnAction(tblClick -> System.out.println("Adding column to table..."));
+//                                generateTableSQL.setOnAction(tblClick -> System.out.println("Generating SQL for table..."));
+
+                    contextMenu.getItems().addAll(alterSchema, deleteSchema);
+                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
                 }
 
                 Optional<TreeItem<String>> selectedItemOptional = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
@@ -584,6 +609,17 @@ public class PanelBrowser implements Initializable {
             );
         } catch (SQLException e) {
             logger.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void deleteSelectedSchema(Schema selectedSchema) {
+        try {
+            TreeView<String> selectedSchemaView = schemaHashMap.get(selectedSchema.getName()).getFirst();
+            DDLGenerator.dropDatabase(selectedSchema,false);
+            schemaViews.remove(selectedSchemaView);
+            vboxBrowser.getChildren().remove(selectedSchemaView);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
