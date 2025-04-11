@@ -74,6 +74,7 @@ public class PanelColumnTab implements Initializable{
         setColumnsReorderable(false);
         setColumnsResizable(false);
         setColumnsEditable(true);
+        setColumnsSortable(false);
 
         // Setting column name properties
         columnNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -158,21 +159,27 @@ public class PanelColumnTab implements Initializable{
 
     }
 
-    public void setColumnsReorderable(boolean isReorderable){
+    public void setColumnsReorderable(boolean reorderable){
         for(TableColumn<?,?> column : columnTable.getColumns()){
-            column.setReorderable(isReorderable);
+            column.setReorderable(reorderable);
         }
     }
 
-    public void setColumnsResizable(boolean isResizable){
+    public void setColumnsResizable(boolean resizable){
         for(TableColumn<?,?> column : columnTable.getColumns()){
-            column.setResizable(isResizable);
+            column.setResizable(resizable);
         }
     }
 
-    private void setColumnsEditable(boolean isEditable) {
+    private void setColumnsEditable(boolean editable) {
         for(TableColumn<?,?> column : columnTable.getColumns()){
-            column.setEditable(isEditable);
+            column.setEditable(editable);
+        }
+    }
+
+    private void setColumnsSortable(boolean sortable){
+        for(TableColumn<?,?> column: columnTable.getColumns()){
+            column.setSortable(sortable);
         }
     }
 

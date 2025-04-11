@@ -9,6 +9,7 @@ import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
+import com.abelovagrupa.dbeeadmin.model.table.DBEngine;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
@@ -33,6 +34,9 @@ public class PanelTableCreation implements Initializable {
 
     @FXML
     ComboBox<String> cbSchema;
+
+    @FXML
+    ComboBox<DBEngine> cbEngine;
 
     @FXML
     TextField txtTableName;
@@ -183,8 +187,11 @@ public class PanelTableCreation implements Initializable {
                     }
                 });
 
-        // Filling comboBox with engine values
+        // Filling comboBox with schema values
         cbSchema.getItems().addAll(DatabaseInspector.getInstance().getDatabaseNames());
+        // Filling comboBox with engine values
+        ObservableList<DBEngine> dbEngines = FXCollections.observableArrayList(DBEngine.values());
+        cbEngine.getItems().addAll(dbEngines);
     }
 
     public void handleTableChange(){
@@ -215,6 +222,11 @@ public class PanelTableCreation implements Initializable {
             AlertManager.showErrorDialog("Error","Schema was not selected",null);
             return;
         }
+        DBEngine schemaEngine = cbEngine.getSelectionModel().getSelectedItem();
+        if(schemaEngine == null){
+            AlertManager.showErrorDialog("Error","Engine was not selected",null);
+            return;
+        }
         Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
         Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
 
@@ -233,10 +245,14 @@ public class PanelTableCreation implements Initializable {
             AlertManager.showErrorDialog("Error","Table name is not valid",null);
             return;
         }
-
         String schemaName = cbSchema.getSelectionModel().getSelectedItem();
         if(schemaName == null){
             AlertManager.showErrorDialog("Error","Schema was not selected",null);
+            return;
+        }
+        DBEngine schemaEngine = cbEngine.getSelectionModel().getSelectedItem();
+        if(schemaEngine == null){
+            AlertManager.showErrorDialog("Error","Engine was not selected",null);
             return;
         }
         Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
@@ -276,11 +292,18 @@ public class PanelTableCreation implements Initializable {
             AlertManager.showErrorDialog("Error","Schema was not selected",null);
             return null;
         }
+        DBEngine schemaEngine = cbEngine.getSelectionModel().getSelectedItem();
+        if(schemaEngine == null){
+            AlertManager.showErrorDialog("Error","Engine was not selected",null);
+            return null;
+        }
+
         Schema tableSchema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
         ProgramState.getInstance().setSelectedSchema(tableSchema);
 
         Table newTable = new Table();
         newTable.setName(tableName);
+        newTable.setDbEngine(schemaEngine);
         tableSchema.getTables().add(newTable);
         newTable.setSchema(tableSchema);
         newTable.setColumns(columns);
