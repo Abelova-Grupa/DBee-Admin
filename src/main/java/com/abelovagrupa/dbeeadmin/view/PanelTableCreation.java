@@ -57,6 +57,7 @@ public class PanelTableCreation implements Initializable {
     Tab foreignKeyTab;
 
     Tab triggerTab;
+
     //Tab Controllers
     PanelColumnTab columTabController;
 
@@ -65,6 +66,7 @@ public class PanelTableCreation implements Initializable {
     PanelFKTab foreignKeyTabController;
 
     PanelTriggerTab triggerTabController;
+
     // Other controllers
     PanelBrowser browserController;
 
