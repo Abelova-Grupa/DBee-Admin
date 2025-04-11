@@ -1,6 +1,7 @@
 package com.abelovagrupa.dbeeadmin.model.index;
 
 import com.abelovagrupa.dbeeadmin.model.column.DataType;
+import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.beans.property.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class Index {
     private List<IndexedColumn> indexedColumns;
     private boolean unique;
     private String comment;
+    private Table table;
 
     // Index table properties
     private StringProperty nameProperty;
@@ -25,7 +27,7 @@ public class Index {
     public Index() {
     }
 
-    public Index(String name, IndexType type, IndexStorageType storageType, int keyBlockSize, String parser, boolean visible, List<IndexedColumn> indexedColumns, boolean unique) {
+    public Index(String name, IndexType type, IndexStorageType storageType, int keyBlockSize, String parser, boolean visible, List<IndexedColumn> indexedColumns, boolean unique,Table table) {
         this.name = name;
         this.type = type;
         this.storageType = storageType;
@@ -34,6 +36,7 @@ public class Index {
         this.visible = visible;
         this.indexedColumns = indexedColumns;
         this.unique = unique;
+        this.table = table;
     }
 
     public String getName() {
@@ -131,6 +134,14 @@ public class Index {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public Table getTable() {
+        return table;
+    }
+
+    public void setTable(Table table) {
+        this.table = table;
     }
 
     @Override

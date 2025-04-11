@@ -94,12 +94,8 @@ public class PanelBrowser implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
         // OPTIMIZATION: Checking time to initialize browser
         long startTime = System.nanoTime();
-
-
-        // TODO: WRITE COMMENTS FROM THIS METHOD
         schemaHashMap = new HashMap<>();
         schemaViews = FXCollections.observableArrayList();
         List<String> schemaNames = DatabaseInspector.getInstance().getDatabaseNames();
@@ -347,7 +343,7 @@ public class PanelBrowser implements Initializable {
 
                                     // TODO: Implement column CM
                                     edit.setOnAction(tblClick -> System.out.println("Editing..."));
-                                    delete.setOnAction(tblClick -> deleteColumn(selectedColumn));
+                                    delete.setOnAction(tblClick -> deleteSelectedColumn(selectedColumn));
 
                                     contextMenu.getItems().addAll(edit, delete);
                                     contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
@@ -425,8 +421,6 @@ public class PanelBrowser implements Initializable {
             throw new RuntimeException(e);
         }
     }
-
-
 
     public TreeItem<String> loadTableTreeItem(Schema schema, String tableName) {
         TreeItem<String> tableNode = new TreeItem<>(tableName, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
@@ -607,7 +601,7 @@ public class PanelBrowser implements Initializable {
         }
     }
 
-    private void deleteColumn(Column selectedColumn) {
+    private void deleteSelectedColumn(Column selectedColumn) {
         try {
             TreeItem<String> selectedColumnNode = schemaHashMap.get(selectedColumn.getTable().getSchema().getName()).getSecond()
                     .getTableNodesHashMap().get(selectedColumn.getTable().getName()).getSecond().
@@ -622,6 +616,17 @@ public class PanelBrowser implements Initializable {
     }
 
     private void deleteSelectedIndex(Index selectedIndex) {
+        try {
+            TreeItem<String> selectedIndexNode = schemaHashMap.get(selectedIndex.getTable().getSchema().getName()).getSecond()
+                    .getTableNodesHashMap().get(selectedIndex.getTable().getName()).getSecond().
+                    getIndexNodesHashMap().get(selectedIndex.getName());
+            DDLGenerator.dropIndex(selectedIndex.getTable().getSchema(),selectedIndex.getTable(),selectedIndex,false);
+
+            TreeItem<String> indexNodeParent = selectedIndexNode.getParent();
+            indexNodeParent.getChildren().remove(selectedIndexNode);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void deleteSelectedForeignKey(ForeignKey selectedForeignKey) {

@@ -589,7 +589,7 @@ public class DatabaseInspector {
 
 
 
-                Index index = new Index(indexName, null, storageType, keyBlockSize, null, visible, null, unique);
+                Index index = new Index(indexName, null, storageType, keyBlockSize, null, visible, null, unique,table);
                 List<IndexedColumn> indexedColumns = getIndexedColumns(schema, table, index);
                 index.setIndexedColumns(indexedColumns);
                 indexList.add(index);
@@ -637,7 +637,7 @@ public class DatabaseInspector {
 
 
 
-                index = new Index(indexName, null, storageType, keyBlockSize, null, visible, null, unique);
+                index = new Index(indexName, null, storageType, keyBlockSize, null, visible, null, unique,table);
                 List<IndexedColumn> indexedColumns = getIndexedColumns(schema, table, index);
                 index.setIndexedColumns(indexedColumns);
             }
