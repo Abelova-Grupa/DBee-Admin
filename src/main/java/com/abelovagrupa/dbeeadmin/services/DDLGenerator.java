@@ -426,6 +426,63 @@ public class DDLGenerator {
 
     }
 
+    public static void addForeignKeys(Schema schema, Table table, List<ForeignKey> foreignKeys, boolean preview) throws SQLException {
+
+        StringBuilder allStatements = new StringBuilder("ALTER TABLE ");
+        allStatements.append(schema.getName());
+        allStatements.append(".");
+        allStatements.append(table.getName());
+        allStatements.append("\n");
+
+        for(var foreignKey : foreignKeys) {
+
+            if (schema == null || schema.getName() == null || schema.getName().isEmpty())
+                throw new IllegalArgumentException("Schema is not set");
+            if (table == null || table.getName() == null || table.getName().isEmpty())
+                throw new IllegalArgumentException("Table is not set");
+            if (foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty())
+                throw new IllegalArgumentException("Foreign key is not set");
+            if (foreignKey.getReferencedColumns() == null || foreignKey.getReferencedColumns().isEmpty())
+                throw new IllegalArgumentException("Referenced columns are not set");
+            if (foreignKey.getReferencingColumns() == null || foreignKey.getReferencingColumns().isEmpty())
+                throw new IllegalArgumentException("Referencing columns are not set");
+
+            StringBuilder queryBuilder = new StringBuilder();
+
+            queryBuilder.append("ADD CONSTRAINT ").append(foreignKey.getName()).append("\n");
+            queryBuilder.append("FOREIGN KEY (");
+            for (Column referencingColumn : foreignKey.getReferencingColumns()) {
+                queryBuilder.append(referencingColumn.getName());
+                queryBuilder.append(", ");
+            }
+            queryBuilder.delete(queryBuilder.length() - 2, queryBuilder.length() - 1);
+            queryBuilder.append(")\n");
+            queryBuilder.append("REFERENCES ").append(foreignKey.getReferencedSchema().getName()).append(".").append(foreignKey.getReferencedTable().getName());
+            queryBuilder.append(" (");
+            for (Column referencedColumn : foreignKey.getReferencedColumns()) {
+                queryBuilder.append(referencedColumn.getName());
+                queryBuilder.append(", ");
+            }
+            queryBuilder.delete(queryBuilder.length() - 2, queryBuilder.length() - 1);
+            queryBuilder.append(")\n");
+            queryBuilder.append("ON DELETE ").append(foreignKey.getOnDeleteAction().toString().replace("_", " ")).append("\n");
+            queryBuilder.append("ON UPDATE ").append(foreignKey.getOnUpdateAction().toString().replace("_", " "));
+            queryBuilder.append(",\n");
+
+            allStatements.append(queryBuilder);
+        }
+
+        allStatements.setLength(allStatements.length() - 2);
+        allStatements.append(";");
+
+        String query = allStatements.toString();
+
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
+
+    }
+
     public static void renameForeignKey(Schema schema, Table table, ForeignKey foreignKey, String newName, boolean preview) throws SQLException{
         if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
         if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
@@ -594,7 +651,11 @@ public class DDLGenerator {
         // Cut the last comma
         allStatements.setLength(allStatements.length() - 2);
         allStatements.append(';');
-        System.out.println(allStatements.toString());
+
+        String query = allStatements.toString();
+        if(preview)
+            new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
+        else executeUpdate(query);
     }
 
     public static void renameIndex(Schema schema, Table table, Index index, String newName, boolean preview) throws SQLException {
