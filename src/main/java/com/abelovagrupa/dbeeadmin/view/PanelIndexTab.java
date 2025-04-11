@@ -84,6 +84,7 @@ public class PanelIndexTab implements Initializable {
         setColumnsResizable(false);
         setColumnsReorderable(false);
         setColumnsEditable(true);
+        setColumnsSortable(false);
 
         // Setting up properties for columns name column of index table
         indexNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -290,6 +291,15 @@ public class PanelIndexTab implements Initializable {
 
         for(TableColumn<?,?> column : indexColumnTable.getColumns()){
             column.setResizable(resizable);
+        }
+    }
+
+    private void setColumnsSortable(boolean sortable){
+        for(TableColumn<?,?> indexColumns: indexTable.getColumns()){
+            indexColumns.setSortable(sortable);
+        }
+        for(TableColumn<?,?> indexedColumnsColumns : indexColumnTable.getColumns()){
+            indexedColumnsColumns.setSortable(sortable);
         }
     }
 

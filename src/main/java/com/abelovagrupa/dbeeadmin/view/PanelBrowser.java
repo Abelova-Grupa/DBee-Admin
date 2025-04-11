@@ -137,7 +137,6 @@ public class PanelBrowser implements Initializable {
         long endTime = System.nanoTime();
         long duration = endTime - startTime; // in nanoseconds
         logger.info("Browser initialization time: {} ns", duration);
-        System.out.println(schemaHashMap);
     }
 
     public TreeView<String> loadSchemaView(FXMLLoader loader, String schemaName) {
@@ -401,9 +400,6 @@ public class PanelBrowser implements Initializable {
                                         contextMenu.hide();
                                 }
                                 if(event.getButton() == MouseButton.SECONDARY) {
-
-
-
                                     contextMenu = new ContextMenu();
                                     MenuItem edit = new MenuItem("Edit foreign key");
                                     MenuItem delete = new MenuItem("Delete foreign key");

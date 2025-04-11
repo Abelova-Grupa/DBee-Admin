@@ -88,6 +88,7 @@ public class PanelFKTab implements Initializable {
         setColumnsWidth();
         setColumnsReorderable(false);
         setColumnsResizable(false);
+        setColumnsSortable(false);
 
         // Setting up properties for foreign key name column of fk table
         fkNameTableColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -242,22 +243,31 @@ public class PanelFKTab implements Initializable {
         fkReferencedColumnTableColumn.prefWidthProperty().bind(foreignKeyColumnsTableWidthProperty.multiply(0.625));
     }
 
-    public void setColumnsReorderable(boolean isReorderable){
+    public void setColumnsReorderable(boolean reorderable){
         for(TableColumn<?,?> column : foreignKeyTable.getColumns()){
-            column.setReorderable(isReorderable);
+            column.setReorderable(reorderable);
         }
         for(TableColumn<?,?> column : foreignKeyColumnsTable.getColumns()){
-            column.setReorderable(isReorderable);
+            column.setReorderable(reorderable);
         }
     }
 
-    public void setColumnsResizable(boolean isResizable){
+    public void setColumnsResizable(boolean resizable){
         for(TableColumn<?,?> column : foreignKeyTable.getColumns()){
-            column.setResizable(isResizable);
+            column.setResizable(resizable);
         }
 
         for(TableColumn<?,?> column : foreignKeyColumnsTable.getColumns()){
-            column.setResizable(isResizable);
+            column.setResizable(resizable);
+        }
+    }
+
+    private void setColumnsSortable(boolean sortable){
+        for(TableColumn<?,?> foreignKeyColumns: foreignKeyTable.getColumns()){
+            foreignKeyColumns.setSortable(sortable);
+        }
+        for(TableColumn<?,?> foreignKeyColumnsColumn : foreignKeyColumnsTable.getColumns()){
+            foreignKeyColumnsColumn.setSortable(sortable);
         }
     }
 

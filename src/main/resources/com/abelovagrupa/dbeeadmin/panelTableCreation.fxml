@@ -15,18 +15,18 @@
 <BorderPane  xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.abelovagrupa.dbeeadmin.view.PanelTableCreation">
    <top>
       <HBox alignment="CENTER_LEFT" spacing="6.0" BorderPane.alignment="TOP_CENTER">
-         <children>
-            <Label text="Table name:" />
-            <TextField fx:id="txtTableName" prefHeight="26.0" prefWidth="204.0" />
-            <Label text="Schema:" />
-            <ComboBox fx:id="cbSchema" prefWidth="200.0" />
-         </children>
          <opaqueInsets>
-            <Insets />
+            <Insets/>
          </opaqueInsets>
          <padding>
-            <Insets bottom="12.0" left="6.0" top="12.0" />
+            <Insets bottom="12.0" left="6.0" top="12.0"/>
          </padding>
+         <Label text="Table name:"/>
+         <TextField fx:id="txtTableName" prefHeight="26.0" prefWidth="204.0"/>
+         <Label text="Schema:"/>
+         <ComboBox fx:id="cbSchema" prefWidth="200.0"/>
+         <Label text="Engine: "/>
+         <ComboBox fx:id="cbEngine" prefWidth="200.0"/>
       </HBox>
    </top>
 
@@ -42,18 +42,16 @@
    </center>
    <bottom>
       <HBox alignment="CENTER_RIGHT">
-         <children>
-            <Button text="Apply" fx:id="applyBtn" onAction="#handleTableChange">
-               <HBox.margin>
-                  <Insets right="10" top="10" bottom="10"/>
-               </HBox.margin>
-            </Button>
-            <Button text="Revert" fx:id="revertBtn">
-               <HBox.margin>
-                  <Insets right="10" top="10" bottom="10"/>
-               </HBox.margin>
-            </Button>
-         </children>
+         <Button text="Apply" fx:id="applyBtn" onAction="#handleTableChange">
+            <HBox.margin>
+               <Insets right="10" top="10" bottom="10"/>
+            </HBox.margin>
+         </Button>
+         <Button text="Revert" fx:id="revertBtn">
+            <HBox.margin>
+               <Insets right="10" top="10" bottom="10"/>
+            </HBox.margin>
+         </Button>
       </HBox>
    </bottom>
 </BorderPane>
