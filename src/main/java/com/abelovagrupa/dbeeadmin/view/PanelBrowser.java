@@ -7,6 +7,7 @@ import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
+import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
 import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
@@ -434,6 +435,33 @@ public class PanelBrowser implements Initializable {
                             }
 
                         }
+                        if (selectedItem.getParent().getValue().equals("Triggers")) {
+                            String triggerName = selectedItem.getValue();
+                            Table table = DatabaseInspector.getInstance().getTableByName(schema, selectedItem.getParent().getParent().getValue());
+                            Trigger selectedTrigger = DatabaseInspector.getInstance().getTriggerByName(table, triggerName);
+                            if(selectedTrigger != null) {
+                                infoController.setSelected(selectedTrigger);
+
+                                // Context menu
+                                if(event.getButton() == MouseButton.PRIMARY){
+                                    if(contextMenu != null && contextMenu.isShowing())
+                                        contextMenu.hide();
+                                }
+                                if(event.getButton() == MouseButton.SECONDARY) {
+                                    contextMenu = new ContextMenu();
+                                    MenuItem edit = new MenuItem("Edit trigger");
+                                    MenuItem delete = new MenuItem("Delete trigger");
+
+                                    // TODO: Implement Trigger CM
+                                    edit.setOnAction(tblClick -> System.out.println("Editing..."));
+                                    delete.setOnAction(tblClick -> System.out.println("Deleting..."));
+
+                                    contextMenu.getItems().addAll(edit, delete);
+                                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                }
+                            }
+
+                        }
                     } catch (NullPointerException e) {
                         logger.warn("No parent value for selected item...");
                     }
@@ -589,9 +617,54 @@ public class PanelBrowser implements Initializable {
         foreignKeyBranch.expandedProperty().addListener(foreignKeyListener);
 
         // Not implemented yet
+
         TreeItem<String> triggersBranch = new TreeItem<>("Triggers", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/triggers.png")).toExternalForm())));
+        TreeItem<String> triggerDummy = new TreeItem<>("Loading triggers...");
+        triggersBranch.getChildren().add(triggerDummy);
+
+        // Create change listener to trigger list
+        ChangeListener<Boolean> triggerListener = new ChangeListener<>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    Task<List<TreeItem<String>>> loadTriggersTask = new Task<>() {
+                        @Override
+                        protected List<TreeItem<String>> call() {
+                            Table table = DatabaseInspector.getInstance().getTableByName(schema, tableName);
+                            List<Trigger> triggers = DatabaseInspector.getInstance().getTriggers(table);
+
+                            List<TreeItem<String>> triggerNodes = new ArrayList<>();
+                            for (Trigger trigger : triggers) {
+                                TreeItem<String> triggerNode = new TreeItem<>(trigger.getName());
+                                triggerNodes.add(triggerNode);
+                                schemaHashMap.get(schema.getName()).getSecond()
+                                    .getTableNodesHashMap().get(tableName).getSecond()
+                                    .getTriggerNodesHashMap()
+                                    .put(trigger.getName(), triggerNode);
+                            }
+                            return triggerNodes;
+                        }
+                    };
+
+                    loadTriggersTask.setOnSucceeded(event -> {
+                        triggersBranch.getChildren().setAll(loadTriggersTask.getValue());
+                        triggersBranch.expandedProperty().removeListener(this);
+                    });
+
+                    loadTriggersTask.setOnFailed(event -> {
+                        logger.error(loadTriggersTask.getException().getMessage());
+                    });
+
+                    new Thread(loadTriggersTask).start();
+                }
+            }
+        };
+
+        triggersBranch.expandedProperty().addListener(triggerListener);
+
 
         tableNode.getChildren().addAll(columnBranch, indexBranch, foreignKeyBranch, triggersBranch);
+
         return tableNode;
     }
 
