@@ -9,6 +9,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class DialogSQLPreview extends Dialog<Boolean> {
     @FXML
@@ -62,7 +63,7 @@ public class DialogSQLPreview extends Dialog<Boolean> {
             return null;
         });
 
-        // Setup the code area
+        // Set up the code area
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
         codeArea.textProperty().addListener((_, _, newText) -> {
             codeArea.setStyleSpans(0, SyntaxHighlighter.computeHighlighting(newText));
@@ -72,7 +73,7 @@ public class DialogSQLPreview extends Dialog<Boolean> {
         this.setTitle("SQL Preview");
         this.setSqlPreviewContent(sql);
         this.getDialogPane().setMinWidth(500);
-        this.getDialogPane().getScene().getStylesheets().add(Main.class.getResource("styles.css").toExternalForm());
+        this.getDialogPane().getScene().getStylesheets().add(Objects.requireNonNull(Main.class.getResource("styles.css")).toExternalForm());
 
     }
 

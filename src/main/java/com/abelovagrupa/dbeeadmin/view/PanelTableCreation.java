@@ -14,6 +14,8 @@ import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
+import com.abelovagrupa.dbeeadmin.util.DiffResult;
+import com.abelovagrupa.dbeeadmin.util.ListDiff;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -27,7 +29,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class PanelTableCreation implements Initializable {
@@ -196,12 +197,13 @@ public class PanelTableCreation implements Initializable {
         cbEngine.getItems().addAll(dbEngines);
     }
 
+    // TODO: Refactor current handler code
     public void handleTableChange(){
         // Recognise which tab is currently selected
         if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(columnsTab)){
             // Creating the table if it doesn't exist
-            List<Column> tableColumns = columTabController.getTableColumns();
-            Table createdTable = createTable(tableColumns);
+            List<Column> commitedColumns = handleColumnChange();
+            Table createdTable = createTable(commitedColumns);
         }
         else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(indexTab)){
             List<Index> tableIndexes = indexTabController.getTableIndexes();
@@ -336,6 +338,49 @@ public class PanelTableCreation implements Initializable {
             throw new RuntimeException(e);
         }
         return newTable;
+    }
+
+    private List<Column> handleColumnChange(){
+        List<Column> tableColumns = columTabController.getTableColumns();
+        DiffResult<Column> columnsDiff = ListDiff.compareLists(columTabController.commitedColumnData,tableColumns,Column.columnAttributeComparator);
+        dropTableColumns(columnsDiff);
+        addTableColumns(columnsDiff);
+        changeTableColumnsAttributes(columnsDiff);
+        columTabController.commitedColumnData = List.copyOf(columTabController.columnsData);
+        return columTabController.commitedColumnData;
+    }
+
+    private void dropTableColumns(DiffResult<Column> columnsDiff){
+        if(columnsDiff.removed.isEmpty()) return;
+        for(Column column : columnsDiff.removed){
+            try {
+                DDLGenerator.dropColumn(column.getTable(),column,false);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void addTableColumns(DiffResult<Column> columnsDiff){
+        if(columnsDiff.added.isEmpty()) return;
+        for(Column column : columnsDiff.added){
+            try {
+                DDLGenerator.addColumn(column.getTable(),column,false);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void changeTableColumnsAttributes(DiffResult<Column> columnsDiff){
+        if(columnsDiff.changedAttributes.isEmpty()) return;
+        for(Column column : columnsDiff.changedAttributes.keySet()){
+            try {
+                DDLGenerator.modifyColumn(column.getTable(),column,false);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 //    public void createTable() {

@@ -4,8 +4,10 @@ import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.beans.property.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
 public class Index {
 
@@ -187,4 +189,42 @@ public class Index {
         result = 31 * result + Boolean.hashCode(isUnique());
         return result;
     }
+
+    public static BiFunction<Index, Index, HashMap<String, Object[]>> indexAttributeComparator = (i1, i2) -> {
+        HashMap<String, Object[]> diffs = new HashMap<>();
+
+        if (!Objects.equals(i1.getName(), i2.getName())) {
+            diffs.put("name", new Object[]{i1.getName(), i2.getName()});
+        }
+        if (!Objects.equals(i1.getType(), i2.getType())) {
+            diffs.put("type", new Object[]{i1.getType(), i2.getType()});
+        }
+        if (!Objects.equals(i1.getStorageType(), i2.getStorageType())) {
+            diffs.put("storageType", new Object[]{i1.getStorageType(), i2.getStorageType()});
+        }
+        if (i1.getKeyBlockSize() != i2.getKeyBlockSize()) {
+            diffs.put("keyBlockSize", new Object[]{i1.getKeyBlockSize(), i2.getKeyBlockSize()});
+        }
+        if (!Objects.equals(i1.getParser(), i2.getParser())) {
+            diffs.put("parser", new Object[]{i1.getParser(), i2.getParser()});
+        }
+        if (i1.isVisible() != i2.isVisible()) {
+            diffs.put("visible", new Object[]{i1.isVisible(), i2.isVisible()});
+        }
+        if (!Objects.equals(i1.getIndexedColumns(), i2.getIndexedColumns())) {
+            diffs.put("indexedColumns", new Object[]{i1.getIndexedColumns(), i2.getIndexedColumns()});
+        }
+        if (i1.isUnique() != i2.isUnique()) {
+            diffs.put("unique", new Object[]{i1.isUnique(), i2.isUnique()});
+        }
+        if (!Objects.equals(i1.getComment(), i2.getComment())) {
+            diffs.put("comment", new Object[]{i1.getComment(), i2.getComment()});
+        }
+        if (!Objects.equals(i1.getTable(), i2.getTable())) {
+            diffs.put("table", new Object[]{i1.getTable(), i2.getTable()});
+        }
+
+        return diffs;
+    };
+
 }

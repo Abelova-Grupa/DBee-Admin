@@ -102,7 +102,6 @@ public class DDLGenerator {
         //Table does not need to have a primary key column
 //        if(!hasprimaryKey) throw new IllegalArgumentException("Table must contain a primary key.");
 
-
         // Create query builder (because we don't want a new string in each iteration of a for loop)
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("CREATE TABLE IF NOT EXISTS ");
@@ -563,9 +562,7 @@ public class DDLGenerator {
         Comparator<IndexedColumn> indexComparator = new Comparator<IndexedColumn>() {
             @Override
             public int compare(IndexedColumn o1, IndexedColumn o2) {
-                if (o1.getOrderNumber() == o2.getOrderNumber()) return 0;
-                else if (o1.getOrderNumber() < o2.getOrderNumber()) return -1;
-                else return 1;
+                return Integer.compare(o1.getOrderNumber(), o2.getOrderNumber());
             }
         };
 
