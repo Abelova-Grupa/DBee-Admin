@@ -12,7 +12,7 @@ public class PanelTableTree {
 
     HashMap<String, TreeItem<String>> foreignKeyNodesHashMap;
 
-    HashMap<String, TreeItem<String>> triggerKeyNodesHashMap;
+    HashMap<String, TreeItem<String>> triggerNodesHashMap;
 
     public PanelTableTree() {
     }
@@ -47,11 +47,13 @@ public class PanelTableTree {
         this.foreignKeyNodesHashMap = foreignKeyNodesHashMap;
     }
 
-    public HashMap<String, TreeItem<String>> getTriggerKeyNodesHashMap() {
-        return triggerKeyNodesHashMap;
+    public HashMap<String, TreeItem<String>> getTriggerNodesHashMap() {
+        if(triggerNodesHashMap == null)
+            triggerNodesHashMap = new HashMap<>();
+        return triggerNodesHashMap;
     }
 
-    public void setTriggerKeyNodesHashMap(HashMap<String, TreeItem<String>> triggerKeyNodesHashMap) {
-        this.triggerKeyNodesHashMap = triggerKeyNodesHashMap;
+    public void setTriggerNodesHashMap(HashMap<String, TreeItem<String>> triggerKeyNodesHashMap) {
+        this.triggerNodesHashMap = triggerKeyNodesHashMap;
     }
 }

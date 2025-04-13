@@ -225,7 +225,14 @@ public class PanelInfoNew implements Initializable {
 
     }
 
-    public void setSelected(Trigger trigger) {}
+    public void setSelected(Trigger trigger) {
+        clearInfo();
+        addProperty("Trigger:", trigger.getName(), true);
+        addProperty("Timing:", trigger.getTiming().toString(), false);
+        addProperty("Event:", trigger.getEvent().toString(), false);
+        addProperty("Created at:", trigger.getCreatedAt().toString(), false);
+        addProperty("Definer:", trigger.getDefiner(), false);
+    }
 
     public void setSelected(View view) {
         clearInfo();

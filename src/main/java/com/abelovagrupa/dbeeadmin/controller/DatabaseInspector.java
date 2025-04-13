@@ -22,6 +22,8 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class DatabaseInspector {
@@ -530,8 +532,114 @@ public class DatabaseInspector {
     }
 
     public List<Trigger> getTriggers(Table table) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        List<Trigger> triggers = new ArrayList<>();
+        String schemaName = table.getSchema().getName();
+        String tableName = table.getName();
+
+        String sql = "SELECT TRIGGER_NAME, EVENT_MANIPULATION, ACTION_TIMING, " +
+            "ACTION_STATEMENT, CREATED, DEFINER " +
+            "FROM INFORMATION_SCHEMA.TRIGGERS " +
+            "WHERE TRIGGER_SCHEMA = ? AND EVENT_OBJECT_TABLE = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, schemaName);
+            stmt.setString(2, tableName);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String name = rs.getString("TRIGGER_NAME");
+                    String eventStr = rs.getString("EVENT_MANIPULATION");
+                    String timingStr = rs.getString("ACTION_TIMING");
+                    String statement = rs.getString("ACTION_STATEMENT");
+                    Timestamp createdTs = rs.getTimestamp("CREATED");
+                    String definer = rs.getString("DEFINER");
+
+                    // Convert SQL timestamp to LocalDateTime
+                    LocalDateTime createdAt = createdTs != null ? createdTs.toLocalDateTime() : null;
+
+                    // Assume triggers are enabled by default (MySQL < 8.0.22 doesn't expose this)
+                    boolean isEnabled = true;
+
+                    // Map string to enum safely
+                    Event event = Event.valueOf(eventStr.toUpperCase());
+                    Timing timing = Timing.valueOf(timingStr.toUpperCase());
+
+                    Trigger trigger = new Trigger(
+                        name,
+                        event,
+                        timing,
+                        table,
+                        statement,      // as description
+                        createdAt,
+                        isEnabled,
+                        definer,
+                        statement
+                    );
+
+                    triggers.add(trigger);
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Failed to load triggers for table: {}", (Object) e.getStackTrace());
+        }
+
+        return triggers;
     }
+
+    public Trigger getTriggerByName(Table table, String triggerName) {
+        String schemaName = table.getSchema().getName();
+        String tableName = table.getName();
+
+        String sql = "SELECT TRIGGER_NAME, EVENT_MANIPULATION, ACTION_TIMING, " +
+            "ACTION_STATEMENT, CREATED, DEFINER " +
+            "FROM INFORMATION_SCHEMA.TRIGGERS " +
+            "WHERE TRIGGER_SCHEMA = ? AND EVENT_OBJECT_TABLE = ? AND TRIGGER_NAME = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, schemaName);
+            stmt.setString(2, tableName);
+            stmt.setString(3, triggerName);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String name = rs.getString("TRIGGER_NAME");
+                    String eventStr = rs.getString("EVENT_MANIPULATION");
+                    String timingStr = rs.getString("ACTION_TIMING");
+                    String statement = rs.getString("ACTION_STATEMENT");
+                    Timestamp createdTs = rs.getTimestamp("CREATED");
+                    String definer = rs.getString("DEFINER");
+
+                    // Convert SQL timestamp to LocalDateTime
+                    LocalDateTime createdAt = createdTs != null ? createdTs.toLocalDateTime() : null;
+
+                    // Assume triggers are enabled by default (MySQL < 8.0.22 doesn't expose this)
+                    boolean isEnabled = true;
+
+                    // Map string to enum safely
+                    Event event = Event.valueOf(eventStr.toUpperCase());
+                    Timing timing = Timing.valueOf(timingStr.toUpperCase());
+
+                    return new Trigger(
+                        name,
+                        event,
+                        timing,
+                        table,
+                        statement,      // as description
+                        createdAt,
+                        isEnabled,
+                        definer,
+                        statement
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Failed to find trigger: {}", (Object) e.getStackTrace());
+        }
+        return null;
+    }
+
+
+
 
     public float getDatabaseSize(String databaseName){
 
