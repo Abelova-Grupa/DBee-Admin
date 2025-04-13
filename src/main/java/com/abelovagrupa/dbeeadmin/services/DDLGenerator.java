@@ -387,6 +387,47 @@ public class DDLGenerator {
         else executeUpdate(query);
     }
 
+    /**
+     * Generates foreign key SQL string in the following form:<br>
+     * <code>fk_name FOREIGN KEY(cols) REFERENCES refSchema.refTable(refCols)
+     * ON DELETE action
+     * ON UPDATE action</code><br>
+     * Add 'ADD CONSTRAINT' and end statement with ',' or ';' where needed.
+     * @param foreignKey foreign key to be converted to sql
+     * @return SQL string
+     */
+    public static String convertForeignKeyToSQL(ForeignKey foreignKey) {
+        StringBuilder queryBuilder = new StringBuilder(foreignKey.getName());
+
+        queryBuilder.append(" ").append("FOREIGN KEY (");
+        for (Column referencingColumn : foreignKey.getReferencingColumns()) {
+            queryBuilder.append(referencingColumn.getName()).append(", ");
+        }
+        queryBuilder.delete(queryBuilder.length() - 2, queryBuilder.length()); // remove trailing comma
+        queryBuilder.append(")\n");
+
+        queryBuilder.append("REFERENCES ")
+            .append(foreignKey.getReferencedSchema().getName())
+            .append(".")
+            .append(foreignKey.getReferencedTable().getName())
+            .append(" (");
+        for (Column referencedColumn : foreignKey.getReferencedColumns()) {
+            queryBuilder.append(referencedColumn.getName()).append(", ");
+        }
+        queryBuilder.delete(queryBuilder.length() - 2, queryBuilder.length()); // remove trailing comma
+        queryBuilder.append(")\n");
+
+        queryBuilder.append("ON DELETE ")
+            .append(foreignKey.getOnDeleteAction().toString().replace("_", " "))
+            .append("\n");
+
+        queryBuilder.append("ON UPDATE ")
+            .append(foreignKey.getOnUpdateAction().toString().replace("_", " "));
+
+        return queryBuilder.toString();
+    }
+
+
     public static void addForeignKey(Schema schema, Table table, ForeignKey foreignKey, boolean preview) throws SQLException{
         if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
         if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
