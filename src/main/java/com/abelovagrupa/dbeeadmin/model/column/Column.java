@@ -3,7 +3,9 @@ package com.abelovagrupa.dbeeadmin.model.column;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.beans.property.*;
 
+import java.util.HashMap;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
 public class Column {
 
@@ -312,10 +314,6 @@ public class Column {
         this.comment = comment;
     }
 
-
-
-
-
     @Override
     public String toString() {
         // Avoiding stackoverflow from circular dependency
@@ -446,5 +444,53 @@ public class Column {
             return new Column(this);
         }
     }
+
+    public static BiFunction<Column,Column, HashMap<String,Object[]>> columnAttributeComparator = (c1, c2) -> {
+        HashMap<String,Object[]> diffs = new HashMap<>();
+        if (!Objects.equals(c1.getName(), c2.getName())) {
+            diffs.put("name", new Object[]{c1.getName(), c2.getName()});
+        }
+        if (c1.isPrimaryKey() != c2.isPrimaryKey()) {
+            diffs.put("primaryKey", new Object[]{c1.isPrimaryKey(), c2.isPrimaryKey()});
+        }
+        if (c1.isNotNull() != c2.isNotNull()) {
+            diffs.put("notNull", new Object[]{c1.isNotNull(), c2.isNotNull()});
+        }
+        if (c1.isUnique() != c2.isUnique()) {
+            diffs.put("unique", new Object[]{c1.isUnique(), c2.isUnique()});
+        }
+        if (c1.isBinary() != c2.isBinary()) {
+            diffs.put("binary", new Object[]{c1.isBinary(), c2.isBinary()});
+        }
+        if (c1.isUnsigned() != c2.isUnsigned()) {
+            diffs.put("unsigned", new Object[]{c1.isUnsigned(), c2.isUnsigned()});
+        }
+        if (c1.isZeroFill() != c2.isZeroFill()) {
+            diffs.put("zeroFill", new Object[]{c1.isZeroFill(), c2.isZeroFill()});
+        }
+        if (c1.isAutoIncrement() != c2.isAutoIncrement()) {
+            diffs.put("autoIncrement", new Object[]{c1.isAutoIncrement(), c2.isAutoIncrement()});
+        }
+        if (!Objects.equals(c1.getSize(), c2.getSize())) {
+            diffs.put("size", new Object[]{c1.getSize(), c2.getSize()});
+        }
+        if (c1.isGenerationExpression() != c2.isGenerationExpression()) {
+            diffs.put("generationExpression", new Object[]{c1.isGenerationExpression(), c2.isGenerationExpression()});
+        }
+        if (!Objects.equals(c1.getDefaultValue(), c2.getDefaultValue())) {
+            diffs.put("defaultValue", new Object[]{c1.getDefaultValue(), c2.getDefaultValue()});
+        }
+        if (!Objects.equals(c1.getComment(), c2.getComment())) {
+            diffs.put("comment", new Object[]{c1.getComment(), c2.getComment()});
+        }
+        if (!Objects.equals(c1.getType(), c2.getType())) {
+            diffs.put("type", new Object[]{c1.getType(), c2.getType()});
+        }
+        if (!Objects.equals(c1.getTable(), c2.getTable())) {
+            diffs.put("table", new Object[]{c1.getTable(), c2.getTable()});
+        }
+
+        return diffs;
+    };
 
 }

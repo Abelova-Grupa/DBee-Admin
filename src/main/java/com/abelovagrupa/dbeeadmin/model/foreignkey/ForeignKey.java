@@ -7,9 +7,11 @@ import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
 public class ForeignKey {
     private String name;
@@ -208,4 +210,45 @@ public class ForeignKey {
     public int hashCode() {
         return Objects.hash(name, referencingSchema, referencingTable, referencedSchema, referencedTable, onDeleteAction, onUpdateAction, comment, columnPairs, referencingColumns, referencedColumns);
     }
+
+    public static BiFunction<ForeignKey, ForeignKey, HashMap<String, Object[]>> foreignKeyAttributeComparator = (fk1, fk2) -> {
+        HashMap<String, Object[]> diffs = new HashMap<>();
+
+        if (!Objects.equals(fk1.getName(), fk2.getName())) {
+            diffs.put("name", new Object[]{fk1.getName(), fk2.getName()});
+        }
+        if (!Objects.equals(fk1.getReferencingSchema(), fk2.getReferencingSchema())) {
+            diffs.put("referencingSchema", new Object[]{fk1.getReferencingSchema(), fk2.getReferencingSchema()});
+        }
+        if (!Objects.equals(fk1.getReferencingTable(), fk2.getReferencingTable())) {
+            diffs.put("referencingTable", new Object[]{fk1.getReferencingTable(), fk2.getReferencingTable()});
+        }
+        if (!Objects.equals(fk1.getReferencedSchema(), fk2.getReferencedSchema())) {
+            diffs.put("referencedSchema", new Object[]{fk1.getReferencedSchema(), fk2.getReferencedSchema()});
+        }
+        if (!Objects.equals(fk1.getReferencedTable(), fk2.getReferencedTable())) {
+            diffs.put("referencedTable", new Object[]{fk1.getReferencedTable(), fk2.getReferencedTable()});
+        }
+        if (!Objects.equals(fk1.getOnDeleteAction(), fk2.getOnDeleteAction())) {
+            diffs.put("onDeleteAction", new Object[]{fk1.getOnDeleteAction(), fk2.getOnDeleteAction()});
+        }
+        if (!Objects.equals(fk1.getOnUpdateAction(), fk2.getOnUpdateAction())) {
+            diffs.put("onUpdateAction", new Object[]{fk1.getOnUpdateAction(), fk2.getOnUpdateAction()});
+        }
+        if (!Objects.equals(fk1.getComment(), fk2.getComment())) {
+            diffs.put("comment", new Object[]{fk1.getComment(), fk2.getComment()});
+        }
+        if (!Objects.equals(fk1.getColumnPairs(), fk2.getColumnPairs())) {
+            diffs.put("columnPairs", new Object[]{fk1.getColumnPairs(), fk2.getColumnPairs()});
+        }
+        if (!Objects.equals(fk1.getReferencingColumns(), fk2.getReferencingColumns())) {
+            diffs.put("referencingColumns", new Object[]{fk1.getReferencingColumns(), fk2.getReferencingColumns()});
+        }
+        if (!Objects.equals(fk1.getReferencedColumns(), fk2.getReferencedColumns())) {
+            diffs.put("referencedColumns", new Object[]{fk1.getReferencedColumns(), fk2.getReferencedColumns()});
+        }
+
+        return diffs;
+    };
+
 }
