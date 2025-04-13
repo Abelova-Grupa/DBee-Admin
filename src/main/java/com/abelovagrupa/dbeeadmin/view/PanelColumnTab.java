@@ -19,6 +19,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -58,7 +59,9 @@ public class PanelColumnTab implements Initializable{
     @FXML
     TableColumn<Column,String> columnDefaultColumn;
 
-    ObservableList<Column> columnsData = FXCollections.observableArrayList(new Column());
+    List<Column> commitedColumnData = new LinkedList<>();
+    // oldColumnData is a list that has values that cannot be changed
+    ObservableList<Column> columnsData = FXCollections.observableArrayList(commitedColumnData);
 
     // Controllers
     PanelIndexTab indexTabController;
@@ -66,6 +69,7 @@ public class PanelColumnTab implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Setting up table properties
+        columnsData.add(new Column());
         columnTable.setEditable(true);
         columnTable.setItems(columnsData);
 
@@ -139,8 +143,6 @@ public class PanelColumnTab implements Initializable{
         });
 
     }
-
-
 
     public void setColumnsWidth(){
         // Current solution is to set columns widths to all sum up to 1 - table width
@@ -412,8 +414,9 @@ public class PanelColumnTab implements Initializable{
     }
 
     public List<Column> getTableColumns(){
-        columnsData.removeIf(this::emptyProperties);
-        return columnsData;
+        List<Column> tableColumns = new ArrayList<>(columnsData);
+        tableColumns.removeIf(this::emptyProperties);
+        return tableColumns;
     }
 
     public boolean emptyProperties(Column column){

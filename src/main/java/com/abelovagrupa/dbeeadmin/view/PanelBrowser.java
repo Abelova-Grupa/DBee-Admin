@@ -144,12 +144,12 @@ public class PanelBrowser implements Initializable {
             schemaHashMap.put(schemaName,Pair.of(schemaView,new PanelSchemaTree()));
 
             // Creating a root node with its first children tables, views, stored procedures and functions
-            TreeItem<String> schemaNode = new TreeItem<>(schemaName, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database.png").toExternalForm())));
+            TreeItem<String> schemaNode = new TreeItem<>(schemaName, new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database.png")).toExternalForm())));
             schemaView.setRoot(schemaNode);
-            TreeItem<String> tableBranch = new TreeItem<>("Tables", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));
-            TreeItem<String> viewBranch = new TreeItem<>("Views", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));
-            TreeItem<String> procedureBranch = new TreeItem<>("Stored Procedures", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));
-            TreeItem<String> functionBranch = new TreeItem<>("Functions", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png").toExternalForm())));
+            TreeItem<String> tableBranch = new TreeItem<>("Tables", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png")).toExternalForm())));
+            TreeItem<String> viewBranch = new TreeItem<>("Views", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png")).toExternalForm())));
+            TreeItem<String> procedureBranch = new TreeItem<>("Stored Procedures", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png")).toExternalForm())));
+            TreeItem<String> functionBranch = new TreeItem<>("Functions", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-management.png")).toExternalForm())));
 
             // Creating an initial tableDummy so that the tableBranch can be expandable
             TreeItem<String> tableDummyNode = new TreeItem<>("Dummy table");
@@ -182,7 +182,7 @@ public class PanelBrowser implements Initializable {
                             List<TreeItem<String>> viewItems = new ArrayList<>();
                             for (String viewName : viewNames) {
                                 ImageView icon = new ImageView(
-                                    new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/view.png").toExternalForm())
+                                    new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/view.png")).toExternalForm())
                                 );
                                 viewItems.add(new TreeItem<>(viewName, icon));
                             }
@@ -229,7 +229,6 @@ public class PanelBrowser implements Initializable {
 
             // TODO: REFACTOR
             schemaView.setOnMouseClicked(event -> {
-
                 // Selecting up active schema
                 if(event.getButton().equals(MouseButton.PRIMARY)){
                     if(contextMenu != null && contextMenu.isShowing()){
@@ -440,7 +439,6 @@ public class PanelBrowser implements Initializable {
                     }
                 }
             });
-
             return schemaView;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -448,8 +446,8 @@ public class PanelBrowser implements Initializable {
     }
 
     public TreeItem<String> loadTableTreeItem(Schema schema, String tableName) {
-        TreeItem<String> tableNode = new TreeItem<>(tableName, new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png").toExternalForm())));
-        TreeItem<String> columnBranch = new TreeItem<>("Columns", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png").toExternalForm())));
+        TreeItem<String> tableNode = new TreeItem<>(tableName, new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png")).toExternalForm())));
+        TreeItem<String> columnBranch = new TreeItem<>("Columns", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png")).toExternalForm())));
         TreeItem<String> columnDummy = new TreeItem<>("Loading columns...");
         columnBranch.getChildren().add(columnDummy);
 
@@ -479,7 +477,6 @@ public class PanelBrowser implements Initializable {
                                         .getTableNodesHashMap().get(tableName).getSecond()
                                         .getColumnNodesHashMap().put(columnName,columnNode);
                             }
-
                             return columnNodes;
                         }
                     };
@@ -495,7 +492,6 @@ public class PanelBrowser implements Initializable {
                         Throwable error = loadColumnsTask.getException();
                         logger.error(error.getMessage());
                     });
-
                     new Thread(loadColumnsTask).start();
                 }
             }
@@ -503,7 +499,7 @@ public class PanelBrowser implements Initializable {
         columnBranch.expandedProperty().addListener(columnBranchListener);
 
         // Adding index branch with dummy child
-        TreeItem<String> indexBranch = new TreeItem<>("Indexes", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/indexes.png").toExternalForm())));
+        TreeItem<String> indexBranch = new TreeItem<>("Indexes", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/indexes.png")).toExternalForm())));
         TreeItem<String> indexDummy = new TreeItem<>("Loading indexes...");
         indexBranch.getChildren().add(indexDummy);
 
@@ -527,7 +523,6 @@ public class PanelBrowser implements Initializable {
                                         getTableNodesHashMap().get(tableName).getSecond().
                                         getIndexNodesHashMap().put(index.getName(),indexNode);
                             }
-
                             return indexNodes;
                         }
                     };
@@ -551,7 +546,7 @@ public class PanelBrowser implements Initializable {
         indexBranch.expandedProperty().addListener(indexBranchListener);
 
         // Adding foreign key branch with dummy child
-        TreeItem<String> foreignKeyBranch = new TreeItem<>("Foreign Keys", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/foreignkeys.png").toExternalForm())));
+        TreeItem<String> foreignKeyBranch = new TreeItem<>("Foreign Keys", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/foreignkeys.png")).toExternalForm())));
         TreeItem<String> foreignKeyDummy = new TreeItem<>("Loading foreign keys...");
         foreignKeyBranch.getChildren().add(foreignKeyDummy);
 
@@ -594,7 +589,7 @@ public class PanelBrowser implements Initializable {
         foreignKeyBranch.expandedProperty().addListener(foreignKeyListener);
 
         // Not implemented yet
-        TreeItem<String> triggersBranch = new TreeItem<>("Triggers", new ImageView(new Image(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/triggers.png").toExternalForm())));
+        TreeItem<String> triggersBranch = new TreeItem<>("Triggers", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/triggers.png")).toExternalForm())));
 
         tableNode.getChildren().addAll(columnBranch, indexBranch, foreignKeyBranch, triggersBranch);
         return tableNode;
@@ -699,16 +694,12 @@ public class PanelBrowser implements Initializable {
             public int compare(TreeView<String> o1, TreeView<String> o2) {
                 String firstSchemaName = o1.getRoot().getValue();
                 String secondSchemaName = o2.getRoot().getValue();
-                if(searchCharacterCount(firstSchemaName,text) > searchCharacterCount(secondSchemaName,text)){
-                    return -1;
-                }else if (searchCharacterCount(firstSchemaName,text) < searchCharacterCount(secondSchemaName,text)){
-                    return 1;
-                }else return 0;
+                return Integer.compare(searchCharacterCount(secondSchemaName, text), searchCharacterCount(firstSchemaName, text));
             }
         };
         // Sorting tree views
         ObservableList<TreeView<String>> sortedSchemaViews = schemaViews;
-        FXCollections.sort(sortedSchemaViews, comparator::compare);
+        FXCollections.sort(sortedSchemaViews, comparator);
 
         //Filtering tree views
         for (TreeView<String> schemaView : sortedSchemaViews){
