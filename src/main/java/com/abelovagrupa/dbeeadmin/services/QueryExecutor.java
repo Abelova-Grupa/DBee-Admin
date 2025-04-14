@@ -3,6 +3,7 @@ package com.abelovagrupa.dbeeadmin.services;
 import com.abelovagrupa.dbeeadmin.connection.DatabaseConnection;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.util.Pair;
+import com.abelovagrupa.dbeeadmin.view.DialogSQLPreview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -108,6 +109,35 @@ public class QueryExecutor {
         }
         DatabaseConnection.getInstance().setCurrentSchema(null);
         return Pair.of(resultSet, rowsAffected);
+
+    }
+
+    public static void executeQuery(String query, boolean preview){
+        DatabaseConnection.getInstance().setCurrentSchema(ProgramState.getInstance().getSelectedSchema());
+        Connection connection;
+
+        try {
+            connection = DatabaseConnection.getInstance().getConnection();
+            Statement statement = connection.createStatement();
+
+            if(preview)
+                // Show dialog window and execute query
+                new DialogSQLPreview(query).showAndWait().ifPresent(b -> {if(b) {
+                    try {
+                        statement.execute(query);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                });
+            else {
+                // just execute query
+                statement.execute(query);
+            }
+        } catch (SQLException e) {
+            logger.error("Error executing SQL query: {}", e.getMessage());
+            AlertManager.showErrorDialog(null, "Error executing SQL query:", e.getMessage());
+        }
 
     }
 
