@@ -6,6 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,6 +24,8 @@ public class PanelEditor implements Initializable {
 
     @FXML
     TabPane editorTabs;
+
+    public static final Logger logger = LogManager.getRootLogger();
 
     public PanelMain getMainController() {
         return mainController;
@@ -49,17 +53,17 @@ public class PanelEditor implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Really fucked up solution, the first ScriptController is instaciated as a field, resultController
-        // needs to be linked with linkControllers method in mainController after loading all controllers
-        // this is the solution i have at the moment
-        // TODO: Think about this controller logic again
         try {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelScript.fxml"));
-        Tab scriptTab = loader.load();
-        setScriptController(loader.getController());
-        scriptController.setEditorController(this);
-        editorTabs.getTabs().add(scriptTab);
-        editorTabs.getSelectionModel().select(scriptTab);
+            long startTime = System.nanoTime();
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelScript.fxml"));
+            Tab scriptTab = loader.load();
+            setScriptController(loader.getController());
+            scriptController.setEditorController(this);
+            editorTabs.getTabs().add(scriptTab);
+            editorTabs.getSelectionModel().select(scriptTab);
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            logger.info("Editor initialization time: {} ns", duration);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
