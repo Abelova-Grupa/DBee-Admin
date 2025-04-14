@@ -16,6 +16,8 @@ import com.abelovagrupa.dbeeadmin.model.view.Algorithm;
 import com.abelovagrupa.dbeeadmin.model.view.View;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.view.DialogSQLPreview;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,6 +31,8 @@ import java.util.List;
  * to the database.
  */
 public class DDLGenerator {
+
+    public static final Logger logger = LogManager.getRootLogger();
 
     //MySql documentation: CREATE SCHEMA is a synonym for CREATE DATABASE as of MySQL 5.0.2.
 
@@ -286,7 +290,6 @@ public class DDLGenerator {
             new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
         else executeUpdate(query);
     }
-
     /**
      * Table alteration: Drops a column from the table.
      * @param table Table that is being altered.
@@ -385,6 +388,47 @@ public class DDLGenerator {
             new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
         else executeUpdate(query);
     }
+
+    /**
+     * Generates foreign key SQL string in the following form:<br>
+     * <code>fk_name FOREIGN KEY(cols) REFERENCES refSchema.refTable(refCols)
+     * ON DELETE action
+     * ON UPDATE action</code><br>
+     * Add 'ADD CONSTRAINT' and end statement with ',' or ';' where needed.
+     * @param foreignKey foreign key to be converted to sql
+     * @return SQL string
+     */
+    public static String convertForeignKeyToSQL(ForeignKey foreignKey) {
+        StringBuilder queryBuilder = new StringBuilder(foreignKey.getName());
+
+        queryBuilder.append(" ").append("FOREIGN KEY (");
+        for (Column referencingColumn : foreignKey.getReferencingColumns()) {
+            queryBuilder.append(referencingColumn.getName()).append(", ");
+        }
+        queryBuilder.delete(queryBuilder.length() - 2, queryBuilder.length()); // remove trailing comma
+        queryBuilder.append(")\n");
+
+        queryBuilder.append("REFERENCES ")
+            .append(foreignKey.getReferencedSchema().getName())
+            .append(".")
+            .append(foreignKey.getReferencedTable().getName())
+            .append(" (");
+        for (Column referencedColumn : foreignKey.getReferencedColumns()) {
+            queryBuilder.append(referencedColumn.getName()).append(", ");
+        }
+        queryBuilder.delete(queryBuilder.length() - 2, queryBuilder.length()); // remove trailing comma
+        queryBuilder.append(")\n");
+
+        queryBuilder.append("ON DELETE ")
+            .append(foreignKey.getOnDeleteAction().toString().replace("_", " "))
+            .append("\n");
+
+        queryBuilder.append("ON UPDATE ")
+            .append(foreignKey.getOnUpdateAction().toString().replace("_", " "));
+
+        return queryBuilder.toString();
+    }
+
 
     public static void addForeignKey(Schema schema, Table table, ForeignKey foreignKey, boolean preview) throws SQLException{
         if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
@@ -546,6 +590,66 @@ public class DDLGenerator {
 
         dropForeignKey(schema,table,oldForeignKey, false);
         addForeignKey(schema,table,newForeignKey, false);
+    }
+
+
+    /**
+     * Generates index SQL string in the following form:<br>
+     * <code>[UNIQUE] INDEX user_idx USING BTREE (cols)
+     * KEY_BLOCK_SIZE = 69 VISIBLE COMMENT 'Comment text';</code><br>
+     * Add 'ALTER TABLE ... ADD' and end statement with ',' or ';' where needed.
+     * @param index index to be converted to SQL.
+     * @return SQL in the form written above
+     */
+    public static String convertIndexToSQL(Index index) {
+        StringBuilder queryBuilder = new StringBuilder();
+
+        // Optional index type (e.g., FULLTEXT, UNIQUE), skip if just "INDEX"
+        try {
+            if (!index.getType().equals(IndexType.INDEX)) {
+                queryBuilder.append(index.getType()).append(" ");
+            }
+        } catch (NullPointerException e) {
+            logger.error("IndexType of {} is null; Default value set.", index.getName());
+        }
+
+
+        queryBuilder.append("INDEX ").append(index.getName())
+            .append(" USING ").append(index.getStorageType()).append(" (");
+        // Sort indexed columns by order number
+        List<IndexedColumn> sortedIndexedColumns = new ArrayList<>(index.getIndexedColumns());
+        sortedIndexedColumns.sort(Comparator.comparingInt(IndexedColumn::getOrderNumber));
+
+        for (int i = 0; i < sortedIndexedColumns.size(); i++) {
+            IndexedColumn indexedColumn = sortedIndexedColumns.get(i);
+            queryBuilder.append(indexedColumn.getColumn().getName());
+            if (indexedColumn.getLength() != 0) {
+                queryBuilder.append("(").append(indexedColumn.getLength()).append(")");
+            }
+            if (i < sortedIndexedColumns.size() - 1) {
+                queryBuilder.append(", ");
+            }
+        }
+
+        queryBuilder.append(")");
+
+        if (index.getKeyBlockSize() != 0) {
+            queryBuilder.append(" KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize());
+        }
+
+        if (index.getParser() != null && !index.getParser().isEmpty()) {
+            queryBuilder.append(" WITH PARSER ").append(index.getParser());
+        }
+
+        queryBuilder.append(index.isVisible() ? " VISIBLE" : " INVISIBLE");
+
+        if (index.getComment() != null && !index.getComment().isEmpty()) {
+            queryBuilder.append(" COMMENT '").append(index.getComment()).append("'");
+        }
+
+        queryBuilder.append(";");
+
+        return queryBuilder.toString();
     }
 
     public static void addIndex(Schema schema, Table table, Index index, boolean preview) throws SQLException {
