@@ -21,6 +21,8 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -59,15 +61,21 @@ public class PanelMain implements Initializable {
     @FXML
     Button btnNewTable;
 
+    public static final Logger logger = LogManager.getRootLogger();
+
     // TODO: Fix format issues with HelpPanel(Vbox)
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        long startTime = System.nanoTime();
         loadBrowser();
         loadInfo();
         loadEditor();
         loadResults();
         loadHelp();
         linkControllers();
+        long endTime = System.nanoTime();
+        long duration = endTime - startTime;
+        logger.info("Application initialization time: {} ns", duration);
     }
 
     public PanelBrowser getBrowserController() {
