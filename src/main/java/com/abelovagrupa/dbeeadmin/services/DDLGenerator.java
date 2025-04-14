@@ -16,6 +16,8 @@ import com.abelovagrupa.dbeeadmin.model.view.Algorithm;
 import com.abelovagrupa.dbeeadmin.model.view.View;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.view.DialogSQLPreview;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,6 +31,8 @@ import java.util.List;
  * to the database.
  */
 public class DDLGenerator {
+
+    public static final Logger logger = LogManager.getRootLogger();
 
     //MySql documentation: CREATE SCHEMA is a synonym for CREATE DATABASE as of MySQL 5.0.2.
 
@@ -287,7 +291,6 @@ public class DDLGenerator {
             new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
         else executeUpdate(query);
     }
-
     /**
      * Table alteration: Drops a column from the table.
      * @param table Table that is being altered.
