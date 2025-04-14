@@ -590,6 +590,66 @@ public class DDLGenerator {
         addForeignKey(schema,table,newForeignKey, false);
     }
 
+
+    /**
+     * Generates index SQL string in the following form:<br>
+     * <code>[UNIQUE] INDEX user_idx USING BTREE (cols)
+     * KEY_BLOCK_SIZE = 69 VISIBLE COMMENT 'Comment text';</code><br>
+     * Add 'ALTER TABLE ... ADD' and end statement with ',' or ';' where needed.
+     * @param index index to be converted to SQL.
+     * @return SQL in the form written above
+     */
+    public static String convertIndexToSQL(Index index) {
+        StringBuilder queryBuilder = new StringBuilder();
+
+        // Optional index type (e.g., FULLTEXT, UNIQUE), skip if just "INDEX"
+        try {
+            if (!index.getType().equals(IndexType.INDEX)) {
+                queryBuilder.append(index.getType()).append(" ");
+            }
+        } catch (NullPointerException e) {
+            logger.error("IndexType of {} is null; Default value set.", index.getName());
+        }
+
+
+        queryBuilder.append("INDEX ").append(index.getName())
+            .append(" USING ").append(index.getStorageType()).append(" (");
+        // Sort indexed columns by order number
+        List<IndexedColumn> sortedIndexedColumns = new ArrayList<>(index.getIndexedColumns());
+        sortedIndexedColumns.sort(Comparator.comparingInt(IndexedColumn::getOrderNumber));
+
+        for (int i = 0; i < sortedIndexedColumns.size(); i++) {
+            IndexedColumn indexedColumn = sortedIndexedColumns.get(i);
+            queryBuilder.append(indexedColumn.getColumn().getName());
+            if (indexedColumn.getLength() != 0) {
+                queryBuilder.append("(").append(indexedColumn.getLength()).append(")");
+            }
+            if (i < sortedIndexedColumns.size() - 1) {
+                queryBuilder.append(", ");
+            }
+        }
+
+        queryBuilder.append(")");
+
+        if (index.getKeyBlockSize() != 0) {
+            queryBuilder.append(" KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize());
+        }
+
+        if (index.getParser() != null && !index.getParser().isEmpty()) {
+            queryBuilder.append(" WITH PARSER ").append(index.getParser());
+        }
+
+        queryBuilder.append(index.isVisible() ? " VISIBLE" : " INVISIBLE");
+
+        if (index.getComment() != null && !index.getComment().isEmpty()) {
+            queryBuilder.append(" COMMENT '").append(index.getComment()).append("'");
+        }
+
+        queryBuilder.append(";");
+
+        return queryBuilder.toString();
+    }
+
     public static void addIndex(Schema schema, Table table, Index index, boolean preview) throws SQLException {
         if(schema == null ) throw new IllegalArgumentException("Schema is not set");
         if(table == null) throw new IllegalArgumentException("Table is not set");
