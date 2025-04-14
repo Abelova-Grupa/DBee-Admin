@@ -87,6 +87,347 @@ public class DDLGenerator {
      * @throws SQLException on SQL error.
      * @throws IllegalArgumentException if schema does not have a name, schema and at least one column set.
      */
+
+    public static String createTableCreationQuery(Table table){
+        if(table.getSchema() == null) throw new IllegalArgumentException("Schema is not set.");
+        if(table.getName() == null) throw new IllegalArgumentException("Undefined table name.");
+        if(table.getColumns() == null || table.getColumns().isEmpty())
+            throw new IllegalArgumentException("Table must have at least one column.");
+
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("CREATE TABLE IF NOT EXISTS ");
+        queryBuilder.append(table.getSchema().getName());
+        queryBuilder.append('.');
+        queryBuilder.append(table.getName());
+
+        for(Column c : table.getColumns()) {
+            queryBuilder.append(convertColumnToSQL(c));
+        }
+
+        // TODO: Engine
+        queryBuilder.setLength(queryBuilder.length() - 2); // Cut trailing comma and enter
+        queryBuilder.append("\n);");
+
+        return queryBuilder.toString();
+
+    }
+
+    public static String createSchemaDropQuery(Schema schema){
+        if(schema.getName().isEmpty() || schema.getName() == null)
+            throw new IllegalArgumentException("Schema name is not set!");
+        // Build
+        return "DROP DATABASE IF EXISTS " + schema.getName() + " ;";
+    }
+
+    public static String createTableDropQuery(Table table){
+        if(table.getName().isEmpty() || table.getName() == null)
+            throw new IllegalArgumentException("Table name is not set!");
+        if(table.getSchema() == null)
+            throw new IllegalArgumentException("Schema is not set!");
+        if(table.getSchema().getName().isEmpty() || table.getSchema().getName() == null)
+            throw new IllegalArgumentException("Schema name is not set!");
+
+        // Build
+        return "DROP TABLE IF EXISTS " + table.getSchema().getName() + "." + table.getName() + " ;";
+    }
+
+    public static String createTableTruncateQuery(Table table){
+        // Validate
+        if(table.getName().isEmpty() || table.getName() == null)
+            throw new IllegalArgumentException("Table name is not set!");
+
+        // Build
+        return "TRUNCATE TABLE " + table.getName() + " ;";
+    }
+
+    public static String createColumnAdditionQuery(Column column){
+        // Validate
+        if(column.getName().isEmpty() || column.getName() == null)
+            throw new IllegalArgumentException("Column name is not set!");
+        if(column.getTable().getName().isEmpty() || column.getTable().getName() == null)
+            throw new IllegalArgumentException("Table name is not set!");
+        if(column.getTable().getSchema() == null)
+            throw new IllegalArgumentException("Schema is not set!");
+        if(column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
+            throw new IllegalArgumentException("Schema name is not set!");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(column.getTable().getSchema().getName());
+        queryBuilder.append(".");
+        queryBuilder.append(column.getTable().getName());
+        queryBuilder.append("ADD COLUMN \n");
+
+        queryBuilder.append(convertColumnToSQL(column));
+        queryBuilder.setLength(queryBuilder.length() - 1);
+
+        return queryBuilder.toString();
+    }
+
+    public static String createColumnDropQuery(Column column){
+        // Validate
+        if(column.getName().isEmpty() || column.getName() == null)
+            throw new IllegalArgumentException("Column name is not set!");
+        if(column.getTable().getName().isEmpty() || column.getTable().getName() == null)
+            throw new IllegalArgumentException("Table name is not set!");
+        if(column.getTable().getSchema() == null)
+            throw new IllegalArgumentException("Schema is not set!");
+        if(column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
+            throw new IllegalArgumentException("Schema name is not set!");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(column.getTable().getSchema().getName());
+        queryBuilder.append(".");
+        queryBuilder.append(column.getTable().getName());
+        queryBuilder.append(" DROP COLUMN ");
+        queryBuilder.append(column.getName());
+
+        return queryBuilder.toString();
+    }
+
+    public static String createColumnRenameQuery(Column column, String newName){
+        // Validate
+        if(column.getName().isEmpty() || column.getName() == null)
+            throw new IllegalArgumentException("Column name is not set!");
+        if(column.getTable().getName().isEmpty() || column.getTable().getName() == null)
+            throw new IllegalArgumentException("Table name is not set!");
+        if(column.getTable().getSchema() == null)
+            throw new IllegalArgumentException("Schema is not set!");
+        if(column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
+            throw new IllegalArgumentException("Schema name is not set!");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(column.getTable().getSchema().getName());
+        queryBuilder.append(".");
+        queryBuilder.append(column.getTable().getName());
+        queryBuilder.append("RENAME COLUMN ");
+        queryBuilder.append(column.getName());
+        queryBuilder.append(" TO ");
+        queryBuilder.append(newName);
+
+        return queryBuilder.toString();
+    }
+
+    public static String createColumnAlterQuery(Column column){
+        // Validate
+        if(column.getName().isEmpty() || column.getName() == null)
+            throw new IllegalArgumentException("Column name is not set!");
+        if(column.getTable().getName().isEmpty() || column.getTable().getName() == null)
+            throw new IllegalArgumentException("Table name is not set!");
+        if(column.getTable().getSchema() == null)
+            throw new IllegalArgumentException("Schema is not set!");
+        if(column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
+            throw new IllegalArgumentException("Schema name is not set!");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(column.getTable().getSchema().getName());
+        queryBuilder.append(".");
+        queryBuilder.append(column.getTable().getName());
+        queryBuilder.append("MODIFY COLUMN \n");
+
+        queryBuilder.append(convertColumnToSQL(column));
+        queryBuilder.setLength(queryBuilder.length() - 1);
+
+        return queryBuilder.toString();
+    }
+
+    public static String createForeignKeyCreationQuery(ForeignKey foreignKey){
+        if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
+        if(foreignKey.getReferencingTable() == null) throw new IllegalArgumentException("Referencing table is not set");
+        if(foreignKey.getReferencingSchema() == null) throw new IllegalArgumentException("Referencing schema is not set");
+        Table table = foreignKey.getReferencingTable();
+        Schema schema = foreignKey.getReferencingSchema();
+        if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
+        if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
+        if(foreignKey.getReferencedColumns() == null || foreignKey.getReferencedColumns().isEmpty()) throw new IllegalArgumentException("Referenced columns are not set");
+        if(foreignKey.getReferencingColumns() == null || foreignKey.getReferencingColumns().isEmpty()) throw new IllegalArgumentException("Referencing columns are not set");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(schema.getName());
+        queryBuilder.append(".");
+        queryBuilder.append(table.getName());
+        queryBuilder.append("\n");
+        queryBuilder.append("ADD CONSTRAINT ").append(foreignKey.getName()).append("\n");
+        queryBuilder.append("FOREIGN KEY (");
+        for (Column referencingColumn : foreignKey.getReferencingColumns()){
+            queryBuilder.append(referencingColumn.getName());
+            queryBuilder.append(", ");
+        }
+        queryBuilder.delete(queryBuilder.length() - 2,queryBuilder.length() -1);
+        queryBuilder.append(")\n");
+        queryBuilder.append("REFERENCES ").append(foreignKey.getReferencedSchema().getName()).append(".").append(foreignKey.getReferencedTable().getName());
+        queryBuilder.append(" (");
+        for (Column referencedColumn : foreignKey.getReferencedColumns()){
+            queryBuilder.append(referencedColumn.getName());
+            queryBuilder.append(", ");
+        }
+        queryBuilder.delete(queryBuilder.length() - 2,queryBuilder.length() -1);
+        queryBuilder.append(")\n");
+        queryBuilder.append("ON DELETE ").append(foreignKey.getOnDeleteAction().toString().replace("_"," ")).append("\n");
+        queryBuilder.append("ON UPDATE ").append(foreignKey.getOnUpdateAction().toString().replace("_"," "));
+        queryBuilder.append(";");
+
+        return queryBuilder.toString();
+    }
+
+    public static String createForeignKeyDropQuery(ForeignKey foreignKey){
+        if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
+        Schema schema = foreignKey.getReferencingSchema();
+        Table table = foreignKey.getReferencingTable();
+        if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
+        if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
+        queryBuilder.append(" DROP FOREIGN KEY ").append(foreignKey.getName()).append(";");
+
+        return queryBuilder.toString();
+    }
+
+    public static String createForeignKeyRenameQuery(ForeignKey foreignKey, String newName){
+        if(foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty()) throw new IllegalArgumentException("Foreign key is not set");
+        if(foreignKey.getReferencedColumns() == null || foreignKey.getReferencedColumns().isEmpty()) throw new IllegalArgumentException("Referenced columns are not set");
+        if(foreignKey.getReferencingColumns() == null || foreignKey.getReferencingColumns().isEmpty()) throw new IllegalArgumentException("Referencing columns are not set");
+        Schema schema = foreignKey.getReferencingSchema();
+        Table table = foreignKey.getReferencedTable();
+        if(schema == null || schema.getName() == null || schema.getName().isEmpty()) throw new IllegalArgumentException("Schema is not set");
+        if(table == null || table.getName() == null || table.getName().isEmpty()) throw new IllegalArgumentException("Table is not set");
+
+
+        StringBuilder dropQueryBuilder = new StringBuilder("ALTER TABLE ");
+        dropQueryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
+        dropQueryBuilder.append("DROP FOREIGN KEY ").append(foreignKey.getName()).append(";").append("\n");
+
+//        String query = dropQueryBuilder.toString();
+//        Connection conn = DatabaseConnection.getInstance().getConnection();
+//        Statement st = conn.createStatement();
+//        st.addBatch(query);
+
+        StringBuilder newQueryBuilder = new StringBuilder("ALTER TABLE ");
+        newQueryBuilder.append(schema.getName()).append(".").append(table.getName()).append("\n");
+        newQueryBuilder.append("ADD CONSTRAINT ").append(newName).append("\n");
+        newQueryBuilder.append("FOREIGN KEY (");
+        for (Column referencingColumn : foreignKey.getReferencingColumns()){
+            newQueryBuilder.append(referencingColumn.getName());
+            newQueryBuilder.append(", ");
+        }
+        newQueryBuilder.append(")\n");
+        newQueryBuilder.append("REFERENCES ").append(foreignKey.getReferencedSchema()).append(".").append(foreignKey.getReferencedTable());
+        newQueryBuilder.append(" (");
+        for (Column referencedColumn : foreignKey.getReferencedColumns()){
+            newQueryBuilder.append(referencedColumn.getName());
+            newQueryBuilder.append(", ");
+        }
+        newQueryBuilder.append(");");
+
+        return dropQueryBuilder.toString() + newQueryBuilder.toString() + " ;";
+    }
+
+    public static String createForeignKeyAlterQuery(ForeignKey oldForeignKey, ForeignKey newForeignKey){
+        return createForeignKeyDropQuery(oldForeignKey) + "\n" + createForeignKeyCreationQuery(newForeignKey);
+    }
+
+    public static String createIndexCreationQuery(Index index){
+        if(index == null) throw new IllegalArgumentException("Index is not set");
+        if(index.getTable().getSchema() == null ) throw new IllegalArgumentException("Schema is not set");
+        if(index.getTable() == null) throw new IllegalArgumentException("Table is not set");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(index.getTable().getSchema().getName()).append(".").append(index.getTable().getName()).append("\n");
+        queryBuilder.append("ADD ").append(
+                !index.getType().equals(IndexType.INDEX) ? index.getType() + " " : " "
+        ).append("INDEX ").append(index.getName()).append(" USING ").append(index.getStorageType()).append(" (");
+
+        Comparator<IndexedColumn> indexComparator = new Comparator<IndexedColumn>() {
+            @Override
+            public int compare(IndexedColumn o1, IndexedColumn o2) {
+                return Integer.compare(o1.getOrderNumber(), o2.getOrderNumber());
+            }
+        };
+
+        List<IndexedColumn> sortedIndexedColumns = index.getIndexedColumns();
+        sortedIndexedColumns.sort(indexComparator);
+//        System.out.println(sortedIndexedColumns);
+
+        for(int i = 0; i < sortedIndexedColumns.size(); i++) {
+            IndexedColumn indexedColumn = sortedIndexedColumns.get(i);
+            queryBuilder.append(indexedColumn.getColumn().getName());
+            if(indexedColumn.getLength() != 0) queryBuilder.append("(").append(indexedColumn.getLength()).append(")");
+            if(i != sortedIndexedColumns.size() - 1) queryBuilder.append(", ");
+        }
+
+        queryBuilder.append(")\n ");
+        if(index.getKeyBlockSize() != 0) queryBuilder.append("KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize()).append(" ");
+        if(index.getParser() != null && !index.getParser().isEmpty()) queryBuilder.append(" WITH PARSER ").append(index.getParser()).append(" ");
+        queryBuilder.append(index.isVisible() ? "VISIBLE " : "INVISIBLE ");
+        if(index.getComment() != null && !index.getComment().isEmpty()) queryBuilder.append("\nCOMMENT ").append("'").append(index.getComment()).append("';");
+        else queryBuilder.append(";");
+
+        return queryBuilder.toString();
+    }
+
+    public static String createIndexRenameQuery(Index index, String newName){
+        if(index == null) throw new IllegalArgumentException("Index is not set");
+        if(index.getTable().getSchema() == null ) throw new IllegalArgumentException("Schema is not set");
+        if(index.getTable() == null) throw new IllegalArgumentException("Table is not set");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+        queryBuilder.append(index.getTable().getSchema().getName()).append(index.getTable().getName()).append(" ");
+        queryBuilder.append("RENAME INDEX ").append(index.getName()).append(" TO ").append(newName).append(";");
+
+        return queryBuilder.toString();
+    }
+
+    public static String createIndexDropQuery(Index index){
+        if(index == null) throw new IllegalArgumentException("Index is not set");
+        if(index.getTable() == null) throw new IllegalArgumentException("Table is not set");
+        if(index.getTable().getSchema() == null ) throw new IllegalArgumentException("Schema is not set");
+
+        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ").append(index.getTable().getSchema().getName())
+                .append(".").append(index.getTable().getName()).append("\n");
+        queryBuilder.append("DROP INDEX ").append(index.getName());
+
+        return queryBuilder.toString();
+    }
+
+    public static String createIndexAlterQuery(Index oldIndex, Index newIndex){
+        return createIndexDropQuery(oldIndex) + "\n" + createIndexCreationQuery(newIndex);
+    }
+
+    public static String createTriggerCreationQuery(Trigger trigger){
+        if(trigger == null) throw new IllegalArgumentException("Trigger is not set");
+        if(trigger.getTable() == null) throw new IllegalArgumentException("Table is not set");
+        if(trigger.getTable().getSchema() == null ) throw new IllegalArgumentException("Schema is not set");
+
+        StringBuilder queryBuilder = new StringBuilder("CREATE TRIGGER ");
+        queryBuilder.append(trigger.getName()).append(" ");
+        queryBuilder.append(trigger.getTiming()).append(" ");
+        queryBuilder.append(trigger.getEvent()).append(" ON ");
+        queryBuilder.append(trigger.getTable().getName());
+        queryBuilder.append(" FOR EACH ROW ");
+        queryBuilder.append(trigger.getStatement());
+        queryBuilder.append(";");
+        return queryBuilder.toString();
+    }
+
+    public static String createTriggerDropQuery(Trigger trigger){
+        if (trigger == null) throw new IllegalArgumentException("Trigger is not set");
+
+        return "DROP TRIGGER IF EXISTS " + trigger.getTable().getSchema().getName() + "." + trigger.getName() + ";";
+    }
+
+    public static String createViewCreationQuery(View view,Algorithm algorithm){
+        StringBuilder queryBuilder = new StringBuilder("CREATE\n\tALGORITHM = ");
+        queryBuilder.append(algorithm.name()).append("\n");
+        queryBuilder.append("VIEW ")
+                .append(view.getSchema().getName())
+                .append(".")
+                .append(view.getName())
+                .append(" AS\n");
+        queryBuilder.append(view.getDefinition()).append(";");
+
+        return queryBuilder.toString();
+    }
+
     public static void createTable(Table table, boolean preview) throws SQLException {
 
         // Validate
@@ -122,7 +463,6 @@ public class DDLGenerator {
         queryBuilder.setLength(queryBuilder.length() - 2); // Cut trailing comma and enter
         queryBuilder.append("\n);");
         String query = queryBuilder.toString();
-//        System.out.println(query);
 
         if(preview)
             new DialogSQLPreview(query).showAndWait().ifPresent( b -> {if(b) executeUpdate(query);});
