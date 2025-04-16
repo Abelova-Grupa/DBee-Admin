@@ -3,14 +3,31 @@ package com.abelovagrupa.dbeeadmin.services;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
 import com.abelovagrupa.dbeeadmin.model.view.Algorithm;
 import com.abelovagrupa.dbeeadmin.model.view.View;
 
+import java.sql.SQLException;
+
 public class QueryProcessor {
 
     private static QueryProcessor instance;
+
+    public static void createSchema(Schema schema, boolean preview) {
+        try {
+            String query =  DDLGenerator.createDatabase(schema);
+            QueryExecutor.executeQuery(query,preview);
+        } catch (SQLException e) {
+            // Impl
+        }
+    }
+
+    public static void dropSchema(Schema schema, boolean preview) throws SQLException {
+        String query = DDLGenerator.dropDatabase(schema);
+        QueryExecutor.executeQuery(query, preview);
+    }
 
     public static void createTable(Table table, boolean preview){
         String query = DDLGenerator.createTableCreationQuery(table);

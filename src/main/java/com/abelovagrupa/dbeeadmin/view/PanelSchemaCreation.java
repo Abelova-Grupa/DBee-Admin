@@ -6,7 +6,8 @@ import com.abelovagrupa.dbeeadmin.model.schema.Charset;
 import com.abelovagrupa.dbeeadmin.model.schema.Collation;
 
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
-import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
+
+import com.abelovagrupa.dbeeadmin.services.QueryProcessor;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -359,17 +360,12 @@ public class PanelSchemaCreation implements Initializable {
         Charset charset = cbCharset.getSelectionModel().getSelectedItem();
         Collation collation = cbCollation.getSelectionModel().getSelectedItem();
 
-        try {
-            DDLGenerator.createDatabase(new Schema(schemaName,charset,collation,null,0,0L),true);
+            QueryProcessor.createSchema(new Schema(schemaName,charset,collation,null,0,0L),true);
             AlertManager.showConfirmationDialog("Success","Schema created",null);
             Schema createdSchema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelSchemaTree.fxml"));
             TreeView<String> schemaView = browserController.loadSchemaView(loader,schemaName);
             browserController.vboxBrowser.getChildren().add(schemaView);
-
-        } catch (SQLException e) {
-            AlertManager.showErrorDialog("Error","Exception while creating schema",e.toString());
-        }
 
     }
 }

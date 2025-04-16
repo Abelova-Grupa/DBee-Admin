@@ -8,9 +8,9 @@ import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
-import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
 import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
+import com.abelovagrupa.dbeeadmin.services.QueryProcessor;
 import com.abelovagrupa.dbeeadmin.util.Pair;
 import com.abelovagrupa.dbeeadmin.view.schemaview.PanelSchemaTree;
 import com.abelovagrupa.dbeeadmin.view.schemaview.PanelTableTree;
@@ -314,6 +314,10 @@ public class PanelBrowser implements Initializable {
 
                                 contextMenu.getItems().addAll(viewTable, editTable, deleteTable, addColumn, generateTableSQL);
                                 contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                            }
+
+                            if (getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem, viewBranch))) {
+
                             }
 
 
@@ -682,68 +686,55 @@ public class PanelBrowser implements Initializable {
     }
 
     private void deleteSelectedSchema(Schema selectedSchema) {
+        TreeView<String> selectedSchemaView = schemaHashMap.get(selectedSchema.getName()).getFirst();
+        // TODO: Drop here
         try {
-            TreeView<String> selectedSchemaView = schemaHashMap.get(selectedSchema.getName()).getFirst();
-            DDLGenerator.dropDatabase(selectedSchema,false);
-            schemaViews.remove(selectedSchemaView);
-            vboxBrowser.getChildren().remove(selectedSchemaView);
+            QueryProcessor.dropSchema(selectedSchema, true);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        schemaViews.remove(selectedSchemaView);
+        vboxBrowser.getChildren().remove(selectedSchemaView);
+
     }
 
     private void deleteSelectedTable(Table selectedTable){
-        try {
             TreeItem<String> selectedTableNode = schemaHashMap.get(selectedTable.getSchema().getName()).getSecond()
                     .getTableNodesHashMap().get(selectedTable.getName()).getFirst();
 
-            DDLGenerator.dropTable(selectedTable,false);
+            QueryProcessor.dropTable(selectedTable,false);
             TreeItem<String> tableNodeParent = selectedTableNode.getParent();
             tableNodeParent.getChildren().remove(selectedTableNode);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     private void deleteSelectedColumn(Column selectedColumn) {
-        try {
             TreeItem<String> selectedColumnNode = schemaHashMap.get(selectedColumn.getTable().getSchema().getName()).getSecond()
                     .getTableNodesHashMap().get(selectedColumn.getTable().getName()).getSecond().
                     getColumnNodesHashMap().get(selectedColumn.getName());
-                DDLGenerator.dropColumn(selectedColumn.getTable(),selectedColumn,false);
+                QueryProcessor.dropColumn(selectedColumn,false);
 
             TreeItem<String> columnNodeParent = selectedColumnNode.getParent();
             columnNodeParent.getChildren().remove(selectedColumnNode);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void deleteSelectedIndex(Index selectedIndex) {
-        try {
             TreeItem<String> selectedIndexNode = schemaHashMap.get(selectedIndex.getTable().getSchema().getName()).getSecond()
                     .getTableNodesHashMap().get(selectedIndex.getTable().getName()).getSecond().
                     getIndexNodesHashMap().get(selectedIndex.getName());
-            DDLGenerator.dropIndex(selectedIndex.getTable().getSchema(),selectedIndex.getTable(),selectedIndex,false);
+            QueryProcessor.dropIndex(selectedIndex,false);
 
             TreeItem<String> indexNodeParent = selectedIndexNode.getParent();
             indexNodeParent.getChildren().remove(selectedIndexNode);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void deleteSelectedForeignKey(ForeignKey selectedForeignKey) {
-        try {
             TreeItem<String> selectedForeignKeyNode = schemaHashMap.get(selectedForeignKey.getReferencingTable().getSchema().getName()).getSecond()
                     .getTableNodesHashMap().get(selectedForeignKey.getReferencingTable().getName()).getSecond().
                     getForeignKeyNodesHashMap().get(selectedForeignKey.getName());
-            DDLGenerator.dropForeignKey(selectedForeignKey.getReferencingSchema(),selectedForeignKey.getReferencingTable(),selectedForeignKey,false);
+            QueryProcessor.dropForeignKey(selectedForeignKey,false);
             TreeItem<String> foreignKeyNodeParent = selectedForeignKeyNode.getParent();
             foreignKeyNodeParent.getChildren().remove(selectedForeignKeyNode);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void sortAndFilterSchemas(String text) {
