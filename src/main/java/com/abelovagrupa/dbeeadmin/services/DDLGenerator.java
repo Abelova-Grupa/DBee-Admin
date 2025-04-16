@@ -44,7 +44,7 @@ public class DDLGenerator {
      * @throws SQLException             on SQL error
      * @throws IllegalArgumentException if schema name, collation or charset are not set
      */
-    public static void createDatabase(Schema schema, boolean preview) throws SQLException {
+    public static String createDatabase(Schema schema) throws SQLException {
 
         // Validate
         if (schema.getName() == null) throw new IllegalArgumentException("Undefined schema name.");
@@ -64,11 +64,7 @@ public class DDLGenerator {
         String finalQuery = query;
 
         // If preview is selected (user gets to decide whether sql should be executed)
-        if (preview)
-            new DialogSQLPreview(query).showAndWait().ifPresent(b -> {
-                if (b) executeUpdate(finalQuery);
-            });
-        else executeUpdate(query);
+        return query;
 
     }
 

@@ -15,6 +15,15 @@ public class QueryProcessor {
 
     private static QueryProcessor instance;
 
+    public static void createSchema(Schema schema, boolean preview) {
+        try {
+            String query =  DDLGenerator.createDatabase(schema);
+            QueryExecutor.executeQuery(query,preview);
+        } catch (SQLException e) {
+            // Impl
+        }
+    }
+
     public static void dropSchema(Schema schema, boolean preview) throws SQLException {
         String query = DDLGenerator.dropDatabase(schema);
         QueryExecutor.executeQuery(query, preview);
