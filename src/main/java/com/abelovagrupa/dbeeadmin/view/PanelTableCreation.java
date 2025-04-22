@@ -205,8 +205,8 @@ public class PanelTableCreation implements Initializable {
 
     // TODO: Refactor current handler code
     public void handleTableChange(){
-        // Recognise which tab is currently selected
         applyQuery = "";
+        // Recognise which tab is currently selected
         if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(columnsTab)){
         // Creating the table if it doesn't exist
             List<Column> commitedColumnData = new LinkedList<>(columTabController.commitedColumnData);
@@ -214,7 +214,7 @@ public class PanelTableCreation implements Initializable {
                 commitedColumnData.removeLast();
             }
             DiffResult<Column> listDifferences = ListDiff.compareLists(commitedColumnData,columTabController.getTableColumns(),Column.columnAttributeComparator,Column.class);
-            if(ListDiff.areSame(listDifferences)) return;
+            if(ListDiff.noDiff(listDifferences)) return;
             // Creating query
             if(currentTable == null){
                 // Table creation + column creation

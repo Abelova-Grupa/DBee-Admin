@@ -3,9 +3,7 @@ package com.abelovagrupa.dbeeadmin.util;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 public class ListDiff {
@@ -44,7 +42,7 @@ public class ListDiff {
         return result;
     }
 
-    public static <T> boolean areSame(DiffResult<T> listDifference){
+    public static <T> boolean noDiff(DiffResult<T> listDifference){
         return listDifference.changedAttributes.isEmpty() && listDifference.added.isEmpty() && listDifference.removed.isEmpty();
     }
 }
