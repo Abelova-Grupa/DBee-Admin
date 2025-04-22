@@ -13,6 +13,7 @@ import com.abelovagrupa.dbeeadmin.model.table.DBEngine;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
+import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.util.DiffResult;
 import com.abelovagrupa.dbeeadmin.util.ListDiff;
@@ -28,6 +29,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -50,6 +52,8 @@ public class PanelTableCreation implements Initializable {
 
     @FXML
     Button revertBtn;
+
+    Table currentTable;
 
     Tab columnsTab;
 
@@ -82,6 +86,8 @@ public class PanelTableCreation implements Initializable {
     public void setBrowserController(PanelBrowser browserController) {
         this.browserController = browserController;
     }
+
+    String applyQuery = "";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -201,9 +207,27 @@ public class PanelTableCreation implements Initializable {
     public void handleTableChange(){
         // Recognise which tab is currently selected
         if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(columnsTab)){
-            // Creating the table if it doesn't exist
-            List<Column> commitedColumns = handleColumnChange();
-            Table createdTable = createTable(commitedColumns);
+        // Creating the table if it doesn't exist
+            applyQuery = "";
+            List<Column> commitedColumnData = new LinkedList<>(columTabController.commitedColumnData);
+            if(!commitedColumnData.isEmpty()){
+                commitedColumnData.removeLast();
+            }
+            DiffResult<Column> listDifferences = ListDiff.compareLists(commitedColumnData,columTabController.getTableColumns(),Column.columnAttributeComparator,Column.class);
+            if(ListDiff.areSame(listDifferences)) return;
+            // Creating query
+            if(currentTable == null){
+                List<Column> columns = columTabController.getTableColumns();
+                currentTable = createTable(columns);
+                applyQuery += DDLGenerator.createTableCreationQuery(currentTable) +"\n";
+            }else{
+                dropTableColumns(listDifferences);
+                addTableColumns(listDifferences);
+                changeTableColumnsAttributes(listDifferences);
+            }
+            // Executing query
+            QueryExecutor.executeQuery(applyQuery,true);
+            columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
         }
         else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(indexTab)){
             List<Index> tableIndexes = indexTabController.getTableIndexes();
@@ -311,38 +335,43 @@ public class PanelTableCreation implements Initializable {
         tableSchema.getTables().add(newTable);
         newTable.setSchema(tableSchema);
         newTable.setColumns(columns);
-        try {
-            DDLGenerator.createTable(newTable,true);
-            Table createdTable = DatabaseInspector.getInstance().getTableByName(tableSchema,newTable.getName());
-            ProgramState.getInstance().setSelectedTable(createdTable);
-            TreeItem<String> newTableNode = getBrowserController().loadTableTreeItem(tableSchema,createdTable.getName());
-            // For now, it works
-            TreeView<String> treeViewToChange = getBrowserController().vboxBrowser.getChildren()
-                    .stream().filter(t -> t instanceof TreeView<?>)
-                    .map(t -> (TreeView<String>) t)
-                    .filter(t -> {
-                        return t.getRoot().getValue().equals(tableSchema.getName());
-                    })
-                    .findFirst().get();
 
-//            TreeView<String> treeViewToChange = (TreeView<String>) getBrowserController().vboxBrowser.getChildren().stream().filter(
-//                    t -> {
-//                        TreeView<String> treeview = (TreeView<String>) t;
-//                        if(treeview.getRoot().getValue().equals(tableSchema.getName())) return true;
-//                        else return false;
-//                    }).findFirst().get();
-            // Schema -> tableBranch("Tables") -> schema tables
-            treeViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        for(Column column : columns){
+            column.setTable(newTable);
         }
+
+//        try {
+//            DDLGenerator.createTable(newTable,true);
+//            Table createdTable = DatabaseInspector.getInstance().getTableByName(tableSchema,newTable.getName());
+//            ProgramState.getInstance().setSelectedTable(createdTable);
+//            TreeItem<String> newTableNode = getBrowserController().loadTableTreeItem(tableSchema,createdTable.getName());
+//            // For now, it works
+//            TreeView<String> treeViewToChange = getBrowserController().vboxBrowser.getChildren()
+//                    .stream().filter(t -> t instanceof TreeView<?>)
+//                    .map(t -> (TreeView<String>) t)
+//                    .filter(t -> {
+//                        return t.getRoot().getValue().equals(tableSchema.getName());
+//                    })
+//                    .findFirst().get();
+//
+////            TreeView<String> treeViewToChange = (TreeView<String>) getBrowserController().vboxBrowser.getChildren().stream().filter(
+////                    t -> {
+////                        TreeView<String> treeview = (TreeView<String>) t;
+////                        if(treeview.getRoot().getValue().equals(tableSchema.getName())) return true;
+////                        else return false;
+////                    }).findFirst().get();
+//            // Schema -> tableBranch("Tables") -> schema tables
+//            treeViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
         return newTable;
     }
 
     private List<Column> handleColumnChange(){
         List<Column> tableColumns = columTabController.getTableColumns();
-        DiffResult<Column> columnsDiff = ListDiff.compareLists(columTabController.commitedColumnData,tableColumns,Column.columnAttributeComparator);
+        DiffResult<Column> columnsDiff = ListDiff.compareLists(columTabController.commitedColumnData,tableColumns,Column.columnAttributeComparator,Column.class);
         dropTableColumns(columnsDiff);
         addTableColumns(columnsDiff);
         changeTableColumnsAttributes(columnsDiff);
@@ -353,33 +382,24 @@ public class PanelTableCreation implements Initializable {
     private void dropTableColumns(DiffResult<Column> columnsDiff){
         if(columnsDiff.removed.isEmpty()) return;
         for(Column column : columnsDiff.removed){
-            try {
-                DDLGenerator.dropColumn(column.getTable(),column,false);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            column.setTable(currentTable);
+            applyQuery += DDLGenerator.createColumnDropQuery(column) + "\n";
         }
     }
 
     private void addTableColumns(DiffResult<Column> columnsDiff){
         if(columnsDiff.added.isEmpty()) return;
         for(Column column : columnsDiff.added){
-            try {
-                DDLGenerator.addColumn(column.getTable(),column,false);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            column.setTable(currentTable);
+            applyQuery += DDLGenerator.createColumnAdditionQuery(column);
         }
     }
 
     private void changeTableColumnsAttributes(DiffResult<Column> columnsDiff){
         if(columnsDiff.changedAttributes.isEmpty()) return;
         for(Column column : columnsDiff.changedAttributes.keySet()){
-            try {
-                DDLGenerator.modifyColumn(column.getTable(),column,false);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            column.setTable(currentTable);
+            applyQuery += DDLGenerator.createColumnAlterQuery(column);
         }
     }
 

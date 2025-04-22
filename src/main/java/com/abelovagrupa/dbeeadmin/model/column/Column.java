@@ -4,6 +4,8 @@ import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.beans.property.*;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
@@ -357,7 +359,55 @@ public class Column {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, primaryKey, notNull, unique, binary, unsigned, zeroFill, autoIncrement, size, generationExpression, defaultValue, comment, type, table);
+        return Objects.hash(name, primaryKey, notNull, unique, binary, unsigned, zeroFill, autoIncrement, size, generationExpression, defaultValue, comment, type);
+    }
+
+    public static List<Column> deepCopy(List<Column> columns) {
+        List<Column> deepColumn = new LinkedList<>();
+
+        for (Column column : columns) {
+            deepColumn.add(new Column(
+                    column.getName(),
+                    column.isPrimaryKey(),
+                    column.isNotNull(),
+                    column.isUnique(),
+                    column.isBinary(),
+                    column.isUnsigned(),
+                    column.isZeroFill(),
+                    column.isAutoIncrement(),
+                    column.getSize(),
+                    column.isGenerationExpression(),
+                    column.getDefaultValue(),
+                    column.getComment(),
+                    column.getType(),
+                    column.getTable()
+            ));
+        }
+        return deepColumn;
+    }
+
+    public static boolean containsByAttributes(List<Column> columns, Column column){
+        for(Column col : columns){
+            if(matchesByAttributes(col, column)) return true;
+        }
+        return false;
+    }
+
+    private static boolean matchesByAttributes(Column a, Column b) {
+        return Objects.equals(a.getName(), b.getName()) &&
+                a.isPrimaryKey() == b.isPrimaryKey() &&
+                a.isNotNull() == b.isNotNull() &&
+                a.isUnique() == b.isUnique() &&
+                a.isBinary() == b.isBinary() &&
+                a.isUnsigned() == b.isUnsigned() &&
+                a.isZeroFill() == b.isZeroFill() &&
+                a.isAutoIncrement() == b.isAutoIncrement() &&
+                Objects.equals(a.getSize(), b.getSize()) &&
+                a.isGenerationExpression() == b.isGenerationExpression() &&
+                Objects.equals(a.getDefaultValue(), b.getDefaultValue()) &&
+                Objects.equals(a.getComment(), b.getComment()) &&
+                Objects.equals(a.getType(), b.getType()) &&
+                Objects.equals(a.getTable(), b.getTable());
     }
 
     // Builder

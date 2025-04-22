@@ -1,5 +1,7 @@
 package com.abelovagrupa.dbeeadmin.util;
 
+import com.abelovagrupa.dbeeadmin.model.column.Column;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -7,20 +9,25 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public class ListDiff {
-    public static <T> DiffResult<T> compareLists(List<T> oldList, List<T> newList, BiFunction<T, T, HashMap<String, Object[]>> attributeComparator){
+    public static <T> DiffResult<T> compareLists(List<T> oldList, List<T> newList, BiFunction<T, T, HashMap<String, Object[]>> attributeComparator, Class<T> compareClass){
         DiffResult<T> result = new DiffResult<>();
-        Set<T> oldSet = new HashSet<>(oldList);
-        Set<T> newSet = new HashSet<>(newList);
+//        Set<T> oldSet = new HashSet<>(oldList);
+//        Set<T> newSet = new HashSet<>(newList);
 
-        for(T oldItem : oldList) {
-            if(!newSet.contains(oldItem)){
-                result.removed.add(oldItem);
+        if(compareClass == Column.class){
+            List<Column> newColumnList = (List<Column>) newList;
+            List<Column> oldColumnList = (List<Column>) oldList;
+
+            for(T oldItem : oldList) {
+                if(!Column.containsByAttributes(newColumnList, (Column) oldItem)){
+                    result.removed.add(oldItem);
+                }
             }
-        }
 
-        for(T newItem : newList) {
-            if(!oldSet.contains(newItem)){
-                result.added.add(newItem);
+            for(T newItem : newList) {
+                if(!Column.containsByAttributes(oldColumnList, (Column) newItem)){
+                    result.added.add(newItem);
+                }
             }
         }
 
@@ -35,5 +42,9 @@ public class ListDiff {
 
         }
         return result;
+    }
+
+    public static <T> boolean areSame(DiffResult<T> listDifference){
+        return listDifference.changedAttributes.isEmpty() && listDifference.added.isEmpty() && listDifference.removed.isEmpty();
     }
 }
