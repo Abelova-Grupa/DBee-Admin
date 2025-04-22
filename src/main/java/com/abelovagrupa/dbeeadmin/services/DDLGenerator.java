@@ -99,7 +99,7 @@ public class DDLGenerator {
         queryBuilder.append("CREATE TABLE IF NOT EXISTS ");
         queryBuilder.append(table.getSchema().getName());
         queryBuilder.append('.');
-        queryBuilder.append(table.getName());
+        queryBuilder.append(table.getName()).append("( \n");
 
         for (Column c : table.getColumns()) {
             queryBuilder.append(convertColumnToSQL(c));
@@ -156,10 +156,10 @@ public class DDLGenerator {
         queryBuilder.append(column.getTable().getSchema().getName());
         queryBuilder.append(".");
         queryBuilder.append(column.getTable().getName());
-        queryBuilder.append("ADD COLUMN \n");
+        queryBuilder.append("\nADD COLUMN ");
 
         queryBuilder.append(convertColumnToSQL(column));
-        queryBuilder.setLength(queryBuilder.length() - 1);
+        queryBuilder.setLength(queryBuilder.length() - 2);
 
         return queryBuilder.toString();
     }
