@@ -206,9 +206,9 @@ public class PanelTableCreation implements Initializable {
     // TODO: Refactor current handler code
     public void handleTableChange(){
         // Recognise which tab is currently selected
+        applyQuery = "";
         if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(columnsTab)){
         // Creating the table if it doesn't exist
-            applyQuery = "";
             List<Column> commitedColumnData = new LinkedList<>(columTabController.commitedColumnData);
             if(!commitedColumnData.isEmpty()){
                 commitedColumnData.removeLast();
@@ -217,17 +217,22 @@ public class PanelTableCreation implements Initializable {
             if(ListDiff.areSame(listDifferences)) return;
             // Creating query
             if(currentTable == null){
+                // Table creation + column creation
                 List<Column> columns = columTabController.getTableColumns();
                 currentTable = createTable(columns);
                 applyQuery += DDLGenerator.createTableCreationQuery(currentTable) +"\n";
+                QueryExecutor.executeQuery(applyQuery,true);
+                renderNewTable(currentTable);
+                columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
             }else{
+                // Column deletion, addition, altering
                 dropTableColumns(listDifferences);
                 addTableColumns(listDifferences);
                 changeTableColumnsAttributes(listDifferences);
+                QueryExecutor.executeQuery(applyQuery,true);
+                columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
             }
-            // Executing query
-            QueryExecutor.executeQuery(applyQuery,true);
-            columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
+
         }
         else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(indexTab)){
             List<Index> tableIndexes = indexTabController.getTableIndexes();
@@ -237,6 +242,28 @@ public class PanelTableCreation implements Initializable {
             List<ForeignKey> tableForeignKeys = foreignKeyTabController.getTableForeignKeys();
             createForeignKeys(tableForeignKeys);
         }
+    }
+
+    private void renderNewTable(Table currentTable) {
+        TreeItem<String> newTableNode = browserController.loadTableTreeItem(currentTable.getSchema(),currentTable.getName());
+
+        TreeView<String> treeViewToChange = getBrowserController().vboxBrowser.getChildren()
+                .stream().filter(t -> t instanceof TreeView<?>)
+                .map(t -> (TreeView<String>) t)
+                .filter(t -> {
+                    return t.getRoot().getValue().equals(currentTable.getSchema().getName());
+                })
+                .findFirst().get();
+
+//            TreeView<String> treeViewToChange = (TreeView<String>) getBrowserController().vboxBrowser.getChildren().stream().filter(
+//                    t -> {
+//                        TreeView<String> treeview = (TreeView<String>) t;
+//                        if(treeview.getRoot().getValue().equals(tableSchema.getName())) return true;
+//                        else return false;
+//                    }).findFirst().get();
+        // Schema -> tableBranch("Tables") -> schema tables
+        treeViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
+
     }
 
     private void createForeignKeys(List<ForeignKey> tableForeignKeys) {
