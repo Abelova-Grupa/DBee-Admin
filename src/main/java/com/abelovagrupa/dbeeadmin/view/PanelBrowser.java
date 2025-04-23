@@ -93,6 +93,14 @@ public class PanelBrowser implements Initializable {
         this.searchObjects = searchObjects;
     }
 
+    public HashMap<String, Pair<TreeView<String>, PanelSchemaTree>> getSchemaHashMap() {
+        return schemaHashMap;
+    }
+
+    public void setSchemaHashMap(HashMap<String, Pair<TreeView<String>, PanelSchemaTree>> schemaHashMap) {
+        this.schemaHashMap = schemaHashMap;
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // OPTIMIZATION: Checking time to initialize browser
@@ -503,14 +511,13 @@ public class PanelBrowser implements Initializable {
                                 String columnName = column.isPrimaryKey()
                                         ? column.getName() + " (\uD83D\uDD11)"
                                         : column.getName();
-                                TreeItem<String> columnNode = new TreeItem<>(columnName);
-                                columnNodes.add(columnNode);
-                                schemaHashMap.get(schema.getName()).getSecond()
-                                        .getTableNodesHashMap().get(tableName).getSecond()
-                                        .getColumnNodesHashMap().put(columnName,columnNode);
+                                TreeItem<String> columnNode = loadColumnTreeItem(tableNode,schema,columnName);
+                                columnBranch.getChildren().add(columnNode);
                             }
                             return columnNodes;
                         }
+
+
                     };
 
                     loadColumnsTask.setOnSucceeded(workerStateEvent -> {
@@ -670,6 +677,17 @@ public class PanelBrowser implements Initializable {
         tableNode.getChildren().addAll(columnBranch, indexBranch, foreignKeyBranch, triggersBranch);
 
         return tableNode;
+    }
+
+    public TreeItem<String> loadColumnTreeItem(TreeItem<String> tableNode, Schema schema, String columnName) {
+        TreeItem<String> columnNode = new TreeItem<>(columnName);
+        TreeItem<String> columnNodes = tableNode.getChildren().getFirst();
+
+        schemaHashMap.get(schema.getName()).getSecond()
+                .getTableNodesHashMap().get(tableNode.getValue()).getSecond()
+                .getColumnNodesHashMap().put(columnName,columnNode);
+
+        return columnNode;
     }
 
     private void displaySelectedTable(Table selectedTable) {
