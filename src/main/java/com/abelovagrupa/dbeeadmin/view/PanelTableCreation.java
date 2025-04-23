@@ -31,6 +31,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class PanelTableCreation implements Initializable {
@@ -226,10 +227,12 @@ public class PanelTableCreation implements Initializable {
                 columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
             }else{
                 // Column deletion, addition, altering
+                applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
                 dropTableColumns(listDifferences);
-                addTableColumns(listDifferences);
+                Optional<List<Column>> columnsToBeAdded = Optional.ofNullable(addTableColumns(listDifferences));
                 changeTableColumnsAttributes(listDifferences);
                 QueryExecutor.executeQuery(applyQuery,true);
+                columnsToBeAdded.ifPresent(this::renderNewColumns);
                 columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
             }
 
@@ -244,26 +247,24 @@ public class PanelTableCreation implements Initializable {
         }
     }
 
+    private void renderNewColumns(List<Column> columnsToBeAdded) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+
+        for(Column column : columnsToBeAdded){
+            TreeItem<String> newColumnNode = new TreeItem<>(column.getName());
+            tableTreeItemToChange.getChildren().getFirst().getChildren().add(newColumnNode);
+        }
+    }
+
     private void renderNewTable(Table currentTable) {
         TreeItem<String> newTableNode = browserController.loadTableTreeItem(currentTable.getSchema(),currentTable.getName());
 
-        TreeView<String> treeViewToChange = getBrowserController().vboxBrowser.getChildren()
-                .stream().filter(t -> t instanceof TreeView<?>)
-                .map(t -> (TreeView<String>) t)
-                .filter(t -> {
-                    return t.getRoot().getValue().equals(currentTable.getSchema().getName());
-                })
-                .findFirst().get();
+        TreeView<String> schemaViewToChange = getBrowserController()
+                .getSchemaHashMap().get(currentTable.getSchema().getName()).getFirst();
 
-//            TreeView<String> treeViewToChange = (TreeView<String>) getBrowserController().vboxBrowser.getChildren().stream().filter(
-//                    t -> {
-//                        TreeView<String> treeview = (TreeView<String>) t;
-//                        if(treeview.getRoot().getValue().equals(tableSchema.getName())) return true;
-//                        else return false;
-//                    }).findFirst().get();
-        // Schema -> tableBranch("Tables") -> schema tables
-        treeViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
-
+        schemaViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
     }
 
     private void createForeignKeys(List<ForeignKey> tableForeignKeys) {
@@ -414,12 +415,20 @@ public class PanelTableCreation implements Initializable {
         }
     }
 
-    private void addTableColumns(DiffResult<Column> columnsDiff){
-        if(columnsDiff.added.isEmpty()) return;
-        for(Column column : columnsDiff.added){
+    private List<Column> addTableColumns(DiffResult<Column> columnsDiff){
+        List<Column> columnsToBeRendered = new LinkedList<>();
+        if(columnsDiff.added.isEmpty()) return null;
+
+        for(int i = 0; i < columnsDiff.added.size(); i++){
+            Column column = columnsDiff.added.get(i);
             column.setTable(currentTable);
+            columnsToBeRendered.add(column);
             applyQuery += DDLGenerator.createColumnAdditionQuery(column);
+            if(i != columnsDiff.added.size() - 1) applyQuery += ",\n";
+            else applyQuery += ";\n";
         }
+
+        return columnsToBeRendered;
     }
 
     private void changeTableColumnsAttributes(DiffResult<Column> columnsDiff){

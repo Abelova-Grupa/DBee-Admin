@@ -113,6 +113,10 @@ public class DDLGenerator {
 
     }
 
+    public static String createTableAlterQuery(Table table){
+        return "ALTER TABLE " + table.getSchema().getName()+ "." + table.getName();
+    }
+
     public static String createSchemaDropQuery(Schema schema) {
         if (schema.getName().isEmpty() || schema.getName() == null)
             throw new IllegalArgumentException("Schema name is not set!");
@@ -152,11 +156,12 @@ public class DDLGenerator {
         if (column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
             throw new IllegalArgumentException("Schema name is not set!");
 
-        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
-        queryBuilder.append(column.getTable().getSchema().getName());
-        queryBuilder.append(".");
-        queryBuilder.append(column.getTable().getName());
-        queryBuilder.append("\nADD COLUMN ");
+//        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
+//        queryBuilder.append(column.getTable().getSchema().getName());
+//        queryBuilder.append(".");
+//        queryBuilder.append(column.getTable().getName());
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("ADD COLUMN ");
 
         queryBuilder.append(convertColumnToSQL(column));
         queryBuilder.setLength(queryBuilder.length() - 2);
@@ -175,13 +180,7 @@ public class DDLGenerator {
         if (column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
             throw new IllegalArgumentException("Schema name is not set!");
 
-        String queryBuilder = "ALTER TABLE " + column.getTable().getSchema().getName() +
-            "." +
-            column.getTable().getName() +
-            " DROP COLUMN " +
-            column.getName();
-
-        return queryBuilder;
+        return "DROP COLUMN " + column.getName();
     }
 
     public static String createColumnRenameQuery(Column column, String newName) {
