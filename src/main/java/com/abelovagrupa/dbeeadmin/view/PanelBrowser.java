@@ -511,7 +511,7 @@ public class PanelBrowser implements Initializable {
                                 String columnName = column.isPrimaryKey()
                                         ? column.getName() + " (\uD83D\uDD11)"
                                         : column.getName();
-                                TreeItem<String> columnNode = loadColumnTreeItem(tableNode,schema,columnName);
+                                TreeItem<String> columnNode = loadColumnTreeItem(table,columnName);
                                 columnBranch.getChildren().add(columnNode);
                             }
                             return columnNodes;
@@ -679,12 +679,11 @@ public class PanelBrowser implements Initializable {
         return tableNode;
     }
 
-    public TreeItem<String> loadColumnTreeItem(TreeItem<String> tableNode, Schema schema, String columnName) {
+    public TreeItem<String> loadColumnTreeItem(Table table, String columnName) {
         TreeItem<String> columnNode = new TreeItem<>(columnName);
-        TreeItem<String> columnNodes = tableNode.getChildren().getFirst();
 
-        schemaHashMap.get(schema.getName()).getSecond()
-                .getTableNodesHashMap().get(tableNode.getValue()).getSecond()
+        schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
                 .getColumnNodesHashMap().put(columnName,columnNode);
 
         return columnNode;
