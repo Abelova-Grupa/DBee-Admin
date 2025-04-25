@@ -236,12 +236,7 @@ public class DDLGenerator {
         if (foreignKey.getReferencingColumns() == null || foreignKey.getReferencingColumns().isEmpty())
             throw new IllegalArgumentException("Referencing columns are not set");
 
-        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
-        queryBuilder.append(schema.getName());
-        queryBuilder.append(".");
-        queryBuilder.append(table.getName());
-        queryBuilder.append("\n");
-        queryBuilder.append("ADD CONSTRAINT ").append(foreignKey.getName()).append("\n");
+        StringBuilder queryBuilder = new StringBuilder("ADD CONSTRAINT ").append(foreignKey.getName()).append("\n");
         queryBuilder.append("FOREIGN KEY (");
         for (Column referencingColumn : foreignKey.getReferencingColumns()) {
             queryBuilder.append(referencingColumn.getName());

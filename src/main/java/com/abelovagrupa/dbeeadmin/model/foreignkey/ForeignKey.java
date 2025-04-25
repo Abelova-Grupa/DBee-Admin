@@ -6,6 +6,7 @@ import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import kotlin.NotImplementedError;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -209,6 +210,38 @@ public class ForeignKey {
     @Override
     public int hashCode() {
         return Objects.hash(name, referencingSchema, referencingTable, referencedSchema, referencedTable, onDeleteAction, onUpdateAction, comment, columnPairs, referencingColumns, referencedColumns);
+    }
+
+    public static boolean containsByAttributes(List<ForeignKey> foreignKeys, ForeignKey foreignKey) {
+        for (ForeignKey fk : foreignKeys) {
+            if (matchesByAttributes(fk, foreignKey)) return true;
+        }
+        return false;
+    }
+
+    private static boolean matchesByAttributes(ForeignKey a, ForeignKey b) {
+        return Objects.equals(a.getName(), b.getName()) &&
+                Objects.equals(a.getReferencingSchema(), b.getReferencingSchema()) &&
+                Objects.equals(a.getReferencingTable(), b.getReferencingTable()) &&
+                Objects.equals(a.getReferencedSchema(), b.getReferencedSchema()) &&
+                Objects.equals(a.getReferencedTable(), b.getReferencedTable()) &&
+                Objects.equals(a.getOnDeleteAction(), b.getOnDeleteAction()) &&
+                Objects.equals(a.getOnUpdateAction(), b.getOnUpdateAction()) &&
+                Objects.equals(a.getComment(), b.getComment());
+    }
+
+    public static ForeignKey deepCopy(ForeignKey foreignKey) {
+        return new ForeignKey(
+                foreignKey.getName(),
+                foreignKey.getReferencingSchema(),
+                foreignKey.getReferencingTable(),
+                foreignKey.getReferencedSchema(),
+                foreignKey.getReferencedTable(),
+                foreignKey.getColumnPairs(),
+                foreignKey.getOnDeleteAction(),
+                foreignKey.getOnUpdateAction(),
+                foreignKey.getComment()
+        );
     }
 
     public static BiFunction<ForeignKey, ForeignKey, HashMap<String, Object[]>> foreignKeyAttributeComparator = (fk1, fk2) -> {

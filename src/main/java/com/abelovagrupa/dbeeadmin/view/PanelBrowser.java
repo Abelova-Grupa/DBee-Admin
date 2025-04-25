@@ -696,6 +696,16 @@ public class PanelBrowser implements Initializable {
         return indexNode;
     }
 
+    public TreeItem<String> loadForeignKeyTreeItem(Table table, String foreignKeyName) {
+        TreeItem<String> foreignKeyNode = new TreeItem<>(foreignKeyName);
+
+        schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getForeignKeyNodesHashMap().put(foreignKeyName,foreignKeyNode);
+
+        return foreignKeyNode;
+    }
+
     private void displaySelectedTable(Table selectedTable) {
         try {
             mainController.resultsController.printResultSetToTable(
@@ -864,6 +874,4 @@ public class PanelBrowser implements Initializable {
 
         return itemHeight;
     }
-
-
 }

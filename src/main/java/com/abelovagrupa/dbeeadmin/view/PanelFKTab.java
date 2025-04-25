@@ -21,6 +21,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -57,7 +58,9 @@ public class PanelFKTab implements Initializable {
     @FXML
     TextArea fkCommentTxtArea;
 
-    ObservableList<ForeignKey> foreignKeyData = FXCollections.observableArrayList(new ForeignKey());
+    List<ForeignKey> commitedForeignKeyData = new LinkedList<>();
+
+    ObservableList<ForeignKey> foreignKeyData = FXCollections.observableArrayList(commitedForeignKeyData);
 
     ObservableList<ForeignKeyColumns> foreignKeyColumnsData = FXCollections.observableArrayList(new ForeignKeyColumns());
 
@@ -77,6 +80,7 @@ public class PanelFKTab implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Setting up foreign key table properties
+        foreignKeyData.add(new ForeignKey());
         foreignKeyTable.setEditable(true);
         foreignKeyTable.setItems(foreignKeyData);
 
@@ -275,6 +279,12 @@ public class PanelFKTab implements Initializable {
         //Removing empty row(last table row)
         List<ForeignKey> foreignKeys = new ArrayList<>(foreignKeyData);
         foreignKeys.removeLast();
+        foreignKeys.removeIf(this::emptyProperties);
         return foreignKeys;
+    }
+
+    public boolean emptyProperties(ForeignKey foreignKey){
+        return foreignKey.getName() == null || foreignKey.getReferencedTable() == null;
+
     }
 }

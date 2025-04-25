@@ -26,6 +26,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import kotlin.NotImplementedError;
+import org.apache.logging.log4j.core.pattern.FormattingInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -262,9 +263,98 @@ public class PanelTableCreation implements Initializable {
                     .stream().map(Index::deepCopy).toList();
 
         }else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(foreignKeyTab)){
-            List<ForeignKey> tableForeignKeys = foreignKeyTabController.getTableForeignKeys();
-            createForeignKeys(tableForeignKeys);
+            if(currentTable == null) return;
+
+            applyQuery = "";
+            List<ForeignKey> commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.foreignKeyData);
+            if(!commitedForeignKeyData.isEmpty()) commitedForeignKeyData.removeLast();
+
+            DiffResult<ForeignKey> listDifferences = ListDiff.compareLists(commitedForeignKeyData,foreignKeyTabController.getTableForeignKeys(),ForeignKey.foreignKeyAttributeComparator,ForeignKey.class);
+            if(ListDiff.noDiff(listDifferences)) return;
+
+            // Foreign key deletion, addition, altering
+            applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
+            Optional<List<ForeignKey>> foreignKeysToBeDeleted = Optional.ofNullable(dropTableForeignKeys(listDifferences));
+            Optional<List<ForeignKey>> foreignKeysToBeAdded = Optional.ofNullable(addTableForeignKeys(listDifferences));
+            QueryExecutor.executeQuery(applyQuery,true);
+
+            foreignKeysToBeDeleted.ifPresent(this::renderForeignKeyDeletion);
+            foreignKeysToBeAdded.ifPresent(this::renderNewForeignKeys);
+
+            foreignKeyTabController.commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.foreignKeyData)
+                    .stream().map(ForeignKey::deepCopy).toList();
+
         }
+    }
+
+    private void renderNewForeignKeys(@NotNull List<ForeignKey> foreignKeys) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+
+        for(ForeignKey foreignKey : foreignKeys){
+            TreeItem<String> newForeignKeyNode = getBrowserController().loadForeignKeyTreeItem(currentTable,foreignKey.getName());
+            tableTreeItemToChange.getChildren().get(2).getChildren().add(newForeignKeyNode);
+        }
+
+    }
+
+    private void renderForeignKeyDeletion(@NotNull List<ForeignKey> foreignKeys) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+
+        List<TreeItem<String>> foreignKeyTreeItemsToDelete = getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                getSecond().getTableNodesHashMap().get(currentTable.getName()).getSecond().getForeignKeyNodesHashMap().values().stream().toList();
+
+        // Think of a faster solution
+        Set<String> deletedFKNames = new HashSet<>();
+        for(ForeignKey foreignKey : foreignKeys) {
+            deletedFKNames.add(foreignKey.getName());
+        }
+
+        Iterator<TreeItem<String>> iterator = foreignKeyTreeItemsToDelete.iterator();
+        while(iterator.hasNext()){
+            TreeItem<String> foreignKeyTreeItem = iterator.next();
+            String name = foreignKeyTreeItem.getValue();
+
+            if(!deletedFKNames.contains(name)){
+                iterator.remove();
+            }
+        }
+
+    }
+
+    private List<ForeignKey> addTableForeignKeys(DiffResult<ForeignKey> fkDiff) {
+        if(fkDiff.added.isEmpty()) return null;
+
+        List<ForeignKey> foreignKeyToBeCreated = new LinkedList<>();
+        for(int i = 0; i < fkDiff.added.size(); i++){
+            ForeignKey foreignKey = fkDiff.added.get(i);
+            foreignKey.setReferencingTable(currentTable);
+            foreignKeyToBeCreated.add(foreignKey);
+            applyQuery += DDLGenerator.createForeignKeyCreationQuery(foreignKey);
+            if(i != fkDiff.added.size() - 1) applyQuery += ",\n";
+            else applyQuery += ";\n";
+        }
+
+        return foreignKeyToBeCreated;
+    }
+
+    private List<ForeignKey> dropTableForeignKeys(DiffResult<ForeignKey> fkDiff) {
+        if(fkDiff.removed.isEmpty()) return null;
+
+        List<ForeignKey> foreignKeysToBeDeleted = new LinkedList<>();
+        for(int i = 0; i < fkDiff.removed.size(); i++){
+            ForeignKey foreignKey = fkDiff.removed.get(i);
+            foreignKey.setReferencingTable(currentTable);
+            foreignKeysToBeDeleted.add(foreignKey);
+            applyQuery += DDLGenerator.createForeignKeyDropQuery(foreignKey);
+            if(i != fkDiff.removed.size() - 1) applyQuery += ",\n";
+            else applyQuery += ";\n";
+        }
+        return foreignKeysToBeDeleted;
+
     }
 
     private void renderIndexDeletion(@NotNull List<Index> indices) {
@@ -323,63 +413,6 @@ public class PanelTableCreation implements Initializable {
                 .getSchemaHashMap().get(currentTable.getSchema().getName()).getFirst();
 
         schemaViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
-    }
-
-    private void createForeignKeys(List<ForeignKey> tableForeignKeys) {
-        String tableName = txtTableName.getText();
-        if(tableName.isBlank() || tableName.contains(" ")){
-            AlertManager.showErrorDialog("Error","Table name is not valid",null);
-            return;
-        }
-        String schemaName = cbSchema.getSelectionModel().getSelectedItem();
-        if(schemaName == null){
-            AlertManager.showErrorDialog("Error","Schema was not selected",null);
-            return;
-        }
-        DBEngine schemaEngine = cbEngine.getSelectionModel().getSelectedItem();
-        if(schemaEngine == null){
-            AlertManager.showErrorDialog("Error","Engine was not selected",null);
-            return;
-        }
-        Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-        Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
-
-        for(ForeignKey foreignKey : tableForeignKeys){
-            try {
-                DDLGenerator.addForeignKey(schema,table,foreignKey,false);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void createIndexes(List<Index> tableIndexes){
-        String tableName = txtTableName.getText();
-        if(tableName.isBlank() || tableName.contains(" ")){
-            AlertManager.showErrorDialog("Error","Table name is not valid",null);
-            return;
-        }
-        String schemaName = cbSchema.getSelectionModel().getSelectedItem();
-        if(schemaName == null){
-            AlertManager.showErrorDialog("Error","Schema was not selected",null);
-            return;
-        }
-        DBEngine schemaEngine = cbEngine.getSelectionModel().getSelectedItem();
-        if(schemaEngine == null){
-            AlertManager.showErrorDialog("Error","Engine was not selected",null);
-            return;
-        }
-        Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-        Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
-
-        for(Index index : tableIndexes){
-            try {
-                DDLGenerator.addIndex(schema,table,index,true);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
     }
 
     private Table createTable(List<Column> columns){
