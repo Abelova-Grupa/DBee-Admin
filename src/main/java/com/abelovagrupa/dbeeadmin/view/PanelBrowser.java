@@ -556,11 +556,8 @@ public class PanelBrowser implements Initializable {
 
                             List<TreeItem<String>> indexNodes = new ArrayList<>();
                             for (Index index : indexes) {
-                                TreeItem<String> indexNode = new TreeItem<>(index.getName());
-                                indexNodes.add(indexNode);
-                                schemaHashMap.get(schema.getName()).getSecond().
-                                        getTableNodesHashMap().get(tableName).getSecond().
-                                        getIndexNodesHashMap().put(index.getName(),indexNode);
+                                TreeItem<String> indexNode = loadIndexTreeItem(table,index.getName());
+                                indexBranch.getChildren().add(indexNode);
                             }
                             return indexNodes;
                         }
@@ -687,6 +684,16 @@ public class PanelBrowser implements Initializable {
                 .getColumnNodesHashMap().put(columnName,columnNode);
 
         return columnNode;
+    }
+
+    public TreeItem<String> loadIndexTreeItem(Table table, String indexName) {
+        TreeItem<String> indexNode = new TreeItem<>(indexName);
+
+        schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getIndexNodesHashMap().put(indexName,indexNode);
+
+        return indexNode;
     }
 
     private void displaySelectedTable(Table selectedTable) {
@@ -857,4 +864,6 @@ public class PanelBrowser implements Initializable {
 
         return itemHeight;
     }
+
+
 }

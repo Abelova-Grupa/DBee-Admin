@@ -26,6 +26,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import kotlin.NotImplementedError;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URL;
@@ -257,6 +258,8 @@ public class PanelTableCreation implements Initializable {
             Optional<List<Index>> indexesToBeCreated = Optional.ofNullable(addTableIndexes(listDifferences));
             QueryExecutor.executeQuery(applyQuery,true);
 
+             indexesToBeCreated.ifPresent(this::renderNewIndexes);
+
             indexTabController.commitedIndexData = new LinkedList<>(indexTabController.indexData)
                     .stream().map(Index::deepCopy).toList();
 
@@ -264,6 +267,18 @@ public class PanelTableCreation implements Initializable {
             List<ForeignKey> tableForeignKeys = foreignKeyTabController.getTableForeignKeys();
             createForeignKeys(tableForeignKeys);
         }
+    }
+
+    private void renderNewIndexes(@NotNull List<Index> indices) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+
+        for(Index index : indices){
+            TreeItem<String> newIndexNode = getBrowserController().loadIndexTreeItem(currentTable,index.getName());
+            tableTreeItemToChange.getChildren().get(1).getChildren().add(newIndexNode);
+        }
+
     }
 
 
