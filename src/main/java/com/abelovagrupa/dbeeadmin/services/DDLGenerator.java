@@ -107,7 +107,7 @@ public class DDLGenerator {
 
         // TODO: Engine
         queryBuilder.setLength(queryBuilder.length() - 2); // Cut trailing comma and enter
-        queryBuilder.append("\n);");
+        queryBuilder.append("\n)");
 
         return queryBuilder.toString();
 
@@ -121,7 +121,7 @@ public class DDLGenerator {
         if (schema.getName().isEmpty() || schema.getName() == null)
             throw new IllegalArgumentException("Schema name is not set!");
         // Build
-        return "DROP DATABASE IF EXISTS " + schema.getName() + " ;";
+        return "DROP DATABASE IF EXISTS " + schema.getName();
     }
 
     public static String createTableDropQuery(Table table) {
@@ -133,7 +133,7 @@ public class DDLGenerator {
             throw new IllegalArgumentException("Schema name is not set!");
 
         // Build
-        return "DROP TABLE IF EXISTS " + table.getSchema().getName() + "." + table.getName() + " ;";
+        return "DROP TABLE IF EXISTS " + table.getSchema().getName() + "." + table.getName();
     }
 
     public static String createTableTruncateQuery(Table table) {
@@ -142,7 +142,7 @@ public class DDLGenerator {
             throw new IllegalArgumentException("Table name is not set!");
 
         // Build
-        return "TRUNCATE TABLE " + table.getName() + " ;";
+        return "TRUNCATE TABLE " + table.getName();
     }
 
     public static String createColumnAdditionQuery(Column column) {
@@ -193,16 +193,11 @@ public class DDLGenerator {
             throw new IllegalArgumentException("Schema is not set!");
         if (column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
             throw new IllegalArgumentException("Schema name is not set!");
-
-        String queryBuilder = "ALTER TABLE " + column.getTable().getSchema().getName() +
-            "." +
-            column.getTable().getName() +
+        return
             "RENAME COLUMN " +
             column.getName() +
             " TO " +
             newName;
-
-        return queryBuilder;
     }
 
     public static String createColumnAlterQuery(Column column) {
@@ -216,12 +211,7 @@ public class DDLGenerator {
         if (column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
             throw new IllegalArgumentException("Schema name is not set!");
 
-        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
-        queryBuilder.append(column.getTable().getSchema().getName());
-        queryBuilder.append(".");
-        queryBuilder.append(column.getTable().getName());
-        queryBuilder.append("MODIFY COLUMN \n");
-
+        StringBuilder queryBuilder = new StringBuilder("MODIFY COLUMN \n");
         queryBuilder.append(convertColumnToSQL(column));
         queryBuilder.setLength(queryBuilder.length() - 1);
 
@@ -269,7 +259,6 @@ public class DDLGenerator {
         queryBuilder.append(")\n");
         queryBuilder.append("ON DELETE ").append(foreignKey.getOnDeleteAction().toString().replace("_", " ")).append("\n");
         queryBuilder.append("ON UPDATE ").append(foreignKey.getOnUpdateAction().toString().replace("_", " "));
-        queryBuilder.append(";");
 
         return queryBuilder.toString();
     }
@@ -284,10 +273,7 @@ public class DDLGenerator {
         if (table == null || table.getName() == null || table.getName().isEmpty())
             throw new IllegalArgumentException("Table is not set");
 
-        String queryBuilder = "ALTER TABLE " + schema.getName() + "." + table.getName() + "\n" +
-            " DROP FOREIGN KEY " + foreignKey.getName() + ";";
-
-        return queryBuilder;
+        return "DROP FOREIGN KEY " + foreignKey.getName();
     }
 
     public static String createForeignKeyRenameQuery(ForeignKey foreignKey, String newName) {
@@ -382,10 +368,8 @@ public class DDLGenerator {
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
 
-        String queryBuilder = "ALTER TABLE " + index.getTable().getSchema().getName() + index.getTable().getName() + " " +
-            "RENAME INDEX " + index.getName() + " TO " + newName + ";";
+        return "RENAME INDEX " + index.getName() + " TO " + newName;
 
-        return queryBuilder;
     }
 
     public static String createIndexDropQuery(Index index) {
