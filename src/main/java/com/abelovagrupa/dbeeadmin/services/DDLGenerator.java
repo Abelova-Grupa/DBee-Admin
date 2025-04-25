@@ -342,11 +342,10 @@ public class DDLGenerator {
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
 
-        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
-        queryBuilder.append(index.getTable().getSchema().getName()).append(".").append(index.getTable().getName()).append("\n");
-        queryBuilder.append("ADD ").append(
+        StringBuilder queryBuilder = new StringBuilder("ADD ")
+                .append(
             !index.getType().equals(IndexType.INDEX) ? index.getType() + " " : " "
-        ).append("INDEX ").append(index.getName()).append(" USING ").append(index.getStorageType()).append(" (");
+        ).append("INDEX ").append(index.getName()).append(" (");
 
         Comparator<IndexedColumn> indexComparator = new Comparator<IndexedColumn>() {
             @Override
@@ -366,15 +365,14 @@ public class DDLGenerator {
             if (i != sortedIndexedColumns.size() - 1) queryBuilder.append(", ");
         }
 
-        queryBuilder.append(")\n ");
+        queryBuilder.append(") USING ").append(index.getStorageType()).append(index.isVisible() ? " VISIBLE " : " INVISIBLE ").append("\n ");
         if (index.getKeyBlockSize() != 0)
             queryBuilder.append("KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize()).append(" ");
         if (index.getParser() != null && !index.getParser().isEmpty())
             queryBuilder.append(" WITH PARSER ").append(index.getParser()).append(" ");
-        queryBuilder.append(index.isVisible() ? "VISIBLE " : "INVISIBLE ");
+
         if (index.getComment() != null && !index.getComment().isEmpty())
-            queryBuilder.append("\nCOMMENT ").append("'").append(index.getComment()).append("';");
-        else queryBuilder.append(";");
+            queryBuilder.append("\nCOMMENT ").append("'").append(index.getComment()).append("'");
 
         return queryBuilder.toString();
     }
@@ -395,11 +393,7 @@ public class DDLGenerator {
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
 
-        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ").append(index.getTable().getSchema().getName())
-            .append(".").append(index.getTable().getName()).append("\n");
-        queryBuilder.append("DROP INDEX ").append(index.getName());
-
-        return queryBuilder.toString();
+        return "DROP INDEX " + index.getName();
     }
 
     public static String createIndexAlterQuery(Index oldIndex, Index newIndex) {
