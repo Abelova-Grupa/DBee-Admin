@@ -31,10 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class PanelTableCreation implements Initializable {
 
@@ -258,7 +255,8 @@ public class PanelTableCreation implements Initializable {
             Optional<List<Index>> indexesToBeCreated = Optional.ofNullable(addTableIndexes(listDifferences));
             QueryExecutor.executeQuery(applyQuery,true);
 
-             indexesToBeCreated.ifPresent(this::renderNewIndexes);
+            indexesToBeDeleted.ifPresent(this::renderIndexDeletion);
+            indexesToBeCreated.ifPresent(this::renderNewIndexes);
 
             indexTabController.commitedIndexData = new LinkedList<>(indexTabController.indexData)
                     .stream().map(Index::deepCopy).toList();
@@ -267,6 +265,32 @@ public class PanelTableCreation implements Initializable {
             List<ForeignKey> tableForeignKeys = foreignKeyTabController.getTableForeignKeys();
             createForeignKeys(tableForeignKeys);
         }
+    }
+
+    private void renderIndexDeletion(@NotNull List<Index> indices) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+
+        List<TreeItem<String>> indexTreeItemsToDelete = getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                getSecond().getTableNodesHashMap().get(currentTable.getName()).getSecond().getIndexNodesHashMap().values().stream().toList();
+
+        // Think of a faster solution
+        Set<String> deletedIndexNames = new HashSet<>();
+        for(Index index : indices) {
+            deletedIndexNames.add(index.getName());
+        }
+
+        Iterator<TreeItem<String>> iterator = indexTreeItemsToDelete.iterator();
+        while(iterator.hasNext()){
+            TreeItem<String> indexTreeItem = iterator.next();
+            String name = indexTreeItem.getValue();
+
+            if(!deletedIndexNames.contains(name)){
+                iterator.remove();
+            }
+        }
+
     }
 
     private void renderNewIndexes(@NotNull List<Index> indices) {
@@ -280,7 +304,6 @@ public class PanelTableCreation implements Initializable {
         }
 
     }
-
 
     private void renderNewColumns(List<Column> columnsToBeAdded) {
         TreeItem<String> tableTreeItemToChange =
