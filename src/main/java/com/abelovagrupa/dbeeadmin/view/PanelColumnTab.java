@@ -60,7 +60,7 @@ public class PanelColumnTab implements Initializable{
     TableColumn<Column,String> columnDefaultColumn;
 
     List<Column> commitedColumnData = new LinkedList<>();
-    // oldColumnData is a list that has values that cannot be changed
+
     ObservableList<Column> columnsData = FXCollections.observableArrayList(commitedColumnData);
 
     // Controllers

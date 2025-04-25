@@ -25,6 +25,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import kotlin.NotImplementedError;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URL;
@@ -206,9 +208,9 @@ public class PanelTableCreation implements Initializable {
 
     // TODO: Refactor current handler code
     public void handleTableChange(){
-        applyQuery = "";
         // Recognise which tab is currently selected
         if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(columnsTab)){
+            applyQuery = "";
             List<Column> commitedColumnData = new LinkedList<>(columTabController.commitedColumnData);
             // Removing last empty row from list copy
             if(!commitedColumnData.isEmpty()) commitedColumnData.removeLast();
@@ -224,30 +226,61 @@ public class PanelTableCreation implements Initializable {
                 applyQuery += DDLGenerator.createTableCreationQuery(currentTable) +"\n";
                 QueryExecutor.executeQuery(applyQuery,true);
                 renderNewTable(currentTable);
-                columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
+                columTabController.commitedColumnData = new LinkedList<>(columTabController.columnsData)
+                        .stream().map(Column::deepCopy).toList();
             }else{
                 // Column deletion, addition, altering
                 applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
-                dropTableColumns(listDifferences);
                 Optional<List<Column>> columnsToBeDeleted = Optional.ofNullable(dropTableColumns(listDifferences));
                 Optional<List<Column>> columnsToBeAdded = Optional.ofNullable(addTableColumns(listDifferences));
                 changeTableColumnsAttributes(listDifferences);
                 QueryExecutor.executeQuery(applyQuery,true);
 //                columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
                 columnsToBeAdded.ifPresent(this::renderNewColumns);
-                columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
+                columTabController.commitedColumnData = new LinkedList<>(columTabController.columnsData)
+                        .stream().map(Column::deepCopy).toList();
             }
 
         }
         else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(indexTab)){
-            List<Index> tableIndexes = indexTabController.getTableIndexes();
-            createIndexes(tableIndexes);
+            if(currentTable == null) return;
+
+            applyQuery = "";
+            List<Index> commitedIndexData = new LinkedList<>(indexTabController.commitedIndexData);
+            if(!commitedIndexData.isEmpty()) commitedIndexData.removeLast();
+
+            DiffResult<Index> listDifferences = ListDiff.compareLists(commitedIndexData,indexTabController.getTableIndexes(),Index.indexAttributeComparator,Index.class);
+            if(ListDiff.noDiff(listDifferences)) return;
+
+            // Index deletion, addition, altering
+            applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
+            Optional<List<Index>> indexesToBeDeleted = Optional.ofNullable(dropTableIndexes(listDifferences));
+            Optional<List<Index>> indexesToBeCreated = Optional.ofNullable(addTableIndexes(listDifferences));
+            QueryExecutor.executeQuery(applyQuery,true);
+
+             indexesToBeCreated.ifPresent(this::renderNewIndexes);
+
+            indexTabController.commitedIndexData = new LinkedList<>(indexTabController.indexData)
+                    .stream().map(Index::deepCopy).toList();
 
         }else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(foreignKeyTab)){
             List<ForeignKey> tableForeignKeys = foreignKeyTabController.getTableForeignKeys();
             createForeignKeys(tableForeignKeys);
         }
     }
+
+    private void renderNewIndexes(@NotNull List<Index> indices) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+
+        for(Index index : indices){
+            TreeItem<String> newIndexNode = getBrowserController().loadIndexTreeItem(currentTable,index.getName());
+            tableTreeItemToChange.getChildren().get(1).getChildren().add(newIndexNode);
+        }
+
+    }
+
 
     private void renderNewColumns(List<Column> columnsToBeAdded) {
         TreeItem<String> tableTreeItemToChange =
@@ -417,17 +450,17 @@ public class PanelTableCreation implements Initializable {
     private List<Column> addTableColumns(DiffResult<Column> columnsDiff){
         if(columnsDiff.added.isEmpty()) return null;
 
-        List<Column> columnsToBeRendered = new LinkedList<>();
+        List<Column> columnsToBeCreated = new LinkedList<>();
         for(int i = 0; i < columnsDiff.added.size(); i++){
             Column column = columnsDiff.added.get(i);
             column.setTable(currentTable);
-            columnsToBeRendered.add(column);
+            columnsToBeCreated.add(column);
             applyQuery += DDLGenerator.createColumnAdditionQuery(column);
             if(i != columnsDiff.added.size() - 1) applyQuery += ",\n";
             else applyQuery += ";\n";
         }
 
-        return columnsToBeRendered;
+        return columnsToBeCreated;
     }
 
     private void changeTableColumnsAttributes(DiffResult<Column> columnsDiff){
@@ -438,6 +471,39 @@ public class PanelTableCreation implements Initializable {
         }
     }
 
+    private List<Index> dropTableIndexes(DiffResult<Index> indexDiff) {
+        if(indexDiff.removed.isEmpty()) return null;
+
+        List<Index> indexesToBeDeleted = new LinkedList<>();
+        for(int i = 0; i < indexDiff.removed.size(); i++){
+            Index index = indexDiff.removed.get(i);
+            index.setTable(currentTable);
+            indexesToBeDeleted.add(index);
+            applyQuery += DDLGenerator.createIndexDropQuery(index);
+            if(i != indexDiff.removed.size() - 1) applyQuery += ",\n";
+            else applyQuery += ";\n";
+        }
+        return indexesToBeDeleted;
+    }
+
+    private List<Index> addTableIndexes(DiffResult<Index> indexDiff){
+        if(indexDiff.added.isEmpty()) return null;
+
+        List<Index> indexesToBeCreated = new LinkedList<>();
+        for(int i = 0; i < indexDiff.added.size(); i++){
+            Index index = indexDiff.added.get(i);
+            index.setTable(currentTable);
+            indexesToBeCreated.add(index);
+            applyQuery += DDLGenerator.createIndexCreationQuery(index);
+            if(i != indexDiff.added.size() - 1) applyQuery += ",\n";
+            else applyQuery += ";\n";
+        }
+        return indexesToBeCreated;
+    }
+
+    private void changeTableIndexAttributes(DiffResult<Index> indexDiff){
+        throw new NotImplementedError();
+    }
 //    public void createTable() {
 //
 //        if(txtTableName.getText().isEmpty())
