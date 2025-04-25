@@ -362,27 +362,23 @@ public class Column {
         return Objects.hash(name, primaryKey, notNull, unique, binary, unsigned, zeroFill, autoIncrement, size, generationExpression, defaultValue, comment, type);
     }
 
-    public static List<Column> deepCopy(List<Column> columns) {
-        List<Column> deepColumn = new LinkedList<>();
-
-        for (Column column : columns) {
-            deepColumn.add(new Column(
-                    column.getName(),
-                    column.isPrimaryKey(),
-                    column.isNotNull(),
-                    column.isUnique(),
-                    column.isBinary(),
-                    column.isUnsigned(),
-                    column.isZeroFill(),
-                    column.isAutoIncrement(),
-                    column.getSize(),
-                    column.isGenerationExpression(),
-                    column.getDefaultValue(),
-                    column.getComment(),
-                    column.getType(),
-                    column.getTable()
-            ));
-        }
+    public static Column deepCopy(Column column) {
+        Column deepColumn = new Column(
+                column.getName(),
+                column.isPrimaryKey(),
+                column.isNotNull(),
+                column.isUnique(),
+                column.isBinary(),
+                column.isUnsigned(),
+                column.isZeroFill(),
+                column.isAutoIncrement(),
+                column.getSize(),
+                column.isGenerationExpression(),
+                column.getDefaultValue(),
+                column.getComment(),
+                column.getType(),
+                column.getTable()
+        );
         return deepColumn;
     }
 

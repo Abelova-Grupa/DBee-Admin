@@ -3,8 +3,11 @@ package com.abelovagrupa.dbeeadmin.model.index;
 import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.beans.property.*;
+import javafx.collections.ObservableList;
+import kotlin.NotImplementedError;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -39,6 +42,39 @@ public class Index {
         this.indexedColumns = indexedColumns;
         this.unique = unique;
         this.table = table;
+    }
+
+    public static boolean containsByAttributes(List<Index> indexes, Index index) {
+        for(Index indx : indexes){
+            if(matchesByAttributes(indx,index)) return true;
+        }
+        return false;
+    }
+
+    private static boolean matchesByAttributes(Index a, Index b) {
+        return Objects.equals(a.getName(), b.getName()) &&
+                Objects.equals(a.getType(), b.getType()) &&
+                Objects.equals(a.getStorageType(), b.getStorageType()) &&
+                Objects.equals(a.getKeyBlockSize(), b.getKeyBlockSize()) &&
+                Objects.equals(a.getParser(), b.getParser()) &&
+                a.isVisible() == b.isVisible() &&
+                Objects.equals(a.getIndexedColumns(), b.getIndexedColumns()) &&
+                a.isUnique() == b.isUnique() &&
+                Objects.equals(a.getTable(), b.getTable());
+    }
+
+    public static Index deepCopy(Index index) {
+        return new Index(
+                index.getName(),
+                index.getType(),
+                index.getStorageType(),
+                index.getKeyBlockSize(),
+                index.getParser(),
+                index.isVisible(),
+                index.getIndexedColumns(),
+                index.isUnique(),
+                index.getTable()
+        );
     }
 
     public String getName() {

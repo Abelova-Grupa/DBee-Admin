@@ -12,6 +12,7 @@ module com.abelovagrupa.dbeeadmin {
     requires annotations;
     requires org.apache.logging.log4j;
     requires org.apache.logging.log4j.core;
+    requires kotlin.stdlib;
 
 
     opens com.abelovagrupa.dbeeadmin to javafx.fxml;

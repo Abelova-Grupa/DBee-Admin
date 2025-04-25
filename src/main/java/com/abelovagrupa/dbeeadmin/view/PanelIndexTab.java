@@ -61,7 +61,9 @@ public class PanelIndexTab implements Initializable {
     @FXML
     TextArea optionTxtArea;
 
-    ObservableList<Index> indexData = FXCollections.observableArrayList(new Index());
+    List<Index> commitedIndexData = new LinkedList<>();
+
+    ObservableList<Index> indexData = FXCollections.observableArrayList(commitedIndexData);
 
     ObservableList<IndexedColumn> indexedColumnData = FXCollections.observableArrayList();
 
@@ -72,6 +74,7 @@ public class PanelIndexTab implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Setting up index table properties
+        indexData.add(new Index());
         indexTable.setEditable(true);
         indexTable.setItems(indexData);
 
@@ -323,6 +326,7 @@ public class PanelIndexTab implements Initializable {
         List<Index> indexes = new ArrayList<>(indexData);
         indexes.removeLast();
         indexes.removeIf(s -> s.getName().equals("PRIMARY") && s.getType().equals(IndexType.PRIMARY));
+        indexes.removeIf(this::emptyProperties);
         return indexes;
     }
 

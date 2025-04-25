@@ -3,6 +3,9 @@ package com.abelovagrupa.dbeeadmin.model.index;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import javafx.beans.property.*;
 
+import java.net.spi.InetAddressResolver;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class IndexedColumn {
@@ -151,6 +154,16 @@ public class IndexedColumn {
         return getOrderNumber() == that.getOrderNumber() && getLength() == that.getLength() && getColumn().equals(that.getColumn()) && getOrder() == that.getOrder() && getIndex().equals(that.getIndex());
     }
 
+    public static IndexedColumn deepCopy(IndexedColumn indexedColumn){
+        return new IndexedColumn(
+                Column.deepCopy(indexedColumn.getColumn()),
+                indexedColumn.getOrderNumber(),
+                indexedColumn.getOrder(),
+                indexedColumn.getLength(),
+                indexedColumn.getIndex()
+        );
+    }
+    
     @Override
     public int hashCode() {
         int result = getColumn().hashCode();

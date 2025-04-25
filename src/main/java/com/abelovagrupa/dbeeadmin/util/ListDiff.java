@@ -1,6 +1,7 @@
 package com.abelovagrupa.dbeeadmin.util;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,24 @@ public class ListDiff {
                     result.added.add(newItem);
                 }
             }
+        }
+
+        if(compareClass == Index.class){
+            List<Index> newIndexList = (List<Index>) newList;
+            List<Index> oldIndexList = (List<Index>) oldList;
+
+            for(T oldItem : oldList) {
+                if(!Index.containsByAttributes(newIndexList, (Index) oldItem)){
+                    result.removed.add(oldItem);
+                }
+            }
+
+            for(T newItem : newList) {
+                if(!Index.containsByAttributes(oldIndexList, (Index) newItem)){
+                    result.added.add(newItem);
+                }
+            }
+
         }
 
         for(int i = 0; i < Math.min(oldList.size(),newList.size()); i++){
