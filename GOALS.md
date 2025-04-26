@@ -7,7 +7,7 @@ This document contains a list of objectives that must be accomplished in order t
 - [x] SQL Code editor
 - [x] Result table
 - [x] History panel
-- [ ] Tree browser
+- [X] Tree browser
 - [ ] Database connector
 
 ### Visual schema operations
