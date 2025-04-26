@@ -162,18 +162,18 @@ public class PanelTableCreation implements Initializable {
                         }
                     }
                     if(columTabController.columnsData.size() > foreignKeyTabController.foreignKeyColumnsData.size()
-                            && ProgramState.getInstance().getSelectedSchema() != null && ProgramState.getInstance().getSelectedTable() != null){
+                            && currentTable != null && currentTable.getSchema() != null){
                         // If a table and schema are selected fill comboBox and referencing columns
                         foreignKeyTabController.foreignKeyColumnsData.clear();
 
-                        List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(ProgramState.getInstance().getSelectedSchema());
+                        List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(currentTable.getSchema());
                         foreignKeyTabController.cbReferencedTable.clear();
                         for(String schemaTableName : schemaTablesNames){
-                            foreignKeyTabController.cbReferencedTable.add(ProgramState.getInstance().getSelectedSchema().getName()+"."+schemaTableName);
+                            foreignKeyTabController.cbReferencedTable.add(currentTable.getSchema().getName()+"."+schemaTableName);
                         }
 
-                        for(int i=0; i < ProgramState.getInstance().getSelectedTable().getColumns().size();i++){
-                            Column column = ProgramState.getInstance().getSelectedTable().getColumns().get(i);
+                        for(int i=0; i < currentTable.getColumns().size();i++){
+                            Column column = currentTable.getColumns().get(i);
                             ForeignKeyColumns newPair = new ForeignKeyColumns();
                             newPair.setFirst(column);
                             foreignKeyTabController.foreignKeyColumnsData.add(newPair);
@@ -211,7 +211,7 @@ public class PanelTableCreation implements Initializable {
             applyQuery = "";
             List<Column> commitedColumnData = new LinkedList<>(columTabController.commitedColumnData);
             // Removing last empty row from list copy
-            if(!commitedColumnData.isEmpty()) commitedColumnData.removeLast();
+            if(!commitedColumnData.isEmpty() && columTabController.emptyProperties(commitedColumnData.getLast())) commitedColumnData.removeLast();
 
             DiffResult<Column> listDifferences = ListDiff.compareLists(commitedColumnData,columTabController.getTableColumns(),Column.columnAttributeComparator,Column.class);
             if(ListDiff.noDiff(listDifferences)) return;
@@ -245,7 +245,7 @@ public class PanelTableCreation implements Initializable {
 
             applyQuery = "";
             List<Index> commitedIndexData = new LinkedList<>(indexTabController.commitedIndexData);
-            if(!commitedIndexData.isEmpty()) commitedIndexData.removeLast();
+            if(!commitedIndexData.isEmpty() && indexTabController.emptyProperties(commitedIndexData.getLast())) commitedIndexData.removeLast();
 
             DiffResult<Index> listDifferences = ListDiff.compareLists(commitedIndexData,indexTabController.getTableIndexes(),Index.indexAttributeComparator,Index.class);
             if(ListDiff.noDiff(listDifferences)) return;
@@ -266,8 +266,8 @@ public class PanelTableCreation implements Initializable {
             if(currentTable == null) return;
 
             applyQuery = "";
-            List<ForeignKey> commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.foreignKeyData);
-            if(!commitedForeignKeyData.isEmpty()) commitedForeignKeyData.removeLast();
+            List<ForeignKey> commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.commitedForeignKeyData);
+            if(!commitedForeignKeyData.isEmpty() && foreignKeyTabController.emptyProperties(commitedForeignKeyData.getLast())) commitedForeignKeyData.removeLast();
 
             DiffResult<ForeignKey> listDifferences = ListDiff.compareLists(commitedForeignKeyData,foreignKeyTabController.getTableForeignKeys(),ForeignKey.foreignKeyAttributeComparator,ForeignKey.class);
             if(ListDiff.noDiff(listDifferences)) return;
@@ -332,6 +332,7 @@ public class PanelTableCreation implements Initializable {
         for(int i = 0; i < fkDiff.added.size(); i++){
             ForeignKey foreignKey = fkDiff.added.get(i);
             foreignKey.setReferencingTable(currentTable);
+            foreignKey.setReferencingSchema(currentTable.getSchema());
             foreignKeyToBeCreated.add(foreignKey);
             applyQuery += DDLGenerator.createForeignKeyCreationQuery(foreignKey);
             if(i != fkDiff.added.size() - 1) applyQuery += ",\n";
@@ -348,6 +349,7 @@ public class PanelTableCreation implements Initializable {
         for(int i = 0; i < fkDiff.removed.size(); i++){
             ForeignKey foreignKey = fkDiff.removed.get(i);
             foreignKey.setReferencingTable(currentTable);
+            foreignKey.setReferencingSchema(currentTable.getSchema());
             foreignKeysToBeDeleted.add(foreignKey);
             applyQuery += DDLGenerator.createForeignKeyDropQuery(foreignKey);
             if(i != fkDiff.removed.size() - 1) applyQuery += ",\n";
