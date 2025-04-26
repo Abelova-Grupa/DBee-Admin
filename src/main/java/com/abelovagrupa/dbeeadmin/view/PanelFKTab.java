@@ -21,6 +21,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -57,7 +58,9 @@ public class PanelFKTab implements Initializable {
     @FXML
     TextArea fkCommentTxtArea;
 
-    ObservableList<ForeignKey> foreignKeyData = FXCollections.observableArrayList(new ForeignKey());
+    List<ForeignKey> commitedForeignKeyData = new LinkedList<>();
+
+    ObservableList<ForeignKey> foreignKeyData = FXCollections.observableArrayList(commitedForeignKeyData);
 
     ObservableList<ForeignKeyColumns> foreignKeyColumnsData = FXCollections.observableArrayList(new ForeignKeyColumns());
 
@@ -77,6 +80,7 @@ public class PanelFKTab implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Setting up foreign key table properties
+        foreignKeyData.add(new ForeignKey());
         foreignKeyTable.setEditable(true);
         foreignKeyTable.setItems(foreignKeyData);
 
@@ -182,25 +186,6 @@ public class PanelFKTab implements Initializable {
             selectedPair.setReferencedColumnProperty(column.getName());
         });
 
-        //Selection listeners
-        foreignKeyTable.getSelectionModel().selectedItemProperty().addListener((obs,oldSelection,newSelection) -> {
-            if(newSelection == null || oldSelection == newSelection) return;
-            selectedForeignKey = newSelection;
-
-            int index = foreignKeyTable.getItems().indexOf(newSelection);
-            newSelection.nameProperty().addListener((_,oldVal,newVal) -> {
-                int lastIndex = foreignKeyTable.getItems().size() - 1;
-                if(index != lastIndex) return;
-                foreignKeyTable.getItems().add(new ForeignKey());
-            });
-
-            newSelection.referencedTableProperty().addListener((_,oldVal,newVal) -> {
-                int lastIndex = foreignKeyTable.getItems().size() - 1;
-                if(index != lastIndex) return;
-                foreignKeyTable.getItems().add(new ForeignKey());
-            });
-        });
-
         // Filling onUpdate and onDelete combo boxes with Action enum
         ObservableList<Action> actions = FXCollections.observableArrayList(Action.values());
         cbOnUpdate.setItems(actions);
@@ -218,18 +203,57 @@ public class PanelFKTab implements Initializable {
             }
         });
 
-        // Setting up change listener on fk comment text field
-        fkCommentTxtArea.focusedProperty().addListener((obs,oldVal,newVal) -> {
-            // If the focus is lost check if the input is different from selected fk attribute
-            if(newVal || selectedForeignKey == null) return;
-            if(selectedForeignKey.getComment() == null && fkCommentTxtArea.getText() == null) return;
-            if(selectedForeignKey.getComment() == null && fkCommentTxtArea.getText() != null) {
-                selectedForeignKey.setComment(fkCommentTxtArea.getText());
+        //Selection listeners
+        foreignKeyTable.getSelectionModel().selectedItemProperty().addListener((obs,oldSelection,newSelection) -> {
+            if(newSelection == null || oldSelection == newSelection) return;
+            selectedForeignKey = newSelection;
+
+            int index = foreignKeyTable.getItems().indexOf(newSelection);
+            newSelection.nameProperty().addListener((_,oldVal,newVal) -> {
+                int lastIndex = foreignKeyTable.getItems().size() - 1;
+                if(index != lastIndex) return;
+                foreignKeyTable.getItems().add(new ForeignKey());
+            });
+
+            newSelection.referencedTableProperty().addListener((_,oldVal,newVal) -> {
+                int lastIndex = foreignKeyTable.getItems().size() - 1;
+                if(index != lastIndex) return;
+                foreignKeyTable.getItems().add(new ForeignKey());
+            });
+
+            for(ForeignKeyColumns fkColumn : foreignKeyColumnsData){
+                fkColumn.setCheckedColumnProperty(selectedForeignKey.getColumnPairs().contains(fkColumn));
             }
-            if(!selectedForeignKey.getComment().equals(fkCommentTxtArea.getText())){
-                selectedForeignKey.setComment(fkCommentTxtArea.getText());
-            }
+
+            cbOnUpdate.setOnAction(event -> {
+                Action action = cbOnUpdate.getSelectionModel().getSelectedItem();
+                selectedForeignKey.setOnUpdateAction(action);
+            });
+
+            cbOnDelete.setOnAction(event -> {
+                Action action = cbOnDelete.getSelectionModel().getSelectedItem();
+                selectedForeignKey.setOnDeleteAction(action);
+            });
+
+            // Setting up change listener on fk comment text field
+            fkCommentTxtArea.focusedProperty().addListener((_,oldVal,newVal) -> {
+                // If the focus is lost check if the input is different from selected fk attribute
+                if(newVal || selectedForeignKey == null) return;
+                if(selectedForeignKey.getComment() == null && fkCommentTxtArea.getText() == null) return;
+                if(selectedForeignKey.getComment() == null && fkCommentTxtArea.getText() != null) {
+                    selectedForeignKey.setComment(fkCommentTxtArea.getText());
+                }
+                if(!selectedForeignKey.getComment().equals(fkCommentTxtArea.getText())){
+                    selectedForeignKey.setComment(fkCommentTxtArea.getText());
+                }
+            });
+
+            cbOnUpdate.getSelectionModel().select(selectedForeignKey.getOnUpdateAction());
+            cbOnDelete.getSelectionModel().select(selectedForeignKey.getOnDeleteAction());
+            fkCommentTxtArea.setText(selectedForeignKey.getComment());
         });
+
+
     }
 
     public void setColumnsWidth(){
@@ -275,6 +299,12 @@ public class PanelFKTab implements Initializable {
         //Removing empty row(last table row)
         List<ForeignKey> foreignKeys = new ArrayList<>(foreignKeyData);
         foreignKeys.removeLast();
+        foreignKeys.removeIf(this::emptyProperties);
         return foreignKeys;
+    }
+
+    public boolean emptyProperties(ForeignKey foreignKey){
+        return foreignKey.getName() == null || foreignKey.getReferencedTable() == null;
+
     }
 }

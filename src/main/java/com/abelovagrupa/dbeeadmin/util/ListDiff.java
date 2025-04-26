@@ -1,6 +1,7 @@
 package com.abelovagrupa.dbeeadmin.util;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 
 import java.util.HashMap;
@@ -42,6 +43,24 @@ public class ListDiff {
 
             for(T newItem : newList) {
                 if(!Index.containsByAttributes(oldIndexList, (Index) newItem)){
+                    result.added.add(newItem);
+                }
+            }
+
+        }
+
+        if(compareClass == ForeignKey.class){
+            List<ForeignKey> newFKList = (List<ForeignKey>) newList;
+            List<ForeignKey> oldFkList = (List<ForeignKey>) oldList;
+
+            for(T oldItem : oldList) {
+                if(!ForeignKey.containsByAttributes(newFKList, (ForeignKey) oldItem)){
+                    result.removed.add(oldItem);
+                }
+            }
+
+            for(T newItem : newList) {
+                if(!ForeignKey.containsByAttributes(oldFkList, (ForeignKey) newItem)){
                     result.added.add(newItem);
                 }
             }
