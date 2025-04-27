@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseButton;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.net.URL;
@@ -250,6 +251,31 @@ public class PanelIndexTab implements Initializable {
             indexedColumn.setLength(event.getNewValue());
         });
 
+        // Initializing context menus for each table row
+        indexTable.setRowFactory(tv -> {
+            TableRow<Index> row = new TableRow<>();
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem deleteItem = new MenuItem("Delete index");
+            deleteItem.setOnAction(tblClick -> deleteSelectedIndex(row.getItem()));
+
+            contextMenu.getItems().addAll(deleteItem);
+
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.SECONDARY && !emptyProperties(row.getItem())) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                } else {
+                    contextMenu.hide();
+                }
+            });
+
+            return row;
+        });
+
+    }
+
+    private void deleteSelectedIndex(Index item) {
+        indexData.remove(item);
     }
 
     private void setColumnsEditable(boolean editable) {

@@ -18,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseButton;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -253,7 +254,29 @@ public class PanelFKTab implements Initializable {
             fkCommentTxtArea.setText(selectedForeignKey.getComment());
         });
 
+        foreignKeyTable.setRowFactory(tv -> {
+            TableRow<ForeignKey> row = new TableRow<>();
+            ContextMenu contextMenu = new ContextMenu();
 
+            MenuItem deleteItem = new MenuItem("Delete foreign key");
+            deleteItem.setOnAction(tblClick -> deleteSelectedForeignKey(row.getItem()));
+
+            contextMenu.getItems().addAll(deleteItem);
+
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.SECONDARY && !emptyProperties(row.getItem())) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                } else {
+                    contextMenu.hide();
+                }
+            });
+
+            return row;
+        });
+    }
+
+    private void deleteSelectedForeignKey(ForeignKey item) {
+        foreignKeyData.remove(item);
     }
 
     public void setColumnsWidth(){
