@@ -89,6 +89,23 @@ public class DDLGenerator {
      * @throws IllegalArgumentException if schema does not have a name, schema and at least one column set.
      */
 
+    public static String createSchemaCreationQuery(Schema schema){
+        // Validate
+        if (schema.getName() == null) throw new IllegalArgumentException("Undefined schema name.");
+        if (schema.getCollation() == null) throw new IllegalArgumentException("Undefined schema collation.");
+        if (schema.getCharset() == null) throw new IllegalArgumentException("Undefined schema character set.");
+
+        // Create query
+        String query = "CREATE DATABASE " + schema.getName() + "\n";
+        if (!schema.getCharset().equals(Charset.DEFAULT)) {
+            query += "CHARACTER SET " + schema.getCharset().name() + "\n";
+            if (!schema.getCollation().equals(Collation.DEFAULT)) {
+                query += "COLLATE " + schema.getCollation().name();
+            }
+        }
+        return query;
+    }
+
     public static String createTableCreationQuery(Table table) {
         if (table.getSchema() == null) throw new IllegalArgumentException("Schema is not set.");
         if (table.getName() == null) throw new IllegalArgumentException("Undefined table name.");

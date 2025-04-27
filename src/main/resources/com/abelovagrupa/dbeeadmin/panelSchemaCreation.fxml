@@ -34,7 +34,7 @@
                   <Insets top="10" left="90"/>
                </VBox.margin>
                <children>
-                  <Button fx:id="btnPreview" mnemonicParsing="false" text="Preview SQL" />
+                  <Button fx:id="btnPreview" mnemonicParsing="false" text="Preview SQL" onAction="#previewSQL"/>
                   <Button fx:id="btnPersist" mnemonicParsing="false" text="Create" onAction="#generate"/>
                </children>
             </HBox>
