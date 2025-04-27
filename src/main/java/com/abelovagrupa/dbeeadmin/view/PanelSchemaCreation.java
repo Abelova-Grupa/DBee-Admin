@@ -7,12 +7,14 @@ import com.abelovagrupa.dbeeadmin.model.schema.Collation;
 
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 
+import com.abelovagrupa.dbeeadmin.services.DDLGenerator;
 import com.abelovagrupa.dbeeadmin.services.QueryProcessor;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -366,6 +368,45 @@ public class PanelSchemaCreation implements Initializable {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelSchemaTree.fxml"));
             TreeView<String> schemaView = browserController.loadSchemaView(loader,schemaName);
             browserController.vboxBrowser.getChildren().add(schemaView);
+
+    }
+
+    public void previewSQL() {
+        if(schemaNameTxtField.getText().isBlank()){
+            AlertManager.showErrorDialog("Error","Schema name cannot be empty",null);
+            return;
+        }
+
+        if(schemaNameTxtField.getText().contains(" ")) {
+            AlertManager.showErrorDialog("Error","Schema name cannot have a blank character",null);
+            return;
+        }
+        if(Character.isDigit(schemaNameTxtField.getText().charAt(0))) {
+            AlertManager.showErrorDialog("Error","Schema name cannot have digits at the beginning",null);
+            return;
+        }
+        if(schemaNameTxtField.getText().matches(".*[^a-zA-Z0-9_].*")){
+            AlertManager.showErrorDialog("Error","Schema name cannot have special characters",null);
+            return;
+        }
+
+        if(cbCharset.getSelectionModel().getSelectedItem() == null){
+            AlertManager.showErrorDialog("Error","Charset is not selected",null);
+            return;
+        }
+
+        if(cbCollation.getSelectionModel().getSelectedItem() == null){
+            AlertManager.showErrorDialog("Error","Collation is not selected",null);
+            return;
+        }
+
+        String schemaName = schemaNameTxtField.getText();
+        Charset charset = cbCharset.getSelectionModel().getSelectedItem();
+        Collation collation = cbCollation.getSelectionModel().getSelectedItem();
+
+        Schema schema = new Schema(schemaName,charset,collation,null,0,0);
+        // TODO: Change dialog buttons to only close
+        new DialogSQLPreview(DDLGenerator.createSchemaCreationQuery(schema)).showAndWait();
 
     }
 }
