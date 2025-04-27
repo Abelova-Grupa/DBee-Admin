@@ -5,17 +5,17 @@ import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexType;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseButton;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.net.URL;
@@ -142,6 +142,32 @@ public class PanelColumnTab implements Initializable{
 
         });
 
+        // Initializing context menus for each table row
+        columnTable.setRowFactory(tv -> {
+            TableRow<Column> row = new TableRow<>();
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem deleteItem = new MenuItem("Delete column");
+
+            deleteItem.setOnAction(tblClick -> deleteSelectedColumn(row.getItem()));
+
+            contextMenu.getItems().addAll(deleteItem);
+
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.SECONDARY && !emptyProperties(row.getItem())) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                } else {
+                    contextMenu.hide();
+                }
+            });
+
+            return row;
+        });
+
+    }
+
+    private void deleteSelectedColumn(Column item) {
+        columnsData.remove(item);
     }
 
     public void setColumnsWidth(){
