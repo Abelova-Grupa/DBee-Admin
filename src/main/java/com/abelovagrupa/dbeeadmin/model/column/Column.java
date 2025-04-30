@@ -95,7 +95,7 @@ public class Column {
     }
 
     public String getName() {
-        if(nameProperty != null)
+        if(nameProperty != null && nameProperty.get() != null)
             return nameProperty.get();
         else return name;
     }

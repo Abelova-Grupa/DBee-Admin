@@ -180,14 +180,6 @@ public class IndexedColumn {
         );
     }
 
-    public boolean matchesByAttributes(IndexedColumn other) {
-        return Objects.equals(this.getColumn(), other.getColumn()) &&
-                this.getOrderNumber() == other.getOrderNumber() &&
-                Objects.equals(this.getOrder(), other.getOrder()) &&
-                this.getLength() == other.getLength() &&
-                Objects.equals(this.getIndex(), other.getIndex());
-    }
-
     @Override
     public int hashCode() {
         int result = getColumn().hashCode();

@@ -201,7 +201,6 @@ public class PanelIndexTab implements Initializable {
 
         indexColumnTable.getSelectionModel().selectedItemProperty().addListener((_,oldSelection,newSelection) -> {
             if(newSelection == null || newSelection == oldSelection) return;
-
             selectedIndexedColumn = selectedIndex.getIndexedColumns().stream().filter(s -> s.getColumn().getName().equals(newSelection.getColumn().getName())).findFirst();
         });
 

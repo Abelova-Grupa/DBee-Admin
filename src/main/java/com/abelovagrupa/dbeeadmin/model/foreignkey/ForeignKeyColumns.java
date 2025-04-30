@@ -23,6 +23,19 @@ public class ForeignKeyColumns extends Pair<Column,Column>{
 
     }
 
+    public static ForeignKeyColumns deepCopy(ForeignKeyColumns foreignKeyColumnPair) {
+        if(foreignKeyColumnPair.getFirst() != null && foreignKeyColumnPair.getSecond() != null){
+            return new ForeignKeyColumns(
+                    Column.deepCopy(foreignKeyColumnPair.first),
+                    Column.deepCopy(foreignKeyColumnPair.second));
+        }else if (foreignKeyColumnPair.getFirst() != null){
+            return new ForeignKeyColumns(Column.deepCopy(foreignKeyColumnPair.first),null);
+        }else {
+            return new ForeignKeyColumns(null,Column.deepCopy(foreignKeyColumnPair.second));
+        }
+
+    }
+
     public BooleanProperty checkedColumnProperty(){
         if(checkedColumnProperty == null){
             checkedColumnProperty = new SimpleBooleanProperty(this,"checkedColumn",false);
@@ -55,5 +68,7 @@ public class ForeignKeyColumns extends Pair<Column,Column>{
     public void setReferencedColumnProperty(String columnName){
         referencedColumnProperty().set(columnName);
     }
+
+
 
 }

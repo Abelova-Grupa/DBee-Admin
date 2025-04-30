@@ -5,6 +5,7 @@ import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.Action;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.services.ProgramState;
@@ -21,10 +22,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class PanelFKTab implements Initializable {
 
@@ -77,6 +75,7 @@ public class PanelFKTab implements Initializable {
 
     ForeignKey selectedForeignKey;
 
+    Optional<ForeignKeyColumns> selectedFKColumn;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -142,14 +141,14 @@ public class PanelFKTab implements Initializable {
                             boolean newValue = checkBox.isSelected();
                             foreignKeyColumnPair.setCheckedColumnProperty(newValue);
                             //If the checkBox is at true add new indexed column to index
+                            ForeignKeyColumns fkcCopy = ForeignKeyColumns.deepCopy(foreignKeyColumnPair);
                             if(newValue){
-                                selectedForeignKey.getColumnPairs().add(foreignKeyColumnPair);
-//                                selectedForeignKey.getReferencingColumns().add(foreignKeyColumnPair.getFirst());
-//                                selectedForeignKey.getReferencedColumns().add(foreignKeyColumnPair.getSecond());
+                                selectedForeignKey.getColumnPairs().add(fkcCopy);
+                                fkcCopy.setCheckedColumnProperty(true);
                             }else {
-                                selectedForeignKey.getColumnPairs().remove(foreignKeyColumnPair);
-//                                selectedForeignKey.getReferencingColumns().remove(foreignKeyColumnPair.getFirst());
-//                                selectedForeignKey.getReferencedColumns().remove(foreignKeyColumnPair.getSecond());
+                                fkcCopy.setCheckedColumnProperty(false);
+                                selectedForeignKey.getColumnPairs().remove(fkcCopy);
+
                             }
                         }
                     });
@@ -176,6 +175,10 @@ public class PanelFKTab implements Initializable {
             Column column = DatabaseInspector.getInstance().getColumnByName(referencingTable,event.getNewValue());
             Pair<Column,Column> selectedPair = foreignKeyColumnsData.get(event.getTablePosition().getRow());
             selectedPair.setFirst(column);
+            selectedFKColumn.ifPresent(fkcolumn -> {
+                fkcolumn.setFirst(column);
+                fkcolumn.setColumnNameProperty(column.getName());
+            });
         });
 
         fkReferencedColumnTableColumn.setCellValueFactory(cellData -> cellData.getValue().referencedColumnProperty());
@@ -185,6 +188,11 @@ public class PanelFKTab implements Initializable {
             ForeignKeyColumns selectedPair = foreignKeyColumnsData.get(event.getTablePosition().getRow());
             selectedPair.setSecond(column);
             selectedPair.setReferencedColumnProperty(column.getName());
+            selectedFKColumn.ifPresent(fkcolumn -> {
+                fkcolumn.setSecond(column);
+                fkcolumn.setReferencedColumnProperty(column.getName());
+            });
+
         });
 
         // Filling onUpdate and onDelete combo boxes with Action enum
@@ -223,7 +231,15 @@ public class PanelFKTab implements Initializable {
             });
 
             for(ForeignKeyColumns fkColumn : foreignKeyColumnsData){
-                fkColumn.setCheckedColumnProperty(selectedForeignKey.getColumnPairs().contains(fkColumn));
+                Optional<ForeignKeyColumns> selectedForeignKeyColumn = selectedForeignKey.getColumnPairs()
+                        .stream().filter(p -> p.getFirst().getName().equals(fkColumn.getFirst().getName())).findFirst();
+                if(selectedForeignKeyColumn.isPresent()){
+                    fkColumn.setCheckedColumnProperty(selectedForeignKeyColumn.get().checkedColumnProperty().get());
+                    fkColumn.setReferencedColumnProperty(selectedForeignKeyColumn.get().getSecond().getName());
+                }else{
+                    fkColumn.setCheckedColumnProperty(false);
+                    fkColumn.setReferencedColumnProperty(null);
+                }
             }
 
             cbOnUpdate.setOnAction(event -> {
@@ -254,6 +270,11 @@ public class PanelFKTab implements Initializable {
             fkCommentTxtArea.setText(selectedForeignKey.getComment());
         });
 
+        foreignKeyColumnsTable.getSelectionModel().selectedItemProperty().addListener((_,oldSelection,newSelection) -> {
+            if(newSelection == null || newSelection == oldSelection) return;
+            selectedFKColumn = selectedForeignKey.getColumnPairs().stream().filter(c -> c.getFirst().getName().equals(newSelection.getFirst().getName())).findFirst();
+        });
+
         foreignKeyTable.setRowFactory(tv -> {
             TableRow<ForeignKey> row = new TableRow<>();
             ContextMenu contextMenu = new ContextMenu();
@@ -273,6 +294,8 @@ public class PanelFKTab implements Initializable {
 
             return row;
         });
+
+        
     }
 
     private void deleteSelectedForeignKey(ForeignKey item) {
