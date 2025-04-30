@@ -60,15 +60,19 @@ public class IndexedColumn {
         return columnNameProperty;
     }
 
+    public void setColumnNameProperty(String columnName){
+        this.columnNameProperty.set(columnName);
+    }
+
     public int getOrderNumber() {
-        if(orderNumberProperty != null){
+        if(orderNumberProperty != null && orderNumberProperty.get() != 0){
             return orderNumberProperty.get();
         }
         else return orderNumber;
     }
 
     public void setOrderNumber(int orderNumber) {
-        if(orderNumberProperty != null){
+        if(orderNumberProperty != null ){
             orderNumberProperty.set(orderNumber);
         }
         this.orderNumber = orderNumber;
@@ -81,8 +85,12 @@ public class IndexedColumn {
         return orderNumberProperty;
     }
 
+    public void setOrderNumberProperty(int orderNumber){
+        this.orderNumberProperty.set(orderNumber);
+    }
+
     public Order getOrder() {
-        if(orderProperty != null){
+        if(orderProperty != null && orderProperty.get() != null){
             return orderProperty.get();
         }
         else return order;
@@ -102,8 +110,12 @@ public class IndexedColumn {
         return orderProperty;
     }
 
+    public void setOrderProperty(Order order){
+        this.orderProperty.set(order);
+    }
+
     public int getLength() {
-        if(lengthProperty != null){
+        if(lengthProperty != null && lengthProperty.get() != 0){
             return lengthProperty.get();
         }
         else return length;
@@ -121,6 +133,10 @@ public class IndexedColumn {
             lengthProperty = new SimpleIntegerProperty(this,"length",length);
         }
         return lengthProperty;
+    }
+
+    public void setLengthProperty(int length){
+        this.lengthProperty.set(length);
     }
 
     public Index getIndex() {
@@ -163,7 +179,7 @@ public class IndexedColumn {
                 indexedColumn.getIndex()
         );
     }
-    
+
     @Override
     public int hashCode() {
         int result = getColumn().hashCode();
