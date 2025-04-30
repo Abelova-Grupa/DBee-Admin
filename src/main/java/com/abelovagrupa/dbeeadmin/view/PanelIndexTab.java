@@ -72,6 +72,8 @@ public class PanelIndexTab implements Initializable {
 
     Index primaryIndex;
 
+    Optional<IndexedColumn> selectedIndexedColumn;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Setting up index table properties
@@ -131,8 +133,20 @@ public class PanelIndexTab implements Initializable {
             });
 
             // Loading indexed columns of a selected index
-            for(IndexedColumn tableColumn : indexedColumnData){
-                tableColumn.setCheckedColumnProperty(selectedIndex.getIndexedColumns().contains(tableColumn));
+            for(IndexedColumn indexColumn : indexedColumnData){
+                Optional<IndexedColumn> selectedIndexColumn = selectedIndex.getIndexedColumns().stream().filter(i -> i.getColumn().getName().equals(indexColumn.getColumn().getName())).findFirst();
+                if(selectedIndexColumn.isPresent()){
+                    indexColumn.setCheckedColumnProperty(selectedIndexColumn.get().checkedColumnProperty().get());
+                    indexColumn.setOrderNumber(selectedIndexColumn.get().getOrderNumber());
+                    indexColumn.setOrderNumberProperty(selectedIndexColumn.get().getOrderNumber());
+                    indexColumn.setOrder(selectedIndexColumn.get().getOrder());
+                    indexColumn.setLength(selectedIndexColumn.get().getLength());
+                }else {
+                    indexColumn.setCheckedColumnProperty(false);
+                    indexColumn.setOrderNumberProperty(0);
+                    indexColumn.setOrderProperty(null);
+                    indexColumn.setLengthProperty(0);
+                }
             }
             // Loading index options
             // Loading combo box with index storage types for index options
@@ -184,6 +198,13 @@ public class PanelIndexTab implements Initializable {
             optionTxtArea.setText(selectedIndex.getComment());
         });
 
+
+        indexColumnTable.getSelectionModel().selectedItemProperty().addListener((_,oldSelection,newSelection) -> {
+            if(newSelection == null || newSelection == oldSelection) return;
+
+            selectedIndexedColumn = selectedIndex.getIndexedColumns().stream().filter(s -> s.getColumn().getName().equals(newSelection.getColumn().getName())).findFirst();
+        });
+
         // Setting up checkbox for checking columns of an index
         indexedColumnsCheckColumn.setCellValueFactory(cellData -> cellData.getValue().checkedColumnProperty());
         indexedColumnsCheckColumn.setCellFactory(col ->{
@@ -198,11 +219,14 @@ public class PanelIndexTab implements Initializable {
                             boolean newValue = checkBox.isSelected();
                             indexedColumn.setCheckedColumnProperty(newValue);
                             //If the checkBox is at true add new indexed column to index
+                            IndexedColumn indexedColumnCopy = IndexedColumn.deepCopy(indexedColumn);
                             if(newValue){
-                                selectedIndex.getIndexedColumns().add(indexedColumn);
-                                indexedColumn.setIndex(selectedIndex);
+                                selectedIndex.getIndexedColumns().add(indexedColumnCopy);
+                                indexedColumnCopy.setCheckedColumnProperty(true);
+                                indexedColumnCopy.setIndex(selectedIndex);
                             }else {
-                                selectedIndex.getIndexedColumns().remove(indexedColumn);
+                                indexedColumnCopy.setCheckedColumnProperty(false);
+                                selectedIndex.getIndexedColumns().remove(indexedColumnCopy);
                             }
 
                         }
@@ -234,6 +258,8 @@ public class PanelIndexTab implements Initializable {
         indexedColumnsNoColumn.setOnEditCommit(event -> {
             IndexedColumn indexedColumn = event.getRowValue();
             indexedColumn.setOrderNumber(event.getNewValue());
+            indexedColumn.setOrderNumberProperty(event.getNewValue());
+            selectedIndexedColumn.ifPresent(column -> column.setOrderNumber(event.getNewValue()));
         });
 
         ObservableList<Order> orderTypes = FXCollections.observableArrayList(Order.values());
@@ -242,6 +268,8 @@ public class PanelIndexTab implements Initializable {
         indexedColumnOrderColumn.setOnEditCommit(event -> {
             IndexedColumn indexedColumn = event.getRowValue();
             indexedColumn.setOrder(event.getNewValue());
+            indexedColumn.setOrderProperty(event.getNewValue());
+            selectedIndexedColumn.ifPresent(column -> column.setOrder(event.getNewValue()));
         });
 
         indexedColumnLength.setCellValueFactory(cellData -> cellData.getValue().lengthProperty().asObject());
@@ -249,6 +277,8 @@ public class PanelIndexTab implements Initializable {
         indexedColumnLength.setOnEditCommit(event -> {
             IndexedColumn indexedColumn = event.getRowValue();
             indexedColumn.setLength(event.getNewValue());
+            indexedColumn.setLengthProperty(event.getNewValue());
+            selectedIndexedColumn.ifPresent(column -> column.setLength(event.getNewValue()));
         });
 
         // Initializing context menus for each table row

@@ -140,6 +140,7 @@ public class PanelTableCreation implements Initializable {
                     if(!newTab.equals(indexTab)) return;
                     indexedColumns.clear();
                     for (Column column : columTabController.columnsData){
+                        if(columTabController.emptyProperties(column)) continue;
                         IndexedColumn indexedColumn = new IndexedColumn();
                         indexedColumn.setColumn(column);
                         indexedColumns.add(indexedColumn);
