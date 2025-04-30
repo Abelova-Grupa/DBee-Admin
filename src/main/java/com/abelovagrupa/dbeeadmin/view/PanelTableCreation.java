@@ -292,6 +292,7 @@ public class PanelTableCreation implements Initializable {
         TreeItem<String> tableTreeItemToChange =
                 getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
                         getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
 
         for(ForeignKey foreignKey : foreignKeys){
             TreeItem<String> newForeignKeyNode = getBrowserController().loadForeignKeyTreeItem(currentTable,foreignKey.getName());
@@ -304,6 +305,7 @@ public class PanelTableCreation implements Initializable {
         TreeItem<String> tableTreeItemToChange =
                 getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
                         getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
 
         List<TreeItem<String>> foreignKeyTreeItemsToDelete = getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
                 getSecond().getTableNodesHashMap().get(currentTable.getName()).getSecond().getForeignKeyNodesHashMap().values().stream().toList();
@@ -364,6 +366,7 @@ public class PanelTableCreation implements Initializable {
         TreeItem<String> tableTreeItemToChange =
                 getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
                         getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
 
         List<TreeItem<String>> indexTreeItemsToDelete = getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
                 getSecond().getTableNodesHashMap().get(currentTable.getName()).getSecond().getIndexNodesHashMap().values().stream().toList();
@@ -390,6 +393,7 @@ public class PanelTableCreation implements Initializable {
         TreeItem<String> tableTreeItemToChange =
                 getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
                         getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
 
         for(Index index : indices){
             TreeItem<String> newIndexNode = getBrowserController().loadIndexTreeItem(currentTable,index.getName());
@@ -402,6 +406,7 @@ public class PanelTableCreation implements Initializable {
         TreeItem<String> tableTreeItemToChange =
                 getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
                         getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
 
         for(Column column : columnsToBeAdded){
             TreeItem<String> newColumnNode = getBrowserController().loadColumnTreeItem(currentTable,column.getName());
@@ -411,6 +416,7 @@ public class PanelTableCreation implements Initializable {
 
     private void renderNewTable(Table currentTable) {
         TreeItem<String> newTableNode = getBrowserController().loadTableTreeItem(currentTable.getSchema(),currentTable.getName());
+        if(newTableNode == null) return;
 
         TreeView<String> schemaViewToChange = getBrowserController()
                 .getSchemaHashMap().get(currentTable.getSchema().getName()).getFirst();

@@ -486,6 +486,7 @@ public class PanelBrowser implements Initializable {
     }
 
     public TreeItem<String> loadTableTreeItem(Schema schema, String tableName) {
+        if(schemaHashMap.get(schema.getName()).getSecond().getTableNodesHashMap().containsKey(tableName)) return null;
         TreeItem<String> tableNode = new TreeItem<>(tableName, new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png")).toExternalForm())));
         TreeItem<String> columnBranch = new TreeItem<>("Columns", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png")).toExternalForm())));
         TreeItem<String> columnDummy = new TreeItem<>("Loading columns...");
@@ -677,6 +678,9 @@ public class PanelBrowser implements Initializable {
     }
 
     public TreeItem<String> loadColumnTreeItem(Table table, String columnName) {
+        if(schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getColumnNodesHashMap().containsKey(columnName)) return null;
         TreeItem<String> columnNode = new TreeItem<>(columnName);
 
         schemaHashMap.get(table.getSchema().getName()).getSecond()
@@ -687,6 +691,9 @@ public class PanelBrowser implements Initializable {
     }
 
     public TreeItem<String> loadIndexTreeItem(Table table, String indexName) {
+        if(schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getIndexNodesHashMap().containsKey(indexName)) return null;
         TreeItem<String> indexNode = new TreeItem<>(indexName);
 
         schemaHashMap.get(table.getSchema().getName()).getSecond()
@@ -697,6 +704,9 @@ public class PanelBrowser implements Initializable {
     }
 
     public TreeItem<String> loadForeignKeyTreeItem(Table table, String foreignKeyName) {
+        if(schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getForeignKeyNodesHashMap().containsKey(foreignKeyName)) return null;
         TreeItem<String> foreignKeyNode = new TreeItem<>(foreignKeyName);
 
         schemaHashMap.get(table.getSchema().getName()).getSecond()
