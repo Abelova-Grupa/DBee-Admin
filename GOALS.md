@@ -48,6 +48,5 @@ This document contains a list of objectives that must be accomplished in order t
 - [x] Index creation
 - [ ] Index altering
 - [X] Index removal
-- [ ] Index rebuilding
   
   
