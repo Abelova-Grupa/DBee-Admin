@@ -515,16 +515,37 @@ public class DDLGenerator {
         if (c.isZeroFill()) sql.append("ZEROFILL ");
         if (c.getDefaultValue() != null) {
             sql.append("DEFAULT ");
-            sql.append(c.getDefaultValue()).append(" ");
+            sql.append(DDLGenerator.formatDefaultValue(c)).append(" ");
         }
         if (c.isGenerationExpression()) {
             sql.append("GENERATED ALWAYS AS (");
-            sql.append(c.getDefaultValue()).append(") ");
+            sql.append(DDLGenerator.formatDefaultValue(c)).append(") ");
         }
         sql.setLength(sql.length() - 1); // Cut trailing space
         sql.append(",\n");
 
         return sql.toString();
+    }
+
+    private static String formatDefaultValue(Column c) {
+        Object defaultValue = c.getDefaultValue();
+        if (defaultValue == null) return null;
+
+        switch (c.getType()) {
+            case VARCHAR:
+            case CHAR:
+            case TEXT:
+            case DATE:
+            case TIME:
+            case DATETIME:
+            case TIMESTAMP:
+                return "'" + defaultValue.toString().replace("'", "''") + "'";
+            case BOOLEAN:
+                return ((defaultValue.toString().equalsIgnoreCase("true") || defaultValue.toString().equals("1")) ? "1" : "0");
+            default:
+                // Assume it's numeric
+                return defaultValue.toString();
+        }
     }
 
     /**
