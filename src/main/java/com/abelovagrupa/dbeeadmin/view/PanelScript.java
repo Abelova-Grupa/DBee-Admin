@@ -114,10 +114,6 @@ public class PanelScript implements Initializable {
            result = QueryExecutor.executeQuery(codeArea.getText());
         }
 
-
-
-
-
         printHistory((result.getSecond() != null) ? result.getSecond() : 0, result.getFirst() != null);
         try {
             printResultSetToTable(result.getFirst());

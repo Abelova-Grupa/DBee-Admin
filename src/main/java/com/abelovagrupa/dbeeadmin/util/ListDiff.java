@@ -1,6 +1,8 @@
 package com.abelovagrupa.dbeeadmin.util;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.index.Index;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,23 +14,6 @@ public class ListDiff {
 //        Set<T> oldSet = new HashSet<>(oldList);
 //        Set<T> newSet = new HashSet<>(newList);
 
-        if(compareClass == Column.class){
-            List<Column> newColumnList = (List<Column>) newList;
-            List<Column> oldColumnList = (List<Column>) oldList;
-
-            for(T oldItem : oldList) {
-                if(!Column.containsByAttributes(newColumnList, (Column) oldItem)){
-                    result.removed.add(oldItem);
-                }
-            }
-
-            for(T newItem : newList) {
-                if(!Column.containsByAttributes(oldColumnList, (Column) newItem)){
-                    result.added.add(newItem);
-                }
-            }
-        }
-
         for(int i = 0; i < Math.min(oldList.size(),newList.size()); i++){
             T oldItem = oldList.get(i);
             T newItem = newList.get(i);
@@ -39,7 +24,74 @@ public class ListDiff {
             }
 
         }
+
+        if(compareClass == Column.class){
+            List<Column> newColumnList = (List<Column>) newList;
+            List<Column> oldColumnList = (List<Column>) oldList;
+
+            for(T oldItem : oldList) {
+                if(!Column.containsByAttributes(newColumnList, (Column) oldItem) && !ListDiff.hasChangedAttributes(oldItem,result)){
+                    result.removed.add(oldItem);
+                }
+            }
+
+            for(T newItem : newList) {
+                if(!Column.containsByAttributes(oldColumnList, (Column) newItem) && !ListDiff.hasChangedAttributes(newItem,result)){
+                    result.added.add(newItem);
+                }
+            }
+        }
+
+        if(compareClass == Index.class){
+            List<Index> newIndexList = (List<Index>) newList;
+            List<Index> oldIndexList = (List<Index>) oldList;
+
+            for(T oldItem : oldList) {
+                if(!Index.containsByAttributes(newIndexList, (Index) oldItem)){
+                    result.removed.add(oldItem);
+                }
+            }
+
+            for(T newItem : newList) {
+                if(!Index.containsByAttributes(oldIndexList, (Index) newItem)){
+                    result.added.add(newItem);
+                }
+            }
+
+        }
+
+        if(compareClass == ForeignKey.class){
+            List<ForeignKey> newFKList = (List<ForeignKey>) newList;
+            List<ForeignKey> oldFkList = (List<ForeignKey>) oldList;
+
+            for(T oldItem : oldList) {
+                if(!ForeignKey.containsByAttributes(newFKList, (ForeignKey) oldItem)){
+                    result.removed.add(oldItem);
+                }
+            }
+
+            for(T newItem : newList) {
+                if(!ForeignKey.containsByAttributes(oldFkList, (ForeignKey) newItem)){
+                    result.added.add(newItem);
+                }
+            }
+
+        }
+
+
         return result;
+    }
+
+    private static <T> boolean hasChangedAttributes(T oldItem, DiffResult<T> result) {
+        if(oldItem instanceof Column){
+            Column column = (Column) oldItem;
+            DiffResult<Column> columnResult = (DiffResult<Column>) result;
+            for(Column col : columnResult.changedAttributes.keySet()){
+                if(col.getName().equals(column.getName())) return true;
+            }
+            return false;
+        }
+        return false;
     }
 
     public static <T> boolean noDiff(DiffResult<T> listDifference){

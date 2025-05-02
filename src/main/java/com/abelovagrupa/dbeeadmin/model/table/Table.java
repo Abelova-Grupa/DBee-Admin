@@ -124,10 +124,10 @@ public class Table {
     @Override
     public int hashCode() {
         int result = getName().hashCode();
-        result = 31 * result + getColumns().hashCode();
-        result = 31 * result + getIndexes().hashCode();
-        result = 31 * result + Objects.hashCode(getForeignKeys());
-        result = 31 * result + Objects.hashCode(getTriggers());
+//        result = 31 * result + getColumns().hashCode();
+//        result = 31 * result + getIndexes().hashCode();
+//        result = 31 * result + Objects.hashCode(getForeignKeys());
+//        result = 31 * result + Objects.hashCode(getTriggers());
         result = 31 * result + getDbEngine().hashCode();
         result = 31 * result + getSchema().hashCode();
         return result;

@@ -86,6 +86,23 @@ public class DDLGenerator {
      * @throws IllegalArgumentException if schema does not have a name, schema and at least one column set.
      */
 
+    public static String createSchemaCreationQuery(Schema schema){
+        // Validate
+        if (schema.getName() == null) throw new IllegalArgumentException("Undefined schema name.");
+        if (schema.getCollation() == null) throw new IllegalArgumentException("Undefined schema collation.");
+        if (schema.getCharset() == null) throw new IllegalArgumentException("Undefined schema character set.");
+
+        // Create query
+        String query = "CREATE DATABASE " + schema.getName() + "\n";
+        if (!schema.getCharset().equals(Charset.DEFAULT)) {
+            query += "CHARACTER SET " + schema.getCharset().name() + "\n";
+            if (!schema.getCollation().equals(Collation.DEFAULT)) {
+                query += "COLLATE " + schema.getCollation().name();
+            }
+        }
+        return query;
+    }
+
     public static String createTableCreationQuery(Table table) {
         if (table.getSchema() == null) throw new IllegalArgumentException("Schema is not set.");
         if (table.getName() == null) throw new IllegalArgumentException("Undefined table name.");
@@ -104,7 +121,7 @@ public class DDLGenerator {
 
         // TODO: Engine
         queryBuilder.setLength(queryBuilder.length() - 2); // Cut trailing comma and enter
-        queryBuilder.append("\n);");
+        queryBuilder.append("\n)");
 
         return queryBuilder.toString();
 
@@ -118,7 +135,7 @@ public class DDLGenerator {
         if (schema.getName().isEmpty() || schema.getName() == null)
             throw new IllegalArgumentException("Schema name is not set!");
         // Build
-        return "DROP DATABASE IF EXISTS " + schema.getName() + " ;";
+        return "DROP DATABASE IF EXISTS " + schema.getName();
     }
 
     public static String createTableDropQuery(Table table) {
@@ -130,7 +147,7 @@ public class DDLGenerator {
             throw new IllegalArgumentException("Schema name is not set!");
 
         // Build
-        return "DROP TABLE IF EXISTS " + table.getSchema().getName() + "." + table.getName() + " ;";
+        return "DROP TABLE IF EXISTS " + table.getSchema().getName() + "." + table.getName();
     }
 
     public static String createTableTruncateQuery(Table table) {
@@ -139,7 +156,7 @@ public class DDLGenerator {
             throw new IllegalArgumentException("Table name is not set!");
 
         // Build
-        return "TRUNCATE TABLE " + table.getName() + " ;";
+        return "TRUNCATE TABLE " + table.getName();
     }
 
     public static String createColumnAdditionQuery(Column column) {
@@ -190,10 +207,7 @@ public class DDLGenerator {
             throw new IllegalArgumentException("Schema is not set!");
         if (column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
             throw new IllegalArgumentException("Schema name is not set!");
-
-        return "ALTER TABLE " + column.getTable().getSchema().getName() +
-            "." +
-            column.getTable().getName() +
+        return
             "RENAME COLUMN " +
             column.getName() +
             " TO " +
@@ -211,14 +225,9 @@ public class DDLGenerator {
         if (column.getTable().getSchema().getName().isEmpty() || column.getTable().getSchema().getName() == null)
             throw new IllegalArgumentException("Schema name is not set!");
 
-        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
-        queryBuilder.append(column.getTable().getSchema().getName());
-        queryBuilder.append(".");
-        queryBuilder.append(column.getTable().getName());
-        queryBuilder.append("MODIFY COLUMN \n");
-
+        StringBuilder queryBuilder = new StringBuilder("MODIFY COLUMN \n");
         queryBuilder.append(convertColumnToSQL(column));
-        queryBuilder.setLength(queryBuilder.length() - 1);
+        queryBuilder.setLength(queryBuilder.length() - 2);
 
         return queryBuilder.toString();
     }
@@ -241,12 +250,7 @@ public class DDLGenerator {
         if (foreignKey.getReferencingColumns() == null || foreignKey.getReferencingColumns().isEmpty())
             throw new IllegalArgumentException("Referencing columns are not set");
 
-        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
-        queryBuilder.append(schema.getName());
-        queryBuilder.append(".");
-        queryBuilder.append(table.getName());
-        queryBuilder.append("\n");
-        queryBuilder.append("ADD CONSTRAINT ").append(foreignKey.getName()).append("\n");
+        StringBuilder queryBuilder = new StringBuilder("ADD CONSTRAINT ").append(foreignKey.getName()).append("\n");
         queryBuilder.append("FOREIGN KEY (");
         for (Column referencingColumn : foreignKey.getReferencingColumns()) {
             queryBuilder.append(referencingColumn.getName());
@@ -264,7 +268,6 @@ public class DDLGenerator {
         queryBuilder.append(")\n");
         queryBuilder.append("ON DELETE ").append(foreignKey.getOnDeleteAction().toString().replace("_", " ")).append("\n");
         queryBuilder.append("ON UPDATE ").append(foreignKey.getOnUpdateAction().toString().replace("_", " "));
-        queryBuilder.append(";");
 
         return queryBuilder.toString();
     }
@@ -279,8 +282,8 @@ public class DDLGenerator {
         if (table == null || table.getName() == null || table.getName().isEmpty())
             throw new IllegalArgumentException("Table is not set");
 
-        return "ALTER TABLE " + schema.getName() + "." + table.getName() + "\n" +
-            " DROP FOREIGN KEY " + foreignKey.getName() + ";";
+
+        return "DROP FOREIGN KEY " + foreignKey.getName();
     }
 
     public static String createForeignKeyRenameQuery(ForeignKey foreignKey, String newName) {
@@ -335,11 +338,10 @@ public class DDLGenerator {
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
 
-        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ");
-        queryBuilder.append(index.getTable().getSchema().getName()).append(".").append(index.getTable().getName()).append("\n");
-        queryBuilder.append("ADD ").append(
+        StringBuilder queryBuilder = new StringBuilder("ADD ")
+                .append(
             !index.getType().equals(IndexType.INDEX) ? index.getType() + " " : " "
-        ).append("INDEX ").append(index.getName()).append(" USING ").append(index.getStorageType()).append(" (");
+        ).append("INDEX ").append(index.getName()).append(" (");
 
         Comparator<IndexedColumn> indexComparator = new Comparator<IndexedColumn>() {
             @Override
@@ -359,15 +361,14 @@ public class DDLGenerator {
             if (i != sortedIndexedColumns.size() - 1) queryBuilder.append(", ");
         }
 
-        queryBuilder.append(")\n ");
+        queryBuilder.append(") USING ").append(index.getStorageType()).append(index.isVisible() ? " VISIBLE " : " INVISIBLE ").append("\n ");
         if (index.getKeyBlockSize() != 0)
             queryBuilder.append("KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize()).append(" ");
         if (index.getParser() != null && !index.getParser().isEmpty())
             queryBuilder.append(" WITH PARSER ").append(index.getParser()).append(" ");
-        queryBuilder.append(index.isVisible() ? "VISIBLE " : "INVISIBLE ");
+
         if (index.getComment() != null && !index.getComment().isEmpty())
-            queryBuilder.append("\nCOMMENT ").append("'").append(index.getComment()).append("';");
-        else queryBuilder.append(";");
+            queryBuilder.append("\nCOMMENT ").append("'").append(index.getComment()).append("'");
 
         return queryBuilder.toString();
     }
@@ -376,9 +377,8 @@ public class DDLGenerator {
         if (index == null) throw new IllegalArgumentException("Index is not set");
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
-
-        return "ALTER TABLE " + index.getTable().getSchema().getName() + index.getTable().getName() + " " +
-            "RENAME INDEX " + index.getName() + " TO " + newName + ";";
+      
+        return "RENAME INDEX " + index.getName() + " TO " + newName;
     }
 
     public static String createIndexDropQuery(Index index) {
@@ -386,11 +386,7 @@ public class DDLGenerator {
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
 
-        StringBuilder queryBuilder = new StringBuilder("ALTER TABLE ").append(index.getTable().getSchema().getName())
-            .append(".").append(index.getTable().getName()).append("\n");
-        queryBuilder.append("DROP INDEX ").append(index.getName());
-
-        return queryBuilder.toString();
+        return "DROP INDEX " + index.getName();
     }
 
     public static String createIndexAlterQuery(Index oldIndex, Index newIndex) {
@@ -514,16 +510,37 @@ public class DDLGenerator {
         if (c.isZeroFill()) sql.append("ZEROFILL ");
         if (c.getDefaultValue() != null) {
             sql.append("DEFAULT ");
-            sql.append(c.getDefaultValue()).append(" ");
+            sql.append(DDLGenerator.formatDefaultValue(c)).append(" ");
         }
         if (c.isGenerationExpression()) {
             sql.append("GENERATED ALWAYS AS (");
-            sql.append(c.getDefaultValue()).append(") ");
+            sql.append(DDLGenerator.formatDefaultValue(c)).append(") ");
         }
         sql.setLength(sql.length() - 1); // Cut trailing space
         sql.append(",\n");
 
         return sql.toString();
+    }
+
+    private static String formatDefaultValue(Column c) {
+        Object defaultValue = c.getDefaultValue();
+        if (defaultValue == null) return null;
+
+        switch (c.getType()) {
+            case VARCHAR:
+            case CHAR:
+            case TEXT:
+            case DATE:
+            case TIME:
+            case DATETIME:
+            case TIMESTAMP:
+                return "'" + defaultValue.toString().replace("'", "''") + "'";
+            case BOOLEAN:
+                return ((defaultValue.toString().equalsIgnoreCase("true") || defaultValue.toString().equals("1")) ? "1" : "0");
+            default:
+                // Assume it's numeric
+                return defaultValue.toString();
+        }
     }
 
     /**

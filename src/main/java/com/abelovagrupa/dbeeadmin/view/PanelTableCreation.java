@@ -25,14 +25,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import kotlin.NotImplementedError;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class PanelTableCreation implements Initializable {
 
@@ -65,7 +63,7 @@ public class PanelTableCreation implements Initializable {
     Tab triggerTab;
 
     //Tab Controllers
-    PanelColumnTab columTabController;
+    PanelColumnTab columnTabController;
 
     PanelIndexTab indexTabController;
 
@@ -99,7 +97,7 @@ public class PanelTableCreation implements Initializable {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
             VBox columnsTabContent = loader.load();
 
-            columTabController = loader.getController();
+            columnTabController = loader.getController();
             columnsTab = new Tab("Columns");
             columnsTab.setClosable(false);
 
@@ -139,7 +137,8 @@ public class PanelTableCreation implements Initializable {
                     // If selected tab is index tab load all columns from column tab
                     if(!newTab.equals(indexTab)) return;
                     indexedColumns.clear();
-                    for (Column column : columTabController.columnsData){
+                    for (Column column : columnTabController.columnsData){
+                        if(columnTabController.emptyProperties(column)) continue;
                         IndexedColumn indexedColumn = new IndexedColumn();
                         indexedColumn.setColumn(column);
                         indexedColumns.add(indexedColumn);
@@ -161,19 +160,19 @@ public class PanelTableCreation implements Initializable {
                             throw new RuntimeException(e);
                         }
                     }
-                    if(columTabController.columnsData.size() > foreignKeyTabController.foreignKeyColumnsData.size()
-                            && ProgramState.getInstance().getSelectedSchema() != null && ProgramState.getInstance().getSelectedTable() != null){
+                    if(columnTabController.columnsData.size() > foreignKeyTabController.foreignKeyColumnsData.size()
+                            && currentTable != null && currentTable.getSchema() != null){
                         // If a table and schema are selected fill comboBox and referencing columns
                         foreignKeyTabController.foreignKeyColumnsData.clear();
 
-                        List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(ProgramState.getInstance().getSelectedSchema());
+                        List<String> schemaTablesNames = DatabaseInspector.getInstance().getTableNames(currentTable.getSchema());
                         foreignKeyTabController.cbReferencedTable.clear();
                         for(String schemaTableName : schemaTablesNames){
-                            foreignKeyTabController.cbReferencedTable.add(ProgramState.getInstance().getSelectedSchema().getName()+"."+schemaTableName);
+                            foreignKeyTabController.cbReferencedTable.add(currentTable.getSchema().getName()+"."+schemaTableName);
                         }
 
-                        for(int i=0; i < ProgramState.getInstance().getSelectedTable().getColumns().size();i++){
-                            Column column = ProgramState.getInstance().getSelectedTable().getColumns().get(i);
+                        for(int i=0; i < currentTable.getColumns().size();i++){
+                            Column column = currentTable.getColumns().get(i);
                             ForeignKeyColumns newPair = new ForeignKeyColumns();
                             newPair.setFirst(column);
                             foreignKeyTabController.foreignKeyColumnsData.add(newPair);
@@ -206,53 +205,236 @@ public class PanelTableCreation implements Initializable {
 
     // TODO: Refactor current handler code
     public void handleTableChange(){
-        applyQuery = "";
         // Recognise which tab is currently selected
         if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(columnsTab)){
-            List<Column> commitedColumnData = new LinkedList<>(columTabController.commitedColumnData);
+            applyQuery = "";
+            List<Column> commitedColumnData = new LinkedList<>(columnTabController.commitedColumnData);
             // Removing last empty row from list copy
-            if(!commitedColumnData.isEmpty()) commitedColumnData.removeLast();
+            if(!commitedColumnData.isEmpty() && columnTabController.emptyProperties(commitedColumnData.getLast())) commitedColumnData.removeLast();
 
-            DiffResult<Column> listDifferences = ListDiff.compareLists(commitedColumnData,columTabController.getTableColumns(),Column.columnAttributeComparator,Column.class);
+            DiffResult<Column> listDifferences = ListDiff.compareLists(commitedColumnData, columnTabController.getTableColumns(),Column.columnAttributeComparator,Column.class);
             if(ListDiff.noDiff(listDifferences)) return;
 
             // Creating the table if it doesn't exist
             if(currentTable == null){
                 // Table creation + column creation
-                List<Column> columns = columTabController.getTableColumns();
+                List<Column> columns = columnTabController.getTableColumns();
                 currentTable = createTable(columns);
                 applyQuery += DDLGenerator.createTableCreationQuery(currentTable) +"\n";
                 QueryExecutor.executeQuery(applyQuery,true);
                 renderNewTable(currentTable);
-                columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
+                columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
+                        .stream().map(Column::deepCopy).toList();
             }else{
                 // Column deletion, addition, altering
                 applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
-                dropTableColumns(listDifferences);
                 Optional<List<Column>> columnsToBeDeleted = Optional.ofNullable(dropTableColumns(listDifferences));
                 Optional<List<Column>> columnsToBeAdded = Optional.ofNullable(addTableColumns(listDifferences));
                 changeTableColumnsAttributes(listDifferences);
+
+                applyQuery += ";";
                 QueryExecutor.executeQuery(applyQuery,true);
-//                columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
+
+                columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
                 columnsToBeAdded.ifPresent(this::renderNewColumns);
-                columTabController.commitedColumnData = Column.deepCopy(columTabController.columnsData);
+                columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
+                        .stream().map(Column::deepCopy).toList();
             }
 
         }
         else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(indexTab)){
-            List<Index> tableIndexes = indexTabController.getTableIndexes();
-            createIndexes(tableIndexes);
+            if(currentTable == null) return;
+
+            applyQuery = "";
+            List<Index> commitedIndexData = new LinkedList<>(indexTabController.commitedIndexData);
+            if(!commitedIndexData.isEmpty() && indexTabController.emptyProperties(commitedIndexData.getLast())) commitedIndexData.removeLast();
+
+            DiffResult<Index> listDifferences = ListDiff.compareLists(commitedIndexData,indexTabController.getTableIndexes(),Index.indexAttributeComparator,Index.class);
+            if(ListDiff.noDiff(listDifferences)) return;
+
+            // Index deletion, addition, altering
+            applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
+            Optional<List<Index>> indexesToBeDeleted = Optional.ofNullable(dropTableIndexes(listDifferences));
+            Optional<List<Index>> indexesToBeCreated = Optional.ofNullable(addTableIndexes(listDifferences));
+            QueryExecutor.executeQuery(applyQuery,true);
+
+            indexesToBeDeleted.ifPresent(this::renderIndexDeletion);
+            indexesToBeCreated.ifPresent(this::renderNewIndexes);
+
+            indexTabController.commitedIndexData = new LinkedList<>(indexTabController.indexData)
+                    .stream().map(Index::deepCopy).toList();
 
         }else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(foreignKeyTab)){
-            List<ForeignKey> tableForeignKeys = foreignKeyTabController.getTableForeignKeys();
-            createForeignKeys(tableForeignKeys);
+            if(currentTable == null) return;
+
+            applyQuery = "";
+            List<ForeignKey> commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.commitedForeignKeyData);
+            if(!commitedForeignKeyData.isEmpty() && foreignKeyTabController.emptyProperties(commitedForeignKeyData.getLast())) commitedForeignKeyData.removeLast();
+
+            DiffResult<ForeignKey> listDifferences = ListDiff.compareLists(commitedForeignKeyData,foreignKeyTabController.getTableForeignKeys(),ForeignKey.foreignKeyAttributeComparator,ForeignKey.class);
+            if(ListDiff.noDiff(listDifferences)) return;
+
+            // Foreign key deletion, addition, altering
+            applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
+            Optional<List<ForeignKey>> foreignKeysToBeDeleted = Optional.ofNullable(dropTableForeignKeys(listDifferences));
+            Optional<List<ForeignKey>> foreignKeysToBeAdded = Optional.ofNullable(addTableForeignKeys(listDifferences));
+            QueryExecutor.executeQuery(applyQuery,true);
+
+            foreignKeysToBeDeleted.ifPresent(this::renderForeignKeyDeletion);
+            foreignKeysToBeAdded.ifPresent(this::renderNewForeignKeys);
+
+            foreignKeyTabController.commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.foreignKeyData)
+                    .stream().map(ForeignKey::deepCopy).toList();
+
         }
+    }
+
+    private void renderColumnDeletion(@NotNull List<Column> columns) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
+
+        List<TreeItem<String>> columnTreeItemsToDelete = getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                getSecond().getTableNodesHashMap().get(currentTable.getName()).getSecond().getColumnNodesHashMap().values().stream().toList();
+
+        // Think of a faster solution
+        Set<String> deletedColumnNames = new HashSet<>();
+        for(Column column : columns) {
+            deletedColumnNames.add(column.getName());
+        }
+
+        Iterator<TreeItem<String>> iterator = columnTreeItemsToDelete.iterator();
+        while(iterator.hasNext()){
+            TreeItem<String> columnKeyTreeItem = iterator.next();
+            String name = columnKeyTreeItem.getValue();
+
+            if(!deletedColumnNames.contains(name)){
+                iterator.remove();
+            }
+        }
+
+    }
+
+    private void renderNewForeignKeys(@NotNull List<ForeignKey> foreignKeys) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
+
+        for(ForeignKey foreignKey : foreignKeys){
+            TreeItem<String> newForeignKeyNode = getBrowserController().loadForeignKeyTreeItem(currentTable,foreignKey.getName());
+            tableTreeItemToChange.getChildren().get(2).getChildren().add(newForeignKeyNode);
+        }
+
+    }
+
+    private void renderForeignKeyDeletion(@NotNull List<ForeignKey> foreignKeys) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
+
+        List<TreeItem<String>> foreignKeyTreeItemsToDelete = getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                getSecond().getTableNodesHashMap().get(currentTable.getName()).getSecond().getForeignKeyNodesHashMap().values().stream().toList();
+
+        // Think of a faster solution
+        Set<String> deletedFKNames = new HashSet<>();
+        for(ForeignKey foreignKey : foreignKeys) {
+            deletedFKNames.add(foreignKey.getName());
+        }
+
+        Iterator<TreeItem<String>> iterator = foreignKeyTreeItemsToDelete.iterator();
+        while(iterator.hasNext()){
+            TreeItem<String> foreignKeyTreeItem = iterator.next();
+            String name = foreignKeyTreeItem.getValue();
+
+            if(!deletedFKNames.contains(name)){
+                iterator.remove();
+            }
+        }
+
+    }
+
+    private List<ForeignKey> addTableForeignKeys(DiffResult<ForeignKey> fkDiff) {
+        if(fkDiff.added.isEmpty()) return null;
+
+        List<ForeignKey> foreignKeyToBeCreated = new LinkedList<>();
+        for(int i = 0; i < fkDiff.added.size(); i++){
+            ForeignKey foreignKey = fkDiff.added.get(i);
+            foreignKey.setReferencingTable(currentTable);
+            foreignKey.setReferencingSchema(currentTable.getSchema());
+            foreignKeyToBeCreated.add(foreignKey);
+            applyQuery += DDLGenerator.createForeignKeyCreationQuery(foreignKey);
+            if(i != fkDiff.added.size() - 1) applyQuery += ",\n";
+            else applyQuery += "\n";
+        }
+
+        return foreignKeyToBeCreated;
+    }
+
+    private List<ForeignKey> dropTableForeignKeys(DiffResult<ForeignKey> fkDiff) {
+        if(fkDiff.removed.isEmpty()) return null;
+
+        List<ForeignKey> foreignKeysToBeDeleted = new LinkedList<>();
+        for(int i = 0; i < fkDiff.removed.size(); i++){
+            ForeignKey foreignKey = fkDiff.removed.get(i);
+            foreignKey.setReferencingTable(currentTable);
+            foreignKey.setReferencingSchema(currentTable.getSchema());
+            foreignKeysToBeDeleted.add(foreignKey);
+            applyQuery += DDLGenerator.createForeignKeyDropQuery(foreignKey);
+            if(i != fkDiff.removed.size() - 1) applyQuery += ",\n";
+            else applyQuery += "\n";
+        }
+        return foreignKeysToBeDeleted;
+
+    }
+
+    private void renderIndexDeletion(@NotNull List<Index> indices) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
+
+        List<TreeItem<String>> indexTreeItemsToDelete = getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                getSecond().getTableNodesHashMap().get(currentTable.getName()).getSecond().getIndexNodesHashMap().values().stream().toList();
+
+        // Think of a faster solution
+        Set<String> deletedIndexNames = new HashSet<>();
+        for(Index index : indices) {
+            deletedIndexNames.add(index.getName());
+        }
+
+        Iterator<TreeItem<String>> iterator = indexTreeItemsToDelete.iterator();
+        while(iterator.hasNext()){
+            TreeItem<String> indexTreeItem = iterator.next();
+            String name = indexTreeItem.getValue();
+
+            if(!deletedIndexNames.contains(name)){
+                iterator.remove();
+            }
+        }
+
+    }
+
+    private void renderNewIndexes(@NotNull List<Index> indices) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
+
+        for(Index index : indices){
+            TreeItem<String> newIndexNode = getBrowserController().loadIndexTreeItem(currentTable,index.getName());
+            tableTreeItemToChange.getChildren().get(1).getChildren().add(newIndexNode);
+        }
+
     }
 
     private void renderNewColumns(List<Column> columnsToBeAdded) {
         TreeItem<String> tableTreeItemToChange =
                 getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
                         getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
 
         for(Column column : columnsToBeAdded){
             TreeItem<String> newColumnNode = getBrowserController().loadColumnTreeItem(currentTable,column.getName());
@@ -262,68 +444,12 @@ public class PanelTableCreation implements Initializable {
 
     private void renderNewTable(Table currentTable) {
         TreeItem<String> newTableNode = getBrowserController().loadTableTreeItem(currentTable.getSchema(),currentTable.getName());
+        if(newTableNode == null) return;
 
         TreeView<String> schemaViewToChange = getBrowserController()
                 .getSchemaHashMap().get(currentTable.getSchema().getName()).getFirst();
 
         schemaViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
-    }
-
-    private void createForeignKeys(List<ForeignKey> tableForeignKeys) {
-        String tableName = txtTableName.getText();
-        if(tableName.isBlank() || tableName.contains(" ")){
-            AlertManager.showErrorDialog("Error","Table name is not valid",null);
-            return;
-        }
-        String schemaName = cbSchema.getSelectionModel().getSelectedItem();
-        if(schemaName == null){
-            AlertManager.showErrorDialog("Error","Schema was not selected",null);
-            return;
-        }
-        DBEngine schemaEngine = cbEngine.getSelectionModel().getSelectedItem();
-        if(schemaEngine == null){
-            AlertManager.showErrorDialog("Error","Engine was not selected",null);
-            return;
-        }
-        Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-        Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
-
-        for(ForeignKey foreignKey : tableForeignKeys){
-            try {
-                DDLGenerator.addForeignKey(schema,table,foreignKey,false);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void createIndexes(List<Index> tableIndexes){
-        String tableName = txtTableName.getText();
-        if(tableName.isBlank() || tableName.contains(" ")){
-            AlertManager.showErrorDialog("Error","Table name is not valid",null);
-            return;
-        }
-        String schemaName = cbSchema.getSelectionModel().getSelectedItem();
-        if(schemaName == null){
-            AlertManager.showErrorDialog("Error","Schema was not selected",null);
-            return;
-        }
-        DBEngine schemaEngine = cbEngine.getSelectionModel().getSelectedItem();
-        if(schemaEngine == null){
-            AlertManager.showErrorDialog("Error","Engine was not selected",null);
-            return;
-        }
-        Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
-        Table table = DatabaseInspector.getInstance().getTableByName(schema,tableName);
-
-        for(Index index : tableIndexes){
-            try {
-                DDLGenerator.addIndex(schema,table,index,true);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
     }
 
     private Table createTable(List<Column> columns){
@@ -370,32 +496,6 @@ public class PanelTableCreation implements Initializable {
             column.setTable(newTable);
         }
 
-//        try {
-//            DDLGenerator.createTable(newTable,true);
-//            Table createdTable = DatabaseInspector.getInstance().getTableByName(tableSchema,newTable.getName());
-//            ProgramState.getInstance().setSelectedTable(createdTable);
-//            TreeItem<String> newTableNode = getBrowserController().loadTableTreeItem(tableSchema,createdTable.getName());
-//            // For now, it works
-//            TreeView<String> treeViewToChange = getBrowserController().vboxBrowser.getChildren()
-//                    .stream().filter(t -> t instanceof TreeView<?>)
-//                    .map(t -> (TreeView<String>) t)
-//                    .filter(t -> {
-//                        return t.getRoot().getValue().equals(tableSchema.getName());
-//                    })
-//                    .findFirst().get();
-//
-////            TreeView<String> treeViewToChange = (TreeView<String>) getBrowserController().vboxBrowser.getChildren().stream().filter(
-////                    t -> {
-////                        TreeView<String> treeview = (TreeView<String>) t;
-////                        if(treeview.getRoot().getValue().equals(tableSchema.getName())) return true;
-////                        else return false;
-////                    }).findFirst().get();
-//            // Schema -> tableBranch("Tables") -> schema tables
-//            treeViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
         return newTable;
     }
 
@@ -409,7 +509,7 @@ public class PanelTableCreation implements Initializable {
             columnsToBeDeleted.add(column);
             applyQuery += DDLGenerator.createColumnDropQuery(column);
             if(i != columnsDiff.removed.size() -1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
         return columnsToBeDeleted;
     }
@@ -417,17 +517,17 @@ public class PanelTableCreation implements Initializable {
     private List<Column> addTableColumns(DiffResult<Column> columnsDiff){
         if(columnsDiff.added.isEmpty()) return null;
 
-        List<Column> columnsToBeRendered = new LinkedList<>();
+        List<Column> columnsToBeCreated = new LinkedList<>();
         for(int i = 0; i < columnsDiff.added.size(); i++){
             Column column = columnsDiff.added.get(i);
             column.setTable(currentTable);
-            columnsToBeRendered.add(column);
+            columnsToBeCreated.add(column);
             applyQuery += DDLGenerator.createColumnAdditionQuery(column);
             if(i != columnsDiff.added.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
 
-        return columnsToBeRendered;
+        return columnsToBeCreated;
     }
 
     private void changeTableColumnsAttributes(DiffResult<Column> columnsDiff){
@@ -438,29 +538,37 @@ public class PanelTableCreation implements Initializable {
         }
     }
 
-//    public void createTable() {
-//
-//        if(txtTableName.getText().isEmpty())
-//        {
-//            AlertManager.showErrorDialog(null, null, "Table name must not be empty.");
-//            return;
-//        }
-//
-//        // TODO: Import schema from programstate instead of this.
-//        Schema tempSchema = new Schema.SchemaBuilder(txtTableName.getText().split("\\.")[0], null, null).build();
-//        Table tempTable = new Table.TableBuilder(null, txtTableName.getText().split("\\.")[1], tempSchema, null).build();
-//        List<Column> columns = new LinkedList<>();
-//        for (PanelColumnTab c : columnControllers) {
-//            if(c.isDeleted()) continue;
-//            columns.add(c.getColumn(tempTable));
-//        }
-//        tempTable.setColumns(columns);
-//        try {
-//            DDLGenerator.createTable(tempTable, true);
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    private List<Index> dropTableIndexes(DiffResult<Index> indexDiff) {
+        if(indexDiff.removed.isEmpty()) return null;
 
+        List<Index> indexesToBeDeleted = new LinkedList<>();
+        for(int i = 0; i < indexDiff.removed.size(); i++){
+            Index index = indexDiff.removed.get(i);
+            index.setTable(currentTable);
+            indexesToBeDeleted.add(index);
+            applyQuery += DDLGenerator.createIndexDropQuery(index);
+            if(i != indexDiff.removed.size() - 1) applyQuery += ",\n";
+            else applyQuery += "\n";
+        }
+        return indexesToBeDeleted;
+    }
 
+    private List<Index> addTableIndexes(DiffResult<Index> indexDiff){
+        if(indexDiff.added.isEmpty()) return null;
+
+        List<Index> indexesToBeCreated = new LinkedList<>();
+        for(int i = 0; i < indexDiff.added.size(); i++){
+            Index index = indexDiff.added.get(i);
+            index.setTable(currentTable);
+            indexesToBeCreated.add(index);
+            applyQuery += DDLGenerator.createIndexCreationQuery(index);
+            if(i != indexDiff.added.size() - 1) applyQuery += ",\n";
+            else applyQuery += "\n";
+        }
+        return indexesToBeCreated;
+    }
+
+    private void changeTableIndexAttributes(DiffResult<Index> indexDiff){
+        throw new NotImplementedError();
+    }
 }

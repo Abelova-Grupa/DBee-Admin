@@ -113,7 +113,7 @@ public class Schema {
         int result = name.hashCode();
         result = 31 * result + charset.hashCode();
         result = 31 * result + collation.hashCode();
-        result = 31 * result + Objects.hashCode(tables);
+//        result = 31 * result + Objects.hashCode(tables);
         result = 31 * result + tableCount;
         result = 31 * result + Double.hashCode(databaseSize);
         return result;

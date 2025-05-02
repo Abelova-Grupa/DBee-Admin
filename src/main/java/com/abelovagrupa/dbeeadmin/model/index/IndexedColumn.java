@@ -3,6 +3,9 @@ package com.abelovagrupa.dbeeadmin.model.index;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import javafx.beans.property.*;
 
+import java.net.spi.InetAddressResolver;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class IndexedColumn {
@@ -57,15 +60,19 @@ public class IndexedColumn {
         return columnNameProperty;
     }
 
+    public void setColumnNameProperty(String columnName){
+        this.columnNameProperty.set(columnName);
+    }
+
     public int getOrderNumber() {
-        if(orderNumberProperty != null){
+        if(orderNumberProperty != null && orderNumberProperty.get() != 0){
             return orderNumberProperty.get();
         }
         else return orderNumber;
     }
 
     public void setOrderNumber(int orderNumber) {
-        if(orderNumberProperty != null){
+        if(orderNumberProperty != null ){
             orderNumberProperty.set(orderNumber);
         }
         this.orderNumber = orderNumber;
@@ -78,8 +85,12 @@ public class IndexedColumn {
         return orderNumberProperty;
     }
 
+    public void setOrderNumberProperty(int orderNumber){
+        this.orderNumberProperty.set(orderNumber);
+    }
+
     public Order getOrder() {
-        if(orderProperty != null){
+        if(orderProperty != null && orderProperty.get() != null){
             return orderProperty.get();
         }
         else return order;
@@ -99,8 +110,12 @@ public class IndexedColumn {
         return orderProperty;
     }
 
+    public void setOrderProperty(Order order){
+        this.orderProperty.set(order);
+    }
+
     public int getLength() {
-        if(lengthProperty != null){
+        if(lengthProperty != null && lengthProperty.get() != 0){
             return lengthProperty.get();
         }
         else return length;
@@ -118,6 +133,10 @@ public class IndexedColumn {
             lengthProperty = new SimpleIntegerProperty(this,"length",length);
         }
         return lengthProperty;
+    }
+
+    public void setLengthProperty(int length){
+        this.lengthProperty.set(length);
     }
 
     public Index getIndex() {
@@ -149,6 +168,16 @@ public class IndexedColumn {
             return getOrderNumber() == that.getOrderNumber() && getLength() == that.getLength() && getColumn().equals(that.getColumn()) && getOrder() == that.getOrder();
         }
         return getOrderNumber() == that.getOrderNumber() && getLength() == that.getLength() && getColumn().equals(that.getColumn()) && getOrder() == that.getOrder() && getIndex().equals(that.getIndex());
+    }
+
+    public static IndexedColumn deepCopy(IndexedColumn indexedColumn){
+        return new IndexedColumn(
+                Column.deepCopy(indexedColumn.getColumn()),
+                indexedColumn.getOrderNumber(),
+                indexedColumn.getOrder(),
+                indexedColumn.getLength(),
+                indexedColumn.getIndex()
+        );
     }
 
     @Override

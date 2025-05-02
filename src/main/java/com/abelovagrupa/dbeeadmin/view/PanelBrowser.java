@@ -309,18 +309,18 @@ public class PanelBrowser implements Initializable {
                                 // Table context menu
                                 contextMenu = new ContextMenu();
                                 MenuItem viewTable = new MenuItem("View Data (SELECT *)");
-                                MenuItem editTable = new MenuItem("Edit Table");
+                                MenuItem alterTable = new MenuItem("Edit Table");
                                 MenuItem deleteTable = new MenuItem("Delete Table");
                                 MenuItem addColumn = new MenuItem("Add Column");
                                 MenuItem generateTableSQL = new MenuItem("Generate Table SQL");
 
                                 viewTable.setOnAction(tblClick -> displaySelectedTable(selectedTable));
-//                                editTable.setOnAction(tblClick -> System.out.println("Editing table..."));
+                                alterTable.setOnAction(tblClick -> alterSelectedTable(selectedTable));
                                 deleteTable.setOnAction(tblClick -> deleteSelectedTable(selectedTable));
 //                                addColumn.setOnAction(tblClick -> System.out.println("Adding column to table..."));
 //                                generateTableSQL.setOnAction(tblClick -> System.out.println("Generating SQL for table..."));
 
-                                contextMenu.getItems().addAll(viewTable, editTable, deleteTable, addColumn, generateTableSQL);
+                                contextMenu.getItems().addAll(viewTable, alterTable, deleteTable, addColumn, generateTableSQL);
                                 contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
                             }
 
@@ -485,7 +485,43 @@ public class PanelBrowser implements Initializable {
         }
     }
 
+    private void alterSelectedTable(Table selectedTable) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelTableCreation.fxml"));
+            BorderPane tableTabContent = null;
+            tableTabContent = fxmlLoader.load();
+            PanelTableCreation tableCreationController = fxmlLoader.getController();
+            tableCreationController.setBrowserController(this);
+
+            tableCreationController.currentTable = selectedTable;
+            tableCreationController.columnTabController.commitedColumnData = new LinkedList<>(selectedTable.getColumns())
+                    .stream().map(Column::deepCopy).toList();
+            List<Column> columnData = new LinkedList<>(selectedTable.getColumns());
+            columnData.add(new Column());
+            tableCreationController.columnTabController.columnsData = FXCollections.observableArrayList(columnData);
+            tableCreationController.columnTabController.columnTable.setItems(tableCreationController.columnTabController.columnsData);
+
+            tableCreationController.txtTableName.setText(selectedTable.getName());
+            tableCreationController.txtTableName.setEditable(false);
+
+            tableCreationController.cbEngine.setValue(selectedTable.getDbEngine());
+            tableCreationController.cbEngine.setDisable(true);
+
+            tableCreationController.cbSchema.setValue(selectedTable.getSchema().getName());
+            tableCreationController.cbSchema.setDisable(true);
+
+            // Creating tab
+            Tab tableTab = new Tab("New Table");
+            tableTab.setContent(tableTabContent);
+            mainController.editorController.editorTabs.getTabs().add(tableTab);
+            mainController.editorController.editorTabs.getSelectionModel().select(tableTab);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public TreeItem<String> loadTableTreeItem(Schema schema, String tableName) {
+        if(schemaHashMap.get(schema.getName()).getSecond().getTableNodesHashMap().containsKey(tableName)) return null;
         TreeItem<String> tableNode = new TreeItem<>(tableName, new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/database-table.png")).toExternalForm())));
         TreeItem<String> columnBranch = new TreeItem<>("Columns", new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/com/abelovagrupa/dbeeadmin/images/columns.png")).toExternalForm())));
         TreeItem<String> columnDummy = new TreeItem<>("Loading columns...");
@@ -556,11 +592,8 @@ public class PanelBrowser implements Initializable {
 
                             List<TreeItem<String>> indexNodes = new ArrayList<>();
                             for (Index index : indexes) {
-                                TreeItem<String> indexNode = new TreeItem<>(index.getName());
-                                indexNodes.add(indexNode);
-                                schemaHashMap.get(schema.getName()).getSecond().
-                                        getTableNodesHashMap().get(tableName).getSecond().
-                                        getIndexNodesHashMap().put(index.getName(),indexNode);
+                                TreeItem<String> indexNode = loadIndexTreeItem(table,index.getName());
+                                indexBranch.getChildren().add(indexNode);
                             }
                             return indexNodes;
                         }
@@ -680,6 +713,9 @@ public class PanelBrowser implements Initializable {
     }
 
     public TreeItem<String> loadColumnTreeItem(Table table, String columnName) {
+        if(schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getColumnNodesHashMap().containsKey(columnName)) return null;
         TreeItem<String> columnNode = new TreeItem<>(columnName);
 
         schemaHashMap.get(table.getSchema().getName()).getSecond()
@@ -687,6 +723,32 @@ public class PanelBrowser implements Initializable {
                 .getColumnNodesHashMap().put(columnName,columnNode);
 
         return columnNode;
+    }
+
+    public TreeItem<String> loadIndexTreeItem(Table table, String indexName) {
+        if(schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getIndexNodesHashMap().containsKey(indexName)) return null;
+        TreeItem<String> indexNode = new TreeItem<>(indexName);
+
+        schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getIndexNodesHashMap().put(indexName,indexNode);
+
+        return indexNode;
+    }
+
+    public TreeItem<String> loadForeignKeyTreeItem(Table table, String foreignKeyName) {
+        if(schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getForeignKeyNodesHashMap().containsKey(foreignKeyName)) return null;
+        TreeItem<String> foreignKeyNode = new TreeItem<>(foreignKeyName);
+
+        schemaHashMap.get(table.getSchema().getName()).getSecond()
+                .getTableNodesHashMap().get(table.getName()).getSecond()
+                .getForeignKeyNodesHashMap().put(foreignKeyName,foreignKeyNode);
+
+        return foreignKeyNode;
     }
 
     private void displaySelectedTable(Table selectedTable) {

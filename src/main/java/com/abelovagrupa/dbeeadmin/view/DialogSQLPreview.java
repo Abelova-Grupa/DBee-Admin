@@ -26,7 +26,7 @@ public class DialogSQLPreview extends Dialog<Boolean> {
      * Note: It doesn't render the window; To do that call .show() or .showAndWait()
      * @param sql Initial sql to be previewed, edited and executed.
      */
-    public DialogSQLPreview(String sql) {
+    public  DialogSQLPreview(String sql) {
         // Load FXML and initialize the dialog
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("dialogSQLPreview.fxml")); // Adjust path as necessary
         loader.setController(this);
