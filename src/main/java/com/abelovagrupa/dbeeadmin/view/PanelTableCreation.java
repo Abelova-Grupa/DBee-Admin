@@ -339,7 +339,7 @@ public class PanelTableCreation implements Initializable {
             foreignKeyToBeCreated.add(foreignKey);
             applyQuery += DDLGenerator.createForeignKeyCreationQuery(foreignKey);
             if(i != fkDiff.added.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
 
         return foreignKeyToBeCreated;
@@ -356,7 +356,7 @@ public class PanelTableCreation implements Initializable {
             foreignKeysToBeDeleted.add(foreignKey);
             applyQuery += DDLGenerator.createForeignKeyDropQuery(foreignKey);
             if(i != fkDiff.removed.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
         return foreignKeysToBeDeleted;
 
@@ -468,32 +468,6 @@ public class PanelTableCreation implements Initializable {
             column.setTable(newTable);
         }
 
-//        try {
-//            DDLGenerator.createTable(newTable,true);
-//            Table createdTable = DatabaseInspector.getInstance().getTableByName(tableSchema,newTable.getName());
-//            ProgramState.getInstance().setSelectedTable(createdTable);
-//            TreeItem<String> newTableNode = getBrowserController().loadTableTreeItem(tableSchema,createdTable.getName());
-//            // For now, it works
-//            TreeView<String> treeViewToChange = getBrowserController().vboxBrowser.getChildren()
-//                    .stream().filter(t -> t instanceof TreeView<?>)
-//                    .map(t -> (TreeView<String>) t)
-//                    .filter(t -> {
-//                        return t.getRoot().getValue().equals(tableSchema.getName());
-//                    })
-//                    .findFirst().get();
-//
-////            TreeView<String> treeViewToChange = (TreeView<String>) getBrowserController().vboxBrowser.getChildren().stream().filter(
-////                    t -> {
-////                        TreeView<String> treeview = (TreeView<String>) t;
-////                        if(treeview.getRoot().getValue().equals(tableSchema.getName())) return true;
-////                        else return false;
-////                    }).findFirst().get();
-//            // Schema -> tableBranch("Tables") -> schema tables
-//            treeViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
         return newTable;
     }
 
@@ -507,7 +481,7 @@ public class PanelTableCreation implements Initializable {
             columnsToBeDeleted.add(column);
             applyQuery += DDLGenerator.createColumnDropQuery(column);
             if(i != columnsDiff.removed.size() -1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
         return columnsToBeDeleted;
     }
@@ -522,7 +496,7 @@ public class PanelTableCreation implements Initializable {
             columnsToBeCreated.add(column);
             applyQuery += DDLGenerator.createColumnAdditionQuery(column);
             if(i != columnsDiff.added.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
 
         return columnsToBeCreated;
@@ -546,7 +520,7 @@ public class PanelTableCreation implements Initializable {
             indexesToBeDeleted.add(index);
             applyQuery += DDLGenerator.createIndexDropQuery(index);
             if(i != indexDiff.removed.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
         return indexesToBeDeleted;
     }
@@ -561,7 +535,7 @@ public class PanelTableCreation implements Initializable {
             indexesToBeCreated.add(index);
             applyQuery += DDLGenerator.createIndexCreationQuery(index);
             if(i != indexDiff.added.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
         return indexesToBeCreated;
     }
@@ -569,29 +543,4 @@ public class PanelTableCreation implements Initializable {
     private void changeTableIndexAttributes(DiffResult<Index> indexDiff){
         throw new NotImplementedError();
     }
-//    public void createTable() {
-//
-//        if(txtTableName.getText().isEmpty())
-//        {
-//            AlertManager.showErrorDialog(null, null, "Table name must not be empty.");
-//            return;
-//        }
-//
-//        // TODO: Import schema from programstate instead of this.
-//        Schema tempSchema = new Schema.SchemaBuilder(txtTableName.getText().split("\\.")[0], null, null).build();
-//        Table tempTable = new Table.TableBuilder(null, txtTableName.getText().split("\\.")[1], tempSchema, null).build();
-//        List<Column> columns = new LinkedList<>();
-//        for (PanelColumnTab c : columnControllers) {
-//            if(c.isDeleted()) continue;
-//            columns.add(c.getColumn(tempTable));
-//        }
-//        tempTable.setColumns(columns);
-//        try {
-//            DDLGenerator.createTable(tempTable, true);
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
-
 }
