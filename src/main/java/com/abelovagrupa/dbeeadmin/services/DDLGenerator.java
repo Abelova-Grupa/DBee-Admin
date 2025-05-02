@@ -60,8 +60,6 @@ public class DDLGenerator {
             }
         }
         query += ";";
-        // Bad implementation
-        String finalQuery = query;
 
         // If preview is selected (user gets to decide whether sql should be executed)
         return query;
@@ -85,7 +83,6 @@ public class DDLGenerator {
      * <i>Note: Table must have a name, schema and at least one column set.</i>
      *
      * @param table Table object to be persisted to the database. Used as P. O. Pattern.
-     * @throws SQLException             on SQL error.
      * @throws IllegalArgumentException if schema does not have a name, schema and at least one column set.
      */
 
@@ -285,6 +282,7 @@ public class DDLGenerator {
         if (table == null || table.getName() == null || table.getName().isEmpty())
             throw new IllegalArgumentException("Table is not set");
 
+
         return "DROP FOREIGN KEY " + foreignKey.getName();
     }
 
@@ -379,9 +377,8 @@ public class DDLGenerator {
         if (index == null) throw new IllegalArgumentException("Index is not set");
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
-
+      
         return "RENAME INDEX " + index.getName() + " TO " + newName;
-
     }
 
     public static String createIndexDropQuery(Index index) {
@@ -401,14 +398,13 @@ public class DDLGenerator {
         if (trigger.getTable() == null) throw new IllegalArgumentException("Table is not set");
         if (trigger.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
 
-        String queryBuilder = "CREATE TRIGGER " + trigger.getName() + " " +
+        return "CREATE TRIGGER " + trigger.getName() + " " +
             trigger.getTiming() + " " +
             trigger.getEvent() + " ON " +
             trigger.getTable().getName() +
             " FOR EACH ROW " +
             trigger.getStatement() +
             ";";
-        return queryBuilder;
     }
 
     public static String createTriggerDropQuery(Trigger trigger) {
@@ -418,15 +414,14 @@ public class DDLGenerator {
     }
 
     public static String createViewCreationQuery(View view, Algorithm algorithm) {
-        String queryBuilder = "CREATE\n\tALGORITHM = " + algorithm.name() + "\n" +
+
+        return "CREATE\n\tALGORITHM = " + algorithm.name() + "\n" +
             "VIEW " +
             view.getSchema().getName() +
             "." +
             view.getName() +
             " AS\n" +
             view.getDefinition() + ";";
-
-        return queryBuilder;
     }
 
     public static void createTable(Table table, boolean preview) throws SQLException {
@@ -552,9 +547,8 @@ public class DDLGenerator {
      * Drops the schema/database
      *
      * @param schema Schema to be dropped
-     * @throws SQLException
      */
-    public static String dropDatabase(Schema schema) throws SQLException {
+    public static String dropDatabase(Schema schema) {
 
         // Validate
         if (schema.getName().isEmpty() || schema.getName() == null)
