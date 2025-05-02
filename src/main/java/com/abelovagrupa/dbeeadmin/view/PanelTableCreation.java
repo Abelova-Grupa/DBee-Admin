@@ -231,7 +231,10 @@ public class PanelTableCreation implements Initializable {
                 Optional<List<Column>> columnsToBeDeleted = Optional.ofNullable(dropTableColumns(listDifferences));
                 Optional<List<Column>> columnsToBeAdded = Optional.ofNullable(addTableColumns(listDifferences));
                 changeTableColumnsAttributes(listDifferences);
+
+                applyQuery += ";";
                 QueryExecutor.executeQuery(applyQuery,true);
+
                 columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
                 columnsToBeAdded.ifPresent(this::renderNewColumns);
                 columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
