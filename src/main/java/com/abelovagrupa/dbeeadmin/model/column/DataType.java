@@ -48,7 +48,9 @@ public enum DataType {
     POLYGON_3D,
     MULTIPOINT,
     GEOMETRY,
-    GEOMETRY_COLLECTION;
+    GEOMETRY_COLLECTION,
+
+    BOOLEAN;
 
     public static boolean hasVariableLength(DataType dataType){
         switch (dataType) {
@@ -94,6 +96,7 @@ public enum DataType {
             case TIMESTAMP:
             case YEAR:
             case CHAR:
+            case BOOLEAN:
                 return false;
 
             // Handle unexpected cases
