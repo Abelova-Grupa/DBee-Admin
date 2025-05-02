@@ -309,18 +309,18 @@ public class PanelBrowser implements Initializable {
                                 // Table context menu
                                 contextMenu = new ContextMenu();
                                 MenuItem viewTable = new MenuItem("View Data (SELECT *)");
-                                MenuItem editTable = new MenuItem("Edit Table");
+                                MenuItem alterTable = new MenuItem("Edit Table");
                                 MenuItem deleteTable = new MenuItem("Delete Table");
                                 MenuItem addColumn = new MenuItem("Add Column");
                                 MenuItem generateTableSQL = new MenuItem("Generate Table SQL");
 
                                 viewTable.setOnAction(tblClick -> displaySelectedTable(selectedTable));
-//                                editTable.setOnAction(tblClick -> System.out.println("Editing table..."));
+                                alterTable.setOnAction(tblClick -> alterSelectedTable(selectedTable));
                                 deleteTable.setOnAction(tblClick -> deleteSelectedTable(selectedTable));
 //                                addColumn.setOnAction(tblClick -> System.out.println("Adding column to table..."));
 //                                generateTableSQL.setOnAction(tblClick -> System.out.println("Generating SQL for table..."));
 
-                                contextMenu.getItems().addAll(viewTable, editTable, deleteTable, addColumn, generateTableSQL);
+                                contextMenu.getItems().addAll(viewTable, alterTable, deleteTable, addColumn, generateTableSQL);
                                 contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
                             }
 
@@ -480,6 +480,40 @@ public class PanelBrowser implements Initializable {
                 }
             });
             return schemaView;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void alterSelectedTable(Table selectedTable) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("panelTableCreation.fxml"));
+            BorderPane tableTabContent = null;
+            tableTabContent = fxmlLoader.load();
+            PanelTableCreation tableCreationController = fxmlLoader.getController();
+            tableCreationController.setBrowserController(this);
+
+            tableCreationController.currentTable = selectedTable;
+            tableCreationController.columnTabController.commitedColumnData = new LinkedList<>(selectedTable.getColumns());
+            List<Column> columnData = new LinkedList<>(selectedTable.getColumns());
+            columnData.add(new Column());
+            tableCreationController.columnTabController.columnsData = FXCollections.observableArrayList(columnData);
+            tableCreationController.columnTabController.columnTable.setItems(tableCreationController.columnTabController.columnsData);
+
+            tableCreationController.txtTableName.setText(selectedTable.getName());
+            tableCreationController.txtTableName.setEditable(false);
+
+            tableCreationController.cbEngine.setValue(selectedTable.getDbEngine());
+            tableCreationController.cbEngine.setDisable(true);
+
+            tableCreationController.cbSchema.setValue(selectedTable.getSchema().getName());
+            tableCreationController.cbSchema.setDisable(true);
+
+            // Creating tab
+            Tab tableTab = new Tab("New Table");
+            tableTab.setContent(tableTabContent);
+            mainController.editorController.editorTabs.getTabs().add(tableTab);
+            mainController.editorController.editorTabs.getSelectionModel().select(tableTab);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
