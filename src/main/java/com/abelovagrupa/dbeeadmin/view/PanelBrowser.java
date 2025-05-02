@@ -494,7 +494,8 @@ public class PanelBrowser implements Initializable {
             tableCreationController.setBrowserController(this);
 
             tableCreationController.currentTable = selectedTable;
-            tableCreationController.columnTabController.commitedColumnData = new LinkedList<>(selectedTable.getColumns());
+            tableCreationController.columnTabController.commitedColumnData = new LinkedList<>(selectedTable.getColumns())
+                    .stream().map(Column::deepCopy).toList();
             List<Column> columnData = new LinkedList<>(selectedTable.getColumns());
             columnData.add(new Column());
             tableCreationController.columnTabController.columnsData = FXCollections.observableArrayList(columnData);

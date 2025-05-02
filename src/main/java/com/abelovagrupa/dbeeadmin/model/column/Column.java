@@ -251,7 +251,7 @@ public class Column {
     }
 
     public Integer getSize() {
-        if(sizeProperty != null)
+        if(sizeProperty != null && sizeProperty.get() != 0)
             return sizeProperty.get();
         else return size;
     }

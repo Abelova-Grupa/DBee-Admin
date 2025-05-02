@@ -232,7 +232,7 @@ public class PanelTableCreation implements Initializable {
                 Optional<List<Column>> columnsToBeAdded = Optional.ofNullable(addTableColumns(listDifferences));
                 changeTableColumnsAttributes(listDifferences);
                 QueryExecutor.executeQuery(applyQuery,true);
-//                columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
+                columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
                 columnsToBeAdded.ifPresent(this::renderNewColumns);
                 columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
                         .stream().map(Column::deepCopy).toList();
@@ -284,6 +284,33 @@ public class PanelTableCreation implements Initializable {
                     .stream().map(ForeignKey::deepCopy).toList();
 
         }
+    }
+
+    private void renderColumnDeletion(@NotNull List<Column> columns) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
+
+        List<TreeItem<String>> columnTreeItemsToDelete = getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                getSecond().getTableNodesHashMap().get(currentTable.getName()).getSecond().getColumnNodesHashMap().values().stream().toList();
+
+        // Think of a faster solution
+        Set<String> deletedColumnNames = new HashSet<>();
+        for(Column column : columns) {
+            deletedColumnNames.add(column.getName());
+        }
+
+        Iterator<TreeItem<String>> iterator = columnTreeItemsToDelete.iterator();
+        while(iterator.hasNext()){
+            TreeItem<String> columnKeyTreeItem = iterator.next();
+            String name = columnKeyTreeItem.getValue();
+
+            if(!deletedColumnNames.contains(name)){
+                iterator.remove();
+            }
+        }
+
     }
 
     private void renderNewForeignKeys(@NotNull List<ForeignKey> foreignKeys) {
