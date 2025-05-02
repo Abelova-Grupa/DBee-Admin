@@ -26,12 +26,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import kotlin.NotImplementedError;
-import org.apache.logging.log4j.core.pattern.FormattingInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.*;
 
 public class PanelTableCreation implements Initializable {
@@ -65,7 +63,7 @@ public class PanelTableCreation implements Initializable {
     Tab triggerTab;
 
     //Tab Controllers
-    PanelColumnTab columTabController;
+    PanelColumnTab columnTabController;
 
     PanelIndexTab indexTabController;
 
@@ -99,7 +97,7 @@ public class PanelTableCreation implements Initializable {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("panelColumnTab.fxml"));
             VBox columnsTabContent = loader.load();
 
-            columTabController = loader.getController();
+            columnTabController = loader.getController();
             columnsTab = new Tab("Columns");
             columnsTab.setClosable(false);
 
@@ -139,8 +137,8 @@ public class PanelTableCreation implements Initializable {
                     // If selected tab is index tab load all columns from column tab
                     if(!newTab.equals(indexTab)) return;
                     indexedColumns.clear();
-                    for (Column column : columTabController.columnsData){
-                        if(columTabController.emptyProperties(column)) continue;
+                    for (Column column : columnTabController.columnsData){
+                        if(columnTabController.emptyProperties(column)) continue;
                         IndexedColumn indexedColumn = new IndexedColumn();
                         indexedColumn.setColumn(column);
                         indexedColumns.add(indexedColumn);
@@ -162,7 +160,7 @@ public class PanelTableCreation implements Initializable {
                             throw new RuntimeException(e);
                         }
                     }
-                    if(columTabController.columnsData.size() > foreignKeyTabController.foreignKeyColumnsData.size()
+                    if(columnTabController.columnsData.size() > foreignKeyTabController.foreignKeyColumnsData.size()
                             && currentTable != null && currentTable.getSchema() != null){
                         // If a table and schema are selected fill comboBox and referencing columns
                         foreignKeyTabController.foreignKeyColumnsData.clear();
@@ -210,22 +208,22 @@ public class PanelTableCreation implements Initializable {
         // Recognise which tab is currently selected
         if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(columnsTab)){
             applyQuery = "";
-            List<Column> commitedColumnData = new LinkedList<>(columTabController.commitedColumnData);
+            List<Column> commitedColumnData = new LinkedList<>(columnTabController.commitedColumnData);
             // Removing last empty row from list copy
-            if(!commitedColumnData.isEmpty() && columTabController.emptyProperties(commitedColumnData.getLast())) commitedColumnData.removeLast();
+            if(!commitedColumnData.isEmpty() && columnTabController.emptyProperties(commitedColumnData.getLast())) commitedColumnData.removeLast();
 
-            DiffResult<Column> listDifferences = ListDiff.compareLists(commitedColumnData,columTabController.getTableColumns(),Column.columnAttributeComparator,Column.class);
+            DiffResult<Column> listDifferences = ListDiff.compareLists(commitedColumnData, columnTabController.getTableColumns(),Column.columnAttributeComparator,Column.class);
             if(ListDiff.noDiff(listDifferences)) return;
 
             // Creating the table if it doesn't exist
             if(currentTable == null){
                 // Table creation + column creation
-                List<Column> columns = columTabController.getTableColumns();
+                List<Column> columns = columnTabController.getTableColumns();
                 currentTable = createTable(columns);
                 applyQuery += DDLGenerator.createTableCreationQuery(currentTable) +"\n";
                 QueryExecutor.executeQuery(applyQuery,true);
                 renderNewTable(currentTable);
-                columTabController.commitedColumnData = new LinkedList<>(columTabController.columnsData)
+                columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
                         .stream().map(Column::deepCopy).toList();
             }else{
                 // Column deletion, addition, altering
@@ -233,10 +231,13 @@ public class PanelTableCreation implements Initializable {
                 Optional<List<Column>> columnsToBeDeleted = Optional.ofNullable(dropTableColumns(listDifferences));
                 Optional<List<Column>> columnsToBeAdded = Optional.ofNullable(addTableColumns(listDifferences));
                 changeTableColumnsAttributes(listDifferences);
+
+                applyQuery += ";";
                 QueryExecutor.executeQuery(applyQuery,true);
-//                columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
+
+                columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
                 columnsToBeAdded.ifPresent(this::renderNewColumns);
-                columTabController.commitedColumnData = new LinkedList<>(columTabController.columnsData)
+                columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
                         .stream().map(Column::deepCopy).toList();
             }
 
@@ -286,6 +287,33 @@ public class PanelTableCreation implements Initializable {
                     .stream().map(ForeignKey::deepCopy).toList();
 
         }
+    }
+
+    private void renderColumnDeletion(@NotNull List<Column> columns) {
+        TreeItem<String> tableTreeItemToChange =
+                getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                        getSecond().getTableNodesHashMap().get(currentTable.getName()).getFirst();
+        if(tableTreeItemToChange == null) return;
+
+        List<TreeItem<String>> columnTreeItemsToDelete = getBrowserController().getSchemaHashMap().get(currentTable.getSchema().getName()).
+                getSecond().getTableNodesHashMap().get(currentTable.getName()).getSecond().getColumnNodesHashMap().values().stream().toList();
+
+        // Think of a faster solution
+        Set<String> deletedColumnNames = new HashSet<>();
+        for(Column column : columns) {
+            deletedColumnNames.add(column.getName());
+        }
+
+        Iterator<TreeItem<String>> iterator = columnTreeItemsToDelete.iterator();
+        while(iterator.hasNext()){
+            TreeItem<String> columnKeyTreeItem = iterator.next();
+            String name = columnKeyTreeItem.getValue();
+
+            if(!deletedColumnNames.contains(name)){
+                iterator.remove();
+            }
+        }
+
     }
 
     private void renderNewForeignKeys(@NotNull List<ForeignKey> foreignKeys) {
@@ -339,7 +367,7 @@ public class PanelTableCreation implements Initializable {
             foreignKeyToBeCreated.add(foreignKey);
             applyQuery += DDLGenerator.createForeignKeyCreationQuery(foreignKey);
             if(i != fkDiff.added.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
 
         return foreignKeyToBeCreated;
@@ -356,7 +384,7 @@ public class PanelTableCreation implements Initializable {
             foreignKeysToBeDeleted.add(foreignKey);
             applyQuery += DDLGenerator.createForeignKeyDropQuery(foreignKey);
             if(i != fkDiff.removed.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
         return foreignKeysToBeDeleted;
 
@@ -468,32 +496,6 @@ public class PanelTableCreation implements Initializable {
             column.setTable(newTable);
         }
 
-//        try {
-//            DDLGenerator.createTable(newTable,true);
-//            Table createdTable = DatabaseInspector.getInstance().getTableByName(tableSchema,newTable.getName());
-//            ProgramState.getInstance().setSelectedTable(createdTable);
-//            TreeItem<String> newTableNode = getBrowserController().loadTableTreeItem(tableSchema,createdTable.getName());
-//            // For now, it works
-//            TreeView<String> treeViewToChange = getBrowserController().vboxBrowser.getChildren()
-//                    .stream().filter(t -> t instanceof TreeView<?>)
-//                    .map(t -> (TreeView<String>) t)
-//                    .filter(t -> {
-//                        return t.getRoot().getValue().equals(tableSchema.getName());
-//                    })
-//                    .findFirst().get();
-//
-////            TreeView<String> treeViewToChange = (TreeView<String>) getBrowserController().vboxBrowser.getChildren().stream().filter(
-////                    t -> {
-////                        TreeView<String> treeview = (TreeView<String>) t;
-////                        if(treeview.getRoot().getValue().equals(tableSchema.getName())) return true;
-////                        else return false;
-////                    }).findFirst().get();
-//            // Schema -> tableBranch("Tables") -> schema tables
-//            treeViewToChange.getRoot().getChildren().getFirst().getChildren().add(newTableNode);
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
         return newTable;
     }
 
@@ -507,7 +509,7 @@ public class PanelTableCreation implements Initializable {
             columnsToBeDeleted.add(column);
             applyQuery += DDLGenerator.createColumnDropQuery(column);
             if(i != columnsDiff.removed.size() -1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
         return columnsToBeDeleted;
     }
@@ -522,7 +524,7 @@ public class PanelTableCreation implements Initializable {
             columnsToBeCreated.add(column);
             applyQuery += DDLGenerator.createColumnAdditionQuery(column);
             if(i != columnsDiff.added.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
 
         return columnsToBeCreated;
@@ -546,7 +548,7 @@ public class PanelTableCreation implements Initializable {
             indexesToBeDeleted.add(index);
             applyQuery += DDLGenerator.createIndexDropQuery(index);
             if(i != indexDiff.removed.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
         return indexesToBeDeleted;
     }
@@ -561,7 +563,7 @@ public class PanelTableCreation implements Initializable {
             indexesToBeCreated.add(index);
             applyQuery += DDLGenerator.createIndexCreationQuery(index);
             if(i != indexDiff.added.size() - 1) applyQuery += ",\n";
-            else applyQuery += ";\n";
+            else applyQuery += "\n";
         }
         return indexesToBeCreated;
     }
@@ -569,29 +571,4 @@ public class PanelTableCreation implements Initializable {
     private void changeTableIndexAttributes(DiffResult<Index> indexDiff){
         throw new NotImplementedError();
     }
-//    public void createTable() {
-//
-//        if(txtTableName.getText().isEmpty())
-//        {
-//            AlertManager.showErrorDialog(null, null, "Table name must not be empty.");
-//            return;
-//        }
-//
-//        // TODO: Import schema from programstate instead of this.
-//        Schema tempSchema = new Schema.SchemaBuilder(txtTableName.getText().split("\\.")[0], null, null).build();
-//        Table tempTable = new Table.TableBuilder(null, txtTableName.getText().split("\\.")[1], tempSchema, null).build();
-//        List<Column> columns = new LinkedList<>();
-//        for (PanelColumnTab c : columnControllers) {
-//            if(c.isDeleted()) continue;
-//            columns.add(c.getColumn(tempTable));
-//        }
-//        tempTable.setColumns(columns);
-//        try {
-//            DDLGenerator.createTable(tempTable, true);
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
-
 }

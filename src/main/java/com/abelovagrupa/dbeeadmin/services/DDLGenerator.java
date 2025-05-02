@@ -230,7 +230,7 @@ public class DDLGenerator {
 
         StringBuilder queryBuilder = new StringBuilder("MODIFY COLUMN \n");
         queryBuilder.append(convertColumnToSQL(column));
-        queryBuilder.setLength(queryBuilder.length() - 1);
+        queryBuilder.setLength(queryBuilder.length() - 2);
 
         return queryBuilder.toString();
     }

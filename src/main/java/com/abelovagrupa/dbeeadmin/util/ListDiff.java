@@ -14,18 +14,29 @@ public class ListDiff {
 //        Set<T> oldSet = new HashSet<>(oldList);
 //        Set<T> newSet = new HashSet<>(newList);
 
+        for(int i = 0; i < Math.min(oldList.size(),newList.size()); i++){
+            T oldItem = oldList.get(i);
+            T newItem = newList.get(i);
+
+            HashMap<String,Object[]> diffs = attributeComparator.apply(oldItem,newItem);
+            if(!diffs.isEmpty()){
+                result.changedAttributes.put(newItem,diffs);
+            }
+
+        }
+
         if(compareClass == Column.class){
             List<Column> newColumnList = (List<Column>) newList;
             List<Column> oldColumnList = (List<Column>) oldList;
 
             for(T oldItem : oldList) {
-                if(!Column.containsByAttributes(newColumnList, (Column) oldItem)){
+                if(!Column.containsByAttributes(newColumnList, (Column) oldItem) && !ListDiff.hasChangedAttributes(oldItem,result)){
                     result.removed.add(oldItem);
                 }
             }
 
             for(T newItem : newList) {
-                if(!Column.containsByAttributes(oldColumnList, (Column) newItem)){
+                if(!Column.containsByAttributes(oldColumnList, (Column) newItem) && !ListDiff.hasChangedAttributes(newItem,result)){
                     result.added.add(newItem);
                 }
             }
@@ -67,17 +78,20 @@ public class ListDiff {
 
         }
 
-        for(int i = 0; i < Math.min(oldList.size(),newList.size()); i++){
-            T oldItem = oldList.get(i);
-            T newItem = newList.get(i);
 
-            HashMap<String,Object[]> diffs = attributeComparator.apply(oldItem,newItem);
-            if(!diffs.isEmpty()){
-                result.changedAttributes.put(newItem,diffs);
-            }
-
-        }
         return result;
+    }
+
+    private static <T> boolean hasChangedAttributes(T oldItem, DiffResult<T> result) {
+        if(oldItem instanceof Column){
+            Column column = (Column) oldItem;
+            DiffResult<Column> columnResult = (DiffResult<Column>) result;
+            for(Column col : columnResult.changedAttributes.keySet()){
+                if(col.getName().equals(column.getName())) return true;
+            }
+            return false;
+        }
+        return false;
     }
 
     public static <T> boolean noDiff(DiffResult<T> listDifference){
