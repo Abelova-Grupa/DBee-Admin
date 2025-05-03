@@ -19,7 +19,7 @@ public class Column {
     private boolean unsigned;
     private boolean zeroFill;
     private boolean autoIncrement;
-    private Integer size;
+    private int size;
     private boolean generationExpression;
     private String defaultValue;
     private String comment;
@@ -250,20 +250,20 @@ public class Column {
         this.table = table;
     }
 
-    public Integer getSize() {
-        if(sizeProperty != null && sizeProperty.get() != 0)
+    public int getSize() {
+        if(sizeProperty != null)
             return sizeProperty.get();
         else return size;
     }
 
-    public void setSize(Integer size) {
+    public void setSize(int size) {
         if(sizeProperty != null)
             sizeProperty.set(size);
         this.size = size;
     }
 
     public IntegerProperty sizeProperty(){
-        if(size == null){
+        if(size == 0){
             sizeProperty = new SimpleIntegerProperty(this,"size",0);
         }
         if(sizeProperty == null){
@@ -379,6 +379,8 @@ public class Column {
                 column.getType(),
                 column.getTable()
         );
+        // Create separate method
+        column.sizeProperty().set(column.getSize());
         return deepColumn;
     }
 
