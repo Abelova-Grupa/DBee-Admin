@@ -79,16 +79,6 @@ public class DDLGenerator {
         }
     }
 
-
-    /**
-     * Creates a database table from a Table object.<br/>
-     * <i>Note: Table must have a name, schema and at least one column set.</i>
-     *
-     * @param table Table object to be persisted to the database. Used as P. O. Pattern.
-     * @throws SQLException             on SQL error.
-     * @throws IllegalArgumentException if schema does not have a name, schema and at least one column set.
-     */
-
     public static String createSchemaCreationQuery(Schema schema){
         // Validate
         if (schema.getName() == null) throw new IllegalArgumentException("Undefined schema name.");
@@ -428,7 +418,14 @@ public class DDLGenerator {
 
         return queryBuilder;
     }
-
+    /**
+     * Creates a database table from a Table object.<br/>
+     * <i>Note: Table must have a name, schema and at least one column set.</i>
+     *
+     * @param table Table object to be persisted to the database. Used as P. O. Pattern.
+     * @throws SQLException             on SQL error.
+     * @throws IllegalArgumentException if schema does not have a name, schema and at least one column set.
+     */
     public static void createTable(Table table, boolean preview) throws SQLException {
 
         // Validate
@@ -496,7 +493,7 @@ public class DDLGenerator {
         else sql.append(c.getType().name());
 
         // Append size
-        if (c.getSize() != null && DataType.hasVariableLength(c.getType())) {
+        if (c.getSize() != 0 && DataType.hasVariableLength(c.getType())) {
             sql.append("(");
             sql.append(c.getSize());
             sql.append(")");

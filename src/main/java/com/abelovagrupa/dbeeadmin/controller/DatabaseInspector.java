@@ -154,7 +154,7 @@ public class DatabaseInspector {
 
         String query = "SELECT COLUMN_NAME, IS_NULLABLE, COLUMN_DEFAULT, " +
             "DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, " +
-            "COLUMN_KEY, EXTRA " +
+            "COLUMN_KEY, EXTRA, COLUMN_DEFAULT " +
             "FROM INFORMATION_SCHEMA.COLUMNS " +
             "WHERE TABLE_NAME = ? AND TABLE_SCHEMA = ?";
 
@@ -166,10 +166,25 @@ public class DatabaseInspector {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String columnName = rs.getString("COLUMN_NAME");
-                    String dataType = rs.getString("DATA_TYPE");
                     boolean isNotNull = rs.getString("IS_NULLABLE").equals("NO");
                     String columnKey = rs.getString("COLUMN_KEY");
+                    String defaultValue = rs.getString("COLUMN_DEFAULT");
                     String extra = rs.getString("EXTRA");
+
+                    String dataType = rs.getString("DATA_TYPE");
+                    int size = switch (dataType.toLowerCase()) {
+                        case "varchar", "char", "binary", "varbinary" -> rs.getInt("CHARACTER_MAXIMUM_LENGTH");
+                        case "decimal", "numeric" ->
+                            // Consider precision as size
+                                rs.getInt("NUMERIC_PRECISION");
+                        case "tinyint", "smallint", "mediumint", "int", "integer", "bigint", "float", "double",
+                             "double precision", "bit", "date", "time", "datetime", "timestamp", "year", "tinyblob",
+                             "blob", "mediumblob", "longblob", "tinytext", "text", "mediumtext", "longtext", "enum",
+                             "set", "json", "point", "linestring_2d", "polygon_2d", "linestring_3d", "polygon_3d",
+                             "multipoint", "geometry", "geometry_collection", "boolean", "bool" -> 0;
+                        default -> 0;
+                    };
+
 
                     // Map to the Column object
                     Column column = new Column();
@@ -188,9 +203,10 @@ public class DatabaseInspector {
                     column.setUnsigned(extra != null && extra.contains("unsigned"));
                     column.setZeroFill(extra != null && extra.contains("zerofill"));
 //                    column.setGenerated(extra != null && extra.contains("generated"));
-
                     DataType type = DataType.valueOf(dataType.toUpperCase());
                     column.setType(type);
+                    column.setSize(size);
+                    column.setDefaultValue(defaultValue);
 
                     column.setTable(table);
                     columns.add(column);
