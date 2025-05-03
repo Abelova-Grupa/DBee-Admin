@@ -30,7 +30,7 @@ This document contains a list of objectives that must be accomplished in order t
 #### Columns
 
 - [x] Column creation
-- [ ] Column altering
+- [X] Column altering
 - [X] Column removal
 
 #### Primary keys
