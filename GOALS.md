@@ -22,7 +22,7 @@ This document contains a list of objectives that must be accomplished in order t
 
 #### Tables
 - [x] Table creation
-- [ ] Table altering
+- [X] Table altering
 - [X] Table removal (DROP)
 - [ ] Table clearing (TRUNCATE)
 
