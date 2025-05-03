@@ -28,7 +28,7 @@ public class SyntaxHighlighter {
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", SQL_KEYWORDS) + ")\\b";
     private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
     private static final String NUMBER_PATTERN = "\\b\\d+\\b";
-    private static final String COMMENT_PATTERN = "--[^\n]*" + "|" + "/\\*[^\\*]*\\*/";
+    private static final String COMMENT_PATTERN = "--[^\n]*" + "|" + "/\\*[^*]*\\*/";
 
     private static final Pattern PATTERN = Pattern.compile(
         "(?<KEYWORD>" + KEYWORD_PATTERN + ")"

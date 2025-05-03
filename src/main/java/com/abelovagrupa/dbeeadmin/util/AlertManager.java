@@ -5,6 +5,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class AlertManager {
 
     // This approach was employed to prevent dependency hell. And to make it look nice.
@@ -30,13 +32,13 @@ public class AlertManager {
     }
 
     private static void display(Alert alert, String title, String header, String content) {
-        assert content != null;
+        if(content == null) content = "";
 
         alert.setTitle((title == null) ? "DBee Admin" : title);
         alert.setHeaderText(header);
         alert.setContentText(content);
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Main.class.getResource("images/bee.png").toExternalForm()));
+        stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResource("images/bee.png")).toExternalForm()));
         alert.showAndWait();
     }
 
