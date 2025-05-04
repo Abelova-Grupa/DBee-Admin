@@ -87,7 +87,8 @@ public class ListDiff {
             Column column = (Column) oldItem;
             DiffResult<Column> columnResult = (DiffResult<Column>) result;
             for(Column col : columnResult.changedAttributes.keySet()){
-                if(col.getName().equals(column.getName())) return true;
+                if(col.getName().equals(column.getName()) ||
+                columnResult.changedAttributes.get(col).get("name")[0].equals(column.getName())) return true;
             }
             return false;
         }

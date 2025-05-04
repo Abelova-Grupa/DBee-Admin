@@ -77,14 +77,6 @@ public class DDLGenerator {
         }
     }
 
-    /**
-     * Creates a database table from a Table object.<br/>
-     * <i>Note: Table must have a name, schema and at least one column set.</i>
-     *
-     * @param table Table object to be persisted to the database. Used as P. O. Pattern.
-     * @throws IllegalArgumentException if schema does not have a name, schema and at least one column set.
-     */
-
     public static String createSchemaCreationQuery(Schema schema){
         // Validate
         if (schema.getName() == null) throw new IllegalArgumentException("Undefined schema name.");
@@ -196,7 +188,7 @@ public class DDLGenerator {
         return "DROP COLUMN " + column.getName();
     }
 
-    public static String createColumnRenameQuery(Column column, String newName) {
+    public static String createColumnRenameQuery(Column column,String oldName, String newName) {
         // Validate
         if (column.getName().isEmpty() || column.getName() == null)
             throw new IllegalArgumentException("Column name is not set!");
@@ -208,7 +200,7 @@ public class DDLGenerator {
             throw new IllegalArgumentException("Schema name is not set!");
         return
             "RENAME COLUMN " +
-            column.getName() +
+            oldName +
             " TO " +
             newName;
     }

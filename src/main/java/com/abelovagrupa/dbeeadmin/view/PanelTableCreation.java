@@ -534,7 +534,16 @@ public class PanelTableCreation implements Initializable {
         if(columnsDiff.changedAttributes.isEmpty()) return;
         for(Column column : columnsDiff.changedAttributes.keySet()){
             column.setTable(currentTable);
-            applyQuery += DDLGenerator.createColumnAlterQuery(column);
+            // Name is changed, create a rename query
+            if(columnsDiff.changedAttributes.get(column).get("name").length != 0 && columnsDiff.changedAttributes.size() == 1){
+                String oldName = (String) columnsDiff.changedAttributes.get(column).get("name")[0];
+                String newName = (String) columnsDiff.changedAttributes.get(column).get("name")[1];
+                applyQuery += DDLGenerator.createColumnRenameQuery(column,oldName,newName);
+                applyQuery += "\n";
+            }
+            else{
+                applyQuery += DDLGenerator.createColumnAlterQuery(column);
+            }
         }
     }
 

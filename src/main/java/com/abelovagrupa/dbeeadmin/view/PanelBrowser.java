@@ -355,8 +355,8 @@ public class PanelBrowser implements Initializable {
 //                                }
 //                            }
 //
-
 //                        }
+
                     try {
                         if (selectedItem.getParent().getValue().equals("Columns") && getTreeItemDepth(selectedItem) == 5) {
                             // TODO: make it efficient, for now it works

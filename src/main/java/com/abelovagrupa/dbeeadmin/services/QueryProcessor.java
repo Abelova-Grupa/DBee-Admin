@@ -54,10 +54,10 @@ public class QueryProcessor {
         QueryExecutor.executeQuery(query,preview);
     }
 
-    public static void renameColumn(Column column, String newName, boolean preview){
-        String query = DDLGenerator.createColumnRenameQuery(column,newName);
-        QueryExecutor.executeQuery(query,preview);
-    }
+//    public static void renameColumn(Column column, String newName, boolean preview){
+//        String query = DDLGenerator.createColumnRenameQuery(column,newName);
+//        QueryExecutor.executeQuery(query,preview);
+//    }
     // I think modifyColumn method is invalid
     public static void alterColumn(Column column,boolean preview){
         String query = DDLGenerator.createColumnAlterQuery(column);
