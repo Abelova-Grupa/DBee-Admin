@@ -255,27 +255,7 @@ public class PanelBrowser implements Initializable {
 //
 //                    }
                 }
-                if(event.getButton() == MouseButton.SECONDARY) {
-                    // Fetch schema name
-                    selectedSchemaName = schemaView.getRoot().getValue();
-                    // Display active schema in info panel and set in programState
-                    Schema selectedSchema = DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName);
-                    infoController.setSelected(selectedSchema);
-                    ProgramState.getInstance().setSelectedSchema(selectedSchema);
-                    
-                    // Table context menu
-                    contextMenu = new ContextMenu();
-                    MenuItem alterSchema = new MenuItem("Alter Schema");
-                    MenuItem deleteSchema = new MenuItem("Delete Schema");
 
-//                                editTable.setOnAction(tblClick -> System.out.println("Editing table..."));
-                    deleteSchema.setOnAction(tblClick -> deleteSelectedSchema(selectedSchema));
-//                                addColumn.setOnAction(tblClick -> System.out.println("Adding column to table..."));
-//                                generateTableSQL.setOnAction(tblClick -> System.out.println("Generating SQL for table..."));
-
-                    contextMenu.getItems().addAll(alterSchema, deleteSchema);
-                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
-                }
 
                 Optional<TreeItem<String>> selectedItemOptional = Optional.ofNullable(schemaView.getSelectionModel().getSelectedItem());
                 Schema schema = DatabaseInspector.getInstance().getDatabaseByName(schemaName);
@@ -326,6 +306,8 @@ public class PanelBrowser implements Initializable {
 
                                 contextMenu.getItems().addAll(viewTable, alterTable, deleteTable, addColumn, generateTableSQL);
                                 contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+
+                                event.consume();
                             }
 
                             if (getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem, viewBranch))) {
@@ -388,6 +370,7 @@ public class PanelBrowser implements Initializable {
 
                                     contextMenu.getItems().addAll(edit, delete);
                                     contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                    event.consume();
                                 }
                             }
                         }
@@ -417,6 +400,7 @@ public class PanelBrowser implements Initializable {
 
                                     contextMenu.getItems().addAll(edit, delete);
                                     contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                    event.consume();
                                 }
 
                             }
@@ -447,6 +431,7 @@ public class PanelBrowser implements Initializable {
 
                                     contextMenu.getItems().addAll(edit, delete);
                                     contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                    event.consume();
                                 }
                             }
 
@@ -474,6 +459,7 @@ public class PanelBrowser implements Initializable {
 
                                     contextMenu.getItems().addAll(edit, delete);
                                     contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+                                    event.consume();
                                 }
                             }
 
@@ -481,6 +467,27 @@ public class PanelBrowser implements Initializable {
                     } catch (NullPointerException e) {
                         logger.warn("No parent value for selected item...");
                     }
+                }
+                if(!event.isConsumed() && event.getButton() == MouseButton.SECONDARY) {
+                    // Fetch schema name
+                    selectedSchemaName = schemaView.getRoot().getValue();
+                    // Display active schema in info panel and set in programState
+                    Schema selectedSchema = DatabaseInspector.getInstance().getDatabaseByName(selectedSchemaName);
+                    infoController.setSelected(selectedSchema);
+                    ProgramState.getInstance().setSelectedSchema(selectedSchema);
+
+                    // Table context menu
+                    contextMenu = new ContextMenu();
+                    MenuItem alterSchema = new MenuItem("Alter Schema");
+                    MenuItem deleteSchema = new MenuItem("Delete Schema");
+
+//                                editTable.setOnAction(tblClick -> System.out.println("Editing table..."));
+                    deleteSchema.setOnAction(tblClick -> deleteSelectedSchema(selectedSchema));
+//                                addColumn.setOnAction(tblClick -> System.out.println("Adding column to table..."));
+//                                generateTableSQL.setOnAction(tblClick -> System.out.println("Generating SQL for table..."));
+
+                    contextMenu.getItems().addAll(alterSchema, deleteSchema);
+                    contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
                 }
             });
             return schemaView;
