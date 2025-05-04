@@ -186,7 +186,7 @@ public class IndexedColumn {
         result = 31 * result + getOrderNumber();
         result = 31 * result + Objects.hashCode(getOrder());
         result = 31 * result + getLength();
-        result = 31 * result + getIndex().hashCode();
+//        result = 31 * result + getIndex().hashCode();
         return result;
     }
 }

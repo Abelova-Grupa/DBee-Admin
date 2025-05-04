@@ -5,6 +5,7 @@ import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import com.abelovagrupa.dbeeadmin.model.trigger.Trigger;
@@ -284,6 +285,9 @@ public class PanelBrowser implements Initializable {
                     Optional<Table> selectedTableOptional = schema.getTables().stream().filter(s -> s.getName().equals(selectedItem.getValue())).findFirst();
                     if (selectedTableOptional.isPresent()) {
                         Table selectedTable = selectedTableOptional.get();
+                        selectedTable.setIndexes(DatabaseInspector.getInstance().getIndexes(schema,selectedTable));
+                        selectedTable.setForeignKeys(DatabaseInspector.getInstance().getForeignKeys(schema,selectedTable));
+
                         // If table is and selected
                         if (getTreeItemDepth(selectedItem) == 3 && (isChildOf(selectedItem, tableBranch))) {
 
@@ -513,6 +517,21 @@ public class PanelBrowser implements Initializable {
 
             tableCreationController.cbSchema.setValue(selectedTable.getSchema().getName());
             tableCreationController.cbSchema.setDisable(true);
+
+            // Loading index data
+            tableCreationController.indexTabController.commitedIndexData = new LinkedList<>(selectedTable.getIndexes())
+                    .stream().map(index -> {
+                        index = Index.deepCopy(index);
+                        for (IndexedColumn ic : index.getIndexedColumns()){
+                            ic.checkedColumnProperty().set(true);
+                        }
+                        return index;
+                    }).toList();
+
+            List<Index> indexData = new LinkedList<>(selectedTable.getIndexes());
+            indexData.add(new Index());
+            tableCreationController.indexTabController.indexData = FXCollections.observableArrayList(indexData);
+            tableCreationController.indexTabController.indexTable.setItems(tableCreationController.indexTabController.indexData);
 
             // Creating tab
             Tab tableTab = new Tab("New Table");

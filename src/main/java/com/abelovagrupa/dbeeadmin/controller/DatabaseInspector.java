@@ -711,9 +711,14 @@ public class DatabaseInspector {
                 }
                 boolean unique = rs.getInt("NON_UNIQUE") == 0; // 0 means unique, 1 means not unique
 
+                IndexType type = null;
+                if(indexName.equals("PRIMARY")) type = IndexType.PRIMARY;
+                if(unique && !indexName.equals("PRIMARY")) type = IndexType.UNIQUE;
+                if(!unique && storageType.equals(IndexStorageType.BTREE)) type = IndexType.INDEX;
+                if(storageType.equals(IndexStorageType.FULLTEXT)) type = IndexType.FULLTEXT;
+                if(storageType.equals(IndexStorageType.SPATIAL)) type = IndexType.SPATIAL;
 
-
-                Index index = new Index(indexName, null, storageType, keyBlockSize, null, visible, null, unique,table);
+                Index index = new Index(indexName, type, storageType, keyBlockSize, null, visible, null, unique,table);
                 List<IndexedColumn> indexedColumns = getIndexedColumns(schema, table, index);
                 index.setIndexedColumns(indexedColumns);
                 indexList.add(index);

@@ -7,6 +7,7 @@ import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexType;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
 import com.abelovagrupa.dbeeadmin.model.table.DBEngine;
@@ -226,19 +227,7 @@ public class PanelTableCreation implements Initializable {
                 columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
                         .stream().map(Column::deepCopy).toList();
             }else{
-                // Column deletion, addition, altering
-                applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
-                Optional<List<Column>> columnsToBeDeleted = Optional.ofNullable(dropTableColumns(listDifferences));
-                Optional<List<Column>> columnsToBeAdded = Optional.ofNullable(addTableColumns(listDifferences));
-                changeTableColumnsAttributes(listDifferences);
-
-                applyQuery += ";";
-                QueryExecutor.executeQuery(applyQuery,true);
-
-                columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
-                columnsToBeAdded.ifPresent(this::renderNewColumns);
-                columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
-                        .stream().map(Column::deepCopy).toList();
+                handleTableColumnChange(listDifferences);
             }
 
         }
@@ -247,6 +236,7 @@ public class PanelTableCreation implements Initializable {
 
             applyQuery = "";
             List<Index> commitedIndexData = new LinkedList<>(indexTabController.commitedIndexData);
+            commitedIndexData.removeIf(s -> s.getName().equals("PRIMARY") && s.getType().equals(IndexType.PRIMARY));
             if(!commitedIndexData.isEmpty() && indexTabController.emptyProperties(commitedIndexData.getLast())) commitedIndexData.removeLast();
 
             DiffResult<Index> listDifferences = ListDiff.compareLists(commitedIndexData,indexTabController.getTableIndexes(),Index.indexAttributeComparator,Index.class);
@@ -256,6 +246,7 @@ public class PanelTableCreation implements Initializable {
             applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
             Optional<List<Index>> indexesToBeDeleted = Optional.ofNullable(dropTableIndexes(listDifferences));
             Optional<List<Index>> indexesToBeCreated = Optional.ofNullable(addTableIndexes(listDifferences));
+            changeTableIndexAttributes(listDifferences);
             QueryExecutor.executeQuery(applyQuery,true);
 
             indexesToBeDeleted.ifPresent(this::renderIndexDeletion);
@@ -287,6 +278,22 @@ public class PanelTableCreation implements Initializable {
                     .stream().map(ForeignKey::deepCopy).toList();
 
         }
+    }
+
+    private void handleTableColumnChange(DiffResult<Column> listDifferences) {
+        // Column deletion, addition, altering
+        applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
+        Optional<List<Column>> columnsToBeDeleted = Optional.ofNullable(dropTableColumns(listDifferences));
+        Optional<List<Column>> columnsToBeAdded = Optional.ofNullable(addTableColumns(listDifferences));
+        changeTableColumnsAttributes(listDifferences);
+
+        applyQuery += ";";
+        QueryExecutor.executeQuery(applyQuery,true);
+
+        columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
+        columnsToBeAdded.ifPresent(this::renderNewColumns);
+        columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
+                .stream().map(Column::deepCopy).toList();
     }
 
     private void renderColumnDeletion(@NotNull List<Column> columns) {
@@ -530,28 +537,7 @@ public class PanelTableCreation implements Initializable {
         return columnsToBeCreated;
     }
 
-    private void changeTableColumnsAttributes(DiffResult<Column> columnsDiff){
-        if(columnsDiff.changedAttributes.isEmpty()) return;
-        for(Column column : columnsDiff.changedAttributes.keySet()){
-            column.setTable(currentTable);
-            // Name is changed, create a rename query
-            if(columnsDiff.changedAttributes.get(column).get("name").length != 0 && columnsDiff.changedAttributes.get(column).size() == 1){
-                String oldName = (String) columnsDiff.changedAttributes.get(column).get("name")[0];
-                String newName = (String) columnsDiff.changedAttributes.get(column).get("name")[1];
-                applyQuery += DDLGenerator.createColumnRenameQuery(column,oldName,newName);
-                applyQuery += "\n";
-            }
-            else if(columnsDiff.changedAttributes.get(column).get("name").length != 0 && columnsDiff.changedAttributes.get(column).size() > 1){
-                String oldName = (String) columnsDiff.changedAttributes.get(column).get("name")[0];
-                String newName = (String) columnsDiff.changedAttributes.get(column).get("name")[1];
-                applyQuery += DDLGenerator.createColumnRenameAndAlterQuery(oldName,newName,column);
-                applyQuery += "\n";
-            }
-            else{
-                applyQuery += DDLGenerator.createColumnAlterQuery(column);
-            }
-        }
-    }
+    
 
     private List<Index> dropTableIndexes(DiffResult<Index> indexDiff) {
         if(indexDiff.removed.isEmpty()) return null;
@@ -583,7 +569,50 @@ public class PanelTableCreation implements Initializable {
         return indexesToBeCreated;
     }
 
-    private void changeTableIndexAttributes(DiffResult<Index> indexDiff){
-        throw new NotImplementedError();
+    private void changeTableColumnsAttributes(DiffResult<Column> columnsDiff){
+        if(columnsDiff.changedAttributes.isEmpty()) return;
+        for(Column column : columnsDiff.changedAttributes.keySet()){
+            column.setTable(currentTable);
+            // Name is changed, create a rename query
+            if(columnsDiff.changedAttributes.get(column).get("name").length != 0 && columnsDiff.changedAttributes.get(column).size() == 1){
+                String oldName = (String) columnsDiff.changedAttributes.get(column).get("name")[0];
+                String newName = (String) columnsDiff.changedAttributes.get(column).get("name")[1];
+                applyQuery += DDLGenerator.createColumnRenameQuery(column,oldName,newName);
+                applyQuery += "\n";
+            }
+            else if(columnsDiff.changedAttributes.get(column).get("name").length != 0 && columnsDiff.changedAttributes.get(column).size() > 1){
+                String oldName = (String) columnsDiff.changedAttributes.get(column).get("name")[0];
+                String newName = (String) columnsDiff.changedAttributes.get(column).get("name")[1];
+                applyQuery += DDLGenerator.createColumnRenameAndAlterQuery(oldName,newName,column);
+                applyQuery += "\n";
+            }
+            else{
+                applyQuery += DDLGenerator.createColumnAlterQuery(column);
+            }
+        }
     }
+    
+    private void changeTableIndexAttributes(DiffResult<Index> indexDiff){
+        if(indexDiff.changedAttributes.isEmpty()) return;
+        for(Index index : indexDiff.changedAttributes.keySet()){
+            index.setTable(currentTable);
+            // Name is changed, create a rename query
+            if(indexDiff.changedAttributes.get(index).get("name").length != 0 && indexDiff.changedAttributes.get(index).size() == 1){
+                String oldName = (String) indexDiff.changedAttributes.get(index).get("name")[0];
+                String newName = (String) indexDiff.changedAttributes.get(index).get("name")[1];
+                applyQuery += DDLGenerator.createIndexRenameQuery(index,oldName,newName);
+                applyQuery += "\n";
+            }
+//            else if(indexDiff.changedAttributes.get(index).get("name").length != 0 && indexDiff.changedAttributes.get(index).size() > 1){
+//                String oldName = (String) indexDiff.changedAttributes.get(index).get("name")[0];
+//                String newName = (String) indexDiff.changedAttributes.get(index).get("name")[1];
+//                applyQuery += DDLGenerator.createColumnRenameAndAlterQuery(oldName,newName,index);
+//                applyQuery += "\n";
+//            }
+            else{
+                applyQuery += DDLGenerator.createIndexAlterQuery(index);
+            }
+        }
+    }
+    
 }

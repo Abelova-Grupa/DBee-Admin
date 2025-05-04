@@ -64,7 +64,7 @@ public class Index {
     }
 
     public static Index deepCopy(Index index) {
-        return new Index(
+        Index newIndex = new Index(
                 index.getName(),
                 index.getType(),
                 index.getStorageType(),
@@ -75,6 +75,9 @@ public class Index {
                 index.isUnique(),
                 index.getTable()
         );
+        newIndex.typeProperty().set(index.getType());
+
+        return newIndex;
     }
 
     public String getName() {

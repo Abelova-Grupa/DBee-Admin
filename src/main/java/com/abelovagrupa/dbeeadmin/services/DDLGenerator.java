@@ -388,12 +388,12 @@ public class DDLGenerator {
         return queryBuilder.toString();
     }
 
-    public static String createIndexRenameQuery(Index index, String newName) {
+    public static String createIndexRenameQuery(Index index,String oldName, String newName) {
         if (index == null) throw new IllegalArgumentException("Index is not set");
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
       
-        return "RENAME INDEX " + index.getName() + " TO " + newName;
+        return "RENAME INDEX " + oldName + " TO " + newName;
     }
 
     public static String createIndexDropQuery(Index index) {
@@ -404,8 +404,8 @@ public class DDLGenerator {
         return "DROP INDEX " + index.getName();
     }
 
-    public static String createIndexAlterQuery(Index oldIndex, Index newIndex) {
-        return createIndexDropQuery(oldIndex) + "\n" + createIndexCreationQuery(newIndex);
+    public static String createIndexAlterQuery(Index index) {
+        return createIndexDropQuery(index) + "\n" + createIndexCreationQuery(index);
     }
 
     public static String createTriggerCreationQuery(Trigger trigger) {
