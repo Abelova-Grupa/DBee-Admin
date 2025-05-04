@@ -71,7 +71,7 @@ public class PanelMain implements Initializable {
         loadInfo();
         loadEditor();
         loadResults();
-        loadHelp();
+        // loadHelp();
         linkControllers();
         long endTime = System.nanoTime();
         long duration = endTime - startTime;
