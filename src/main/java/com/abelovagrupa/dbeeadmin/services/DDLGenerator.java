@@ -77,14 +77,6 @@ public class DDLGenerator {
         }
     }
 
-    /**
-     * Creates a database table from a Table object.<br/>
-     * <i>Note: Table must have a name, schema and at least one column set.</i>
-     *
-     * @param table Table object to be persisted to the database. Used as P. O. Pattern.
-     * @throws IllegalArgumentException if schema does not have a name, schema and at least one column set.
-     */
-
     public static String createSchemaCreationQuery(Schema schema){
         // Validate
         if (schema.getName() == null) throw new IllegalArgumentException("Undefined schema name.");
@@ -196,7 +188,7 @@ public class DDLGenerator {
         return "DROP COLUMN " + column.getName();
     }
 
-    public static String createColumnRenameQuery(Column column, String newName) {
+    public static String createColumnRenameQuery(Column column,String oldName, String newName) {
         // Validate
         if (column.getName().isEmpty() || column.getName() == null)
             throw new IllegalArgumentException("Column name is not set!");
@@ -208,7 +200,7 @@ public class DDLGenerator {
             throw new IllegalArgumentException("Schema name is not set!");
         return
             "RENAME COLUMN " +
-            column.getName() +
+            oldName +
             " TO " +
             newName;
     }
@@ -267,6 +259,30 @@ public class DDLGenerator {
         queryBuilder.append(")\n");
         queryBuilder.append("ON DELETE ").append(foreignKey.getOnDeleteAction().toString().replace("_", " ")).append("\n");
         queryBuilder.append("ON UPDATE ").append(foreignKey.getOnUpdateAction().toString().replace("_", " "));
+
+        return queryBuilder.toString();
+    }
+
+    public static String createColumnRenameAndAlterQuery(String oldName,String newName, Column column) {
+        if (column == null || column.getName() == null || column.getName().isEmpty()) {
+            throw new IllegalArgumentException("New column name is not set!");
+        }
+        if (column.getTable() == null || column.getTable().getName() == null || column.getTable().getName().isEmpty()) {
+            throw new IllegalArgumentException("Table name is not set!");
+        }
+        if (column.getTable().getSchema() == null || column.getTable().getSchema().getName() == null || column.getTable().getSchema().getName().isEmpty()) {
+            throw new IllegalArgumentException("Schema name is not set!");
+        }
+
+        StringBuilder queryBuilder = new StringBuilder("CHANGE COLUMN ")
+                .append(oldName)
+                .append(" ")
+                .append(convertColumnToSQL(column));
+
+        // Remove the trailing comma and newline added by convertColumnToSQLForAlter
+        if (queryBuilder.toString().endsWith(",\n")) {
+            queryBuilder.setLength(queryBuilder.length() - 2);
+        }
 
         return queryBuilder.toString();
     }
@@ -372,12 +388,12 @@ public class DDLGenerator {
         return queryBuilder.toString();
     }
 
-    public static String createIndexRenameQuery(Index index, String newName) {
+    public static String createIndexRenameQuery(Index index,String oldName, String newName) {
         if (index == null) throw new IllegalArgumentException("Index is not set");
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
       
-        return "RENAME INDEX " + index.getName() + " TO " + newName;
+        return "RENAME INDEX " + oldName + " TO " + newName;
     }
 
     public static String createIndexDropQuery(Index index) {
@@ -388,8 +404,8 @@ public class DDLGenerator {
         return "DROP INDEX " + index.getName();
     }
 
-    public static String createIndexAlterQuery(Index oldIndex, Index newIndex) {
-        return createIndexDropQuery(oldIndex) + "\n" + createIndexCreationQuery(newIndex);
+    public static String createIndexAlterQuery(Index index) {
+        return createIndexDropQuery(index) + "\n" + createIndexCreationQuery(index);
     }
 
     public static String createTriggerCreationQuery(Trigger trigger) {
@@ -1260,5 +1276,4 @@ public class DDLGenerator {
         DatabaseConnection.getInstance().setCurrentSchema(null);
 
     }
-
 }

@@ -54,10 +54,10 @@ public class QueryProcessor {
         QueryExecutor.executeQuery(query,preview);
     }
 
-    public static void renameColumn(Column column, String newName, boolean preview){
-        String query = DDLGenerator.createColumnRenameQuery(column,newName);
-        QueryExecutor.executeQuery(query,preview);
-    }
+//    public static void renameColumn(Column column, String newName, boolean preview){
+//        String query = DDLGenerator.createColumnRenameQuery(column,newName);
+//        QueryExecutor.executeQuery(query,preview);
+//    }
     // I think modifyColumn method is invalid
     public static void alterColumn(Column column,boolean preview){
         String query = DDLGenerator.createColumnAlterQuery(column);
@@ -89,18 +89,13 @@ public class QueryProcessor {
         QueryExecutor.executeQuery(query,preview);
     }
 
-    public static void renameIndex(Index index, String newName, boolean preview){
-        String query = DDLGenerator.createIndexRenameQuery(index,newName);
+    public static void renameIndex(Index index,String oldName, String newName, boolean preview){
+        String query = DDLGenerator.createIndexRenameQuery(index,oldName,newName);
         QueryExecutor.executeQuery(query,preview);
     }
 
     public static void dropIndex(Index index, boolean preview){
         String query = DDLGenerator.createIndexDropQuery(index);
-        QueryExecutor.executeQuery(query,preview);
-    }
-
-    public static void alterIndex(Index oldIndex, Index newIndex, boolean preview){
-        String query = DDLGenerator.createIndexAlterQuery(oldIndex,newIndex);
         QueryExecutor.executeQuery(query,preview);
     }
 

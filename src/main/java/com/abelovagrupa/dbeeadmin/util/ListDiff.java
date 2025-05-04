@@ -47,13 +47,13 @@ public class ListDiff {
             List<Index> oldIndexList = (List<Index>) oldList;
 
             for(T oldItem : oldList) {
-                if(!Index.containsByAttributes(newIndexList, (Index) oldItem)){
+                if(!Index.containsByAttributes(newIndexList, (Index) oldItem)  && !hasChangedAttributes(oldItem,result)){
                     result.removed.add(oldItem);
                 }
             }
 
             for(T newItem : newList) {
-                if(!Index.containsByAttributes(oldIndexList, (Index) newItem)){
+                if(!Index.containsByAttributes(oldIndexList, (Index) newItem) && !hasChangedAttributes(newItem,result)){
                     result.added.add(newItem);
                 }
             }
@@ -65,13 +65,13 @@ public class ListDiff {
             List<ForeignKey> oldFkList = (List<ForeignKey>) oldList;
 
             for(T oldItem : oldList) {
-                if(!ForeignKey.containsByAttributes(newFKList, (ForeignKey) oldItem)){
+                if(!ForeignKey.containsByAttributes(newFKList, (ForeignKey) oldItem) && !hasChangedAttributes(oldItem,result)){
                     result.removed.add(oldItem);
                 }
             }
 
             for(T newItem : newList) {
-                if(!ForeignKey.containsByAttributes(oldFkList, (ForeignKey) newItem)){
+                if(!ForeignKey.containsByAttributes(oldFkList, (ForeignKey) newItem) && !hasChangedAttributes(newItem,result)){
                     result.added.add(newItem);
                 }
             }
@@ -87,10 +87,30 @@ public class ListDiff {
             Column column = (Column) oldItem;
             DiffResult<Column> columnResult = (DiffResult<Column>) result;
             for(Column col : columnResult.changedAttributes.keySet()){
-                if(col.getName().equals(column.getName())) return true;
+                if(col.getName().equals(column.getName()) ||
+                columnResult.changedAttributes.get(col).get("name")[0].equals(column.getName())) return true;
             }
             return false;
         }
+        if(oldItem instanceof Index){
+            Index index = (Index) oldItem;
+            DiffResult<Index> columnResult = (DiffResult<Index>) result;
+            for(Index ix : columnResult.changedAttributes.keySet()){
+                if(ix.getName().equals(index.getName()) ||
+                        columnResult.changedAttributes.get(ix).get("name")[0].equals(index.getName())) return true;
+            }
+            return false;
+        }
+        if(oldItem instanceof ForeignKey){
+            ForeignKey foreignKey = (ForeignKey) oldItem;
+            DiffResult<ForeignKey> columnResult = (DiffResult<ForeignKey>) result;
+            for(ForeignKey fk : columnResult.changedAttributes.keySet()){
+                if(fk.getName().equals(foreignKey.getName()) ||
+                        columnResult.changedAttributes.get(fk).get("name")[0].equals(foreignKey.getName())) return true;
+            }
+            return false;
+        }
+
         return false;
     }
 
