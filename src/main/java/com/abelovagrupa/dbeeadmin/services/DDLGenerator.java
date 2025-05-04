@@ -263,6 +263,30 @@ public class DDLGenerator {
         return queryBuilder.toString();
     }
 
+    public static String createColumnRenameAndAlterQuery(String oldName,String newName, Column column) {
+        if (column == null || column.getName() == null || column.getName().isEmpty()) {
+            throw new IllegalArgumentException("New column name is not set!");
+        }
+        if (column.getTable() == null || column.getTable().getName() == null || column.getTable().getName().isEmpty()) {
+            throw new IllegalArgumentException("Table name is not set!");
+        }
+        if (column.getTable().getSchema() == null || column.getTable().getSchema().getName() == null || column.getTable().getSchema().getName().isEmpty()) {
+            throw new IllegalArgumentException("Schema name is not set!");
+        }
+
+        StringBuilder queryBuilder = new StringBuilder("CHANGE COLUMN ")
+                .append(oldName)
+                .append(" ")
+                .append(convertColumnToSQL(column));
+
+        // Remove the trailing comma and newline added by convertColumnToSQLForAlter
+        if (queryBuilder.toString().endsWith(",\n")) {
+            queryBuilder.setLength(queryBuilder.length() - 2);
+        }
+
+        return queryBuilder.toString();
+    }
+
     public static String createForeignKeyDropQuery(ForeignKey foreignKey) {
         if (foreignKey == null || foreignKey.getName() == null || foreignKey.getName().isEmpty())
             throw new IllegalArgumentException("Foreign key is not set");
@@ -1252,5 +1276,4 @@ public class DDLGenerator {
         DatabaseConnection.getInstance().setCurrentSchema(null);
 
     }
-
 }
