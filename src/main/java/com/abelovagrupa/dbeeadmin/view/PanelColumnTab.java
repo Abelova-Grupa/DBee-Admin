@@ -62,9 +62,9 @@ public class PanelColumnTab implements Initializable{
 
     HashMap<Integer, Pair<Column,Column>> columnPairs = new HashMap<>();
 
-    HashMap<Column,Integer> commitedColumnId = new HashMap<>();
+    IdentityHashMap<Column,Integer> commitedColumnId = new IdentityHashMap<>();
 
-    HashMap<Column, Integer> columnId = new HashMap<>();
+    IdentityHashMap<Column, Integer> columnId = new IdentityHashMap<>();
 
     // Controllers
     PanelIndexTab indexTabController;
@@ -89,12 +89,12 @@ public class PanelColumnTab implements Initializable{
         columnNameColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
             column.setName(event.getNewValue());
-            if(!columnId.containsKey(column)){
-                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
-                columnPairs.put(++lastId,Pair.of(null,column));
-                columnId.put(column,lastId);
-                System.out.println("Oke!");
-            }
+//            if(!columnId.containsKey(column)){
+//                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
+//                columnPairs.put(++lastId,Pair.of(null,column));
+//                columnId.put(column,lastId);
+//                System.out.println("Iznenadjenje!");
+//            }
         });
 
         // Setting data type column properties
@@ -104,12 +104,12 @@ public class PanelColumnTab implements Initializable{
         columnDataTypeColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
             column.setType(event.getNewValue());
-            if(!Column.containsByAttributes(columnId.keySet(),column)){
-                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
-                columnPairs.put(++lastId,Pair.of(null,column));
-                columnId.put(column,lastId);
-                System.out.println("Iznenadjenje!");
-            }
+//            if(!columnId.containsKey(column)){
+//                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
+//                columnPairs.put(++lastId,Pair.of(null,column));
+//                columnId.put(column,lastId);
+//                System.out.println("Iznenadjenje!");
+//            }
         });
         // Setting column size properties for certain types
         columnSizeColumn.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
@@ -117,11 +117,11 @@ public class PanelColumnTab implements Initializable{
         columnSizeColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
             column.setSize(event.getNewValue());
-            if(!Column.containsByAttributes(columnId.keySet(),column)){
-                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
-                columnPairs.put(++lastId,Pair.of(null,column));
-                columnId.put(column,lastId);
-            }
+//            if(Column.containsByAttributes(columnId.keySet(),column)){
+//                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
+//                columnPairs.put(++lastId,Pair.of(null,column));
+//                columnId.put(column,lastId);
+//            }
         });
         // Setting checkbox columns
         setCheckBoxes();
@@ -132,11 +132,11 @@ public class PanelColumnTab implements Initializable{
         columnDefaultColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
             column.setDefaultValue(event.getNewValue());
-            if(!columnId.containsKey(column)){
-                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
-                columnPairs.put(++lastId,Pair.of(null,column));
-                columnId.put(column,lastId);
-            }
+//            if(!Column.containsByAttributes(columnId.keySet(),column)){
+//                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
+//                columnPairs.put(++lastId,Pair.of(null,column));
+//                columnId.put(column,lastId);
+//            }
         });
 
         // Setting up listener for data change in column table

@@ -212,9 +212,18 @@ public class PanelTableCreation implements Initializable {
             List<Column> commitedColumnData = new LinkedList<>(columnTabController.commitedColumnData);
             // Removing last empty row from list copy
             if(!commitedColumnData.isEmpty() && columnTabController.emptyProperties(commitedColumnData.getLast())){
-                columnTabController.columnPairs.remove(Collections.max(columnTabController.columnPairs.keySet()));
                 commitedColumnData.removeLast();
             }
+
+            List<Column> columnData = new LinkedList<>(columnTabController.getTableColumns());
+            Integer lastPairId = columnTabController.columnPairs.isEmpty() ? 0 : Collections.max(columnTabController.columnPairs.keySet());
+            for(Column column : columnData){
+                if(!columnTabController.columnId.containsKey(column)) {
+                    columnTabController.columnPairs.put(++lastPairId,Pair.of(null,column));
+                    columnTabController.columnId.put(column,lastPairId);
+                }
+            }
+
 
             DiffResult<Column> listDifferences = ListDiff.compareLists(columnTabController.columnPairs,Column.columnAttributeComparator,Column.class);
             if(ListDiff.noDiff(listDifferences)) return;

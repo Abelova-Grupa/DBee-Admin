@@ -350,8 +350,7 @@ public class Column {
             Objects.equals(generationExpression, column.generationExpression) &&
             Objects.equals(defaultValue, column.defaultValue) &&
             Objects.equals(comment, column.comment) &&
-            (type == column.type) &&
-            Objects.equals(table, column.table);
+            (type == column.type);
     }
 
     @Override
