@@ -393,7 +393,7 @@ public class DDLGenerator {
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
       
-        return "RENAME INDEX " + oldName + " TO " + newName;
+        return "RENAME INDEX `" + oldName + "` TO `" + newName + "`";
     }
 
     public static String createIndexDropQuery(Index index) {

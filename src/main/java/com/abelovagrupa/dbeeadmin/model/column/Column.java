@@ -380,7 +380,7 @@ public class Column {
         return deepColumn;
     }
 
-    public static boolean containsByAttributes(Set<Column> columns, Column column){
+    public static boolean containsByAttributes(List<Column> columns, Column column){
         for(Column col : columns){
             if(matchesByAttributes(col, column)) return true;
         }

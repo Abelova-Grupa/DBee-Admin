@@ -17,7 +17,7 @@ import com.abelovagrupa.dbeeadmin.services.ProgramState;
 import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.util.DiffResult;
-import com.abelovagrupa.dbeeadmin.util.ListDiff;
+import com.abelovagrupa.dbeeadmin.util.StructDiff;
 import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -225,8 +225,8 @@ public class PanelTableCreation implements Initializable {
             }
 
 
-            DiffResult<Column> listDifferences = ListDiff.compareLists(columnTabController.columnPairs,Column.columnAttributeComparator,Column.class);
-            if(ListDiff.noDiff(listDifferences)) return;
+            DiffResult<Column> listDifferences = StructDiff.comparePairs(columnTabController.columnPairs,Column.columnAttributeComparator,Column.class);
+            if(StructDiff.noDiff(listDifferences)) return;
 
             // Creating the table if it doesn't exist
             if(currentTable == null){
@@ -254,9 +254,9 @@ public class PanelTableCreation implements Initializable {
             List<Index> indexData = indexTabController.getTableIndexes();
             // commitedIndexData and indexData are the same length
             Integer lastPairId = indexTabController.indexPairs.isEmpty() ? 0 : Collections.max(indexTabController.indexPairs.keySet());
-            for(int i = 0; i < Math.min(commitedIndexData.size(),indexData.size()); i++){
-                indexTabController.indexPairs.put(++lastPairId, Pair.of(commitedIndexData.get(i),indexData.get(i)));
-            }
+//            for(int i = 0; i < Math.min(commitedIndexData.size(),indexData.size()); i++){
+//                indexTabController.indexPairs.put(++lastPairId, Pair.of(commitedIndexData.get(i),indexData.get(i)));
+//            }
             for(Index index : indexData){
                 if(!indexTabController.indexIds.containsKey(index)){
                     indexTabController.indexPairs.put(++lastPairId,Pair.of(null,index));
@@ -264,8 +264,8 @@ public class PanelTableCreation implements Initializable {
                 }
             }
 
-            DiffResult<Index> listDifferences = ListDiff.compareLists(indexTabController.indexPairs,Index.indexAttributeComparator,Index.class);
-            if(ListDiff.noDiff(listDifferences)) return;
+            DiffResult<Index> listDifferences = StructDiff.comparePairs(indexTabController.indexPairs,Index.indexAttributeComparator,Index.class);
+            if(StructDiff.noDiff(listDifferences)) return;
 
             // Index deletion, addition, altering
             handleTableIndexChange(listDifferences);
@@ -277,8 +277,8 @@ public class PanelTableCreation implements Initializable {
             List<ForeignKey> commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.commitedForeignKeyData);
             if(!commitedForeignKeyData.isEmpty() && foreignKeyTabController.emptyProperties(commitedForeignKeyData.getLast())) commitedForeignKeyData.removeLast();
 
-            DiffResult<ForeignKey> listDifferences = ListDiff.compareLists(foreignKeyTabController.fkPairs,ForeignKey.foreignKeyAttributeComparator,ForeignKey.class);
-            if(ListDiff.noDiff(listDifferences)) return;
+            DiffResult<ForeignKey> listDifferences = StructDiff.comparePairs(foreignKeyTabController.fkPairs,ForeignKey.foreignKeyAttributeComparator,ForeignKey.class);
+            if(StructDiff.noDiff(listDifferences)) return;
 
             // Foreign key deletion, addition, altering
             applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
@@ -623,11 +623,19 @@ public class PanelTableCreation implements Initializable {
     
     private void changeTableIndexAttributes(DiffResult<Index> indexDiff){
         if(indexDiff.changedAttributes.isEmpty()) return;
+
+        for(Index index : indexDiff.changedAttributes.keySet()){
+
+        }
+
         for(Index index : indexDiff.changedAttributes.keySet()){
             index.setTable(currentTable);
-            DiffResult<IndexedColumn> indexColumnDiff = ListDiff.compareLists(null,IndexedColumn.indexedColumnAttributeComparator,IndexedColumn.class);
+            Integer id = indexTabController.indexIds.get(index);
+            Index committedIndex = indexTabController.indexPairs.get(id).getFirst();
+
+            DiffResult<IndexedColumn> indexColumnDiff = StructDiff.compareLists(committedIndex.getIndexedColumns(),index.getIndexedColumns(),IndexedColumn.indexedColumnAttributeComparator,IndexedColumn.class);
             // Name is changed, create a rename query
-            if(indexDiff.changedAttributes.get(index).get("name").length != 0 && indexDiff.changedAttributes.get(index).size() == 1 && ListDiff.noDiff(indexColumnDiff)){
+            if(indexDiff.changedAttributes.get(index).get("name").length != 0 && indexDiff.changedAttributes.get(index).size() == 1 && StructDiff.noDiff(indexColumnDiff)){
                 String oldName = (String) indexDiff.changedAttributes.get(index).get("name")[0];
                 String newName = (String) indexDiff.changedAttributes.get(index).get("name")[1];
                 applyQuery += DDLGenerator.createIndexRenameQuery(index,oldName,newName);
