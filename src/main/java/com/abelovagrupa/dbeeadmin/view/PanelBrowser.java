@@ -522,9 +522,7 @@ public class PanelBrowser implements Initializable {
             for(int i = 0; i < columnController.commitedColumnData.size(); i++){
                 Column commitedColumn = columnController.commitedColumnData.get(i);
                 Column column = columnController.columnsData.get(i);
-                Integer lastId;
-                if(columnController.columnPairs.isEmpty()) lastId = 0;
-                else lastId = Collections.max(columnController.columnPairs.keySet());
+                Integer lastId = columnController.columnPairs.isEmpty() ? 0 : Collections.max(columnController.columnPairs.keySet());
 
                 columnController.columnPairs.put(++lastId,Pair.of(commitedColumn,column));
                 columnController.commitedColumnId.put(column,lastId);
@@ -559,9 +557,7 @@ public class PanelBrowser implements Initializable {
             for(int i = 0; i < indexController.commitedIndexData.size(); i++){
                 Index commitedIndex = indexController.commitedIndexData.get(i);
                 Index index = indexController.indexData.get(i);
-                Integer lastId;
-                if(indexController.indexPairs.isEmpty()) lastId = 0;
-                else lastId = Collections.max(indexController.indexPairs.keySet());
+                Integer lastId = indexController.indexPairs.isEmpty() ? 0 : Collections.max(indexController.indexPairs.keySet());
                 indexController.indexPairs.put(++lastId,Pair.of(commitedIndex,index));
                 indexController.commitedIndexIds.put(commitedIndex,lastId);
                 indexController.indexIds.put(index,lastId);

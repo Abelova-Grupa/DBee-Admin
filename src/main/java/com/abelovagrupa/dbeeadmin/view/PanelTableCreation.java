@@ -253,9 +253,15 @@ public class PanelTableCreation implements Initializable {
 
             List<Index> indexData = indexTabController.getTableIndexes();
             // commitedIndexData and indexData are the same length
-            Integer lastPairId = Collections.max(indexTabController.indexPairs.keySet());
-            for(int i = 0; i < commitedIndexData.size(); i++){
+            Integer lastPairId = indexTabController.indexPairs.isEmpty() ? 0 : Collections.max(indexTabController.indexPairs.keySet());
+            for(int i = 0; i < Math.min(commitedIndexData.size(),indexData.size()); i++){
                 indexTabController.indexPairs.put(++lastPairId, Pair.of(commitedIndexData.get(i),indexData.get(i)));
+            }
+            for(Index index : indexData){
+                if(!indexTabController.indexIds.containsKey(index)){
+                    indexTabController.indexPairs.put(++lastPairId,Pair.of(null,index));
+                    indexTabController.indexIds.put(index,lastPairId);
+                }
             }
 
             DiffResult<Index> listDifferences = ListDiff.compareLists(indexTabController.indexPairs,Index.indexAttributeComparator,Index.class);

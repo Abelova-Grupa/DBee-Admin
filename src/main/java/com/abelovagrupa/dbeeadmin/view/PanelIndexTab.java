@@ -71,9 +71,9 @@ public class PanelIndexTab implements Initializable {
 
     HashMap<Integer,Pair<Index,Index>> indexPairs = new HashMap<>();
 
-    HashMap<Index,Integer> commitedIndexIds = new HashMap<>();
+    IdentityHashMap<Index,Integer> commitedIndexIds = new IdentityHashMap<>();
 
-    HashMap<Index,Integer> indexIds = new HashMap<>();
+    IdentityHashMap<Index,Integer> indexIds = new IdentityHashMap<>();
 
     Index selectedIndex;
 
@@ -312,7 +312,8 @@ public class PanelIndexTab implements Initializable {
 
     private void deleteSelectedIndex(Index item) {
         indexData.remove(item);
-
+        Integer id = indexIds.get(item);
+        indexPairs.get(id).setSecond(null);
     }
 
     private void setColumnsEditable(boolean editable) {
