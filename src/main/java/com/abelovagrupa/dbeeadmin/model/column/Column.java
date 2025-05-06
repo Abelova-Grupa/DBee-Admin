@@ -3,10 +3,7 @@ package com.abelovagrupa.dbeeadmin.model.column;
 import com.abelovagrupa.dbeeadmin.model.table.Table;
 import javafx.beans.property.*;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 
 public class Column {
@@ -384,14 +381,14 @@ public class Column {
         return deepColumn;
     }
 
-    public static boolean containsByAttributes(List<Column> columns, Column column){
+    public static boolean containsByAttributes(Set<Column> columns, Column column){
         for(Column col : columns){
             if(matchesByAttributes(col, column)) return true;
         }
         return false;
     }
 
-    private static boolean matchesByAttributes(Column a, Column b) {
+    public static boolean matchesByAttributes(Column a, Column b) {
         return Objects.equals(a.getName(), b.getName()) &&
                 a.isPrimaryKey() == b.isPrimaryKey() &&
                 a.isNotNull() == b.isNotNull() &&

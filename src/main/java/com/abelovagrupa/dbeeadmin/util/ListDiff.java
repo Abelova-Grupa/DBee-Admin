@@ -9,14 +9,34 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 public class ListDiff {
-    public static <T> DiffResult<T> compareLists(List<T> oldList, List<T> newList, BiFunction<T, T, HashMap<String, Object[]>> attributeComparator, Class<T> compareClass){
+    public static <T> DiffResult<T> compareLists(HashMap<Integer,Pair<T,T>> attributePairs, BiFunction<T, T, HashMap<String, Object[]>> attributeComparator, Class<T> compareClass){
         DiffResult<T> result = new DiffResult<>();
-//        Set<T> oldSet = new HashSet<>(oldList);
-//        Set<T> newSet = new HashSet<>(newList);
 
-        for(int i = 0; i < Math.min(oldList.size(),newList.size()); i++){
-            T oldItem = oldList.get(i);
-            T newItem = newList.get(i);
+//        for(int i = 0; i < Math.min(oldList.size(),newList.size()); i++){
+//            T oldItem = oldList.get(i);
+//            T newItem = newList.get(i);
+//
+//            HashMap<String,Object[]> diffs = attributeComparator.apply(oldItem,newItem);
+//            if(!diffs.isEmpty()){
+//                result.changedAttributes.put(newItem,diffs);
+//            }
+//
+//        }
+
+        // Not ordered search
+        for(Pair<T,T> itemPair : attributePairs.values()){
+            T oldItem = itemPair.getFirst();
+            T newItem = itemPair.getSecond();
+
+            if(oldItem == null && newItem == null) continue;
+            if(oldItem != null && newItem == null) {
+                result.removed.add(oldItem);
+                continue;
+            }
+            if(oldItem == null && newItem != null){
+                result.added.add(newItem);
+                continue;
+            }
 
             HashMap<String,Object[]> diffs = attributeComparator.apply(oldItem,newItem);
             if(!diffs.isEmpty()){
@@ -25,59 +45,79 @@ public class ListDiff {
 
         }
 
-        if(compareClass == Column.class){
-            List<Column> newColumnList = (List<Column>) newList;
-            List<Column> oldColumnList = (List<Column>) oldList;
-
-            for(T oldItem : oldList) {
-                if(!Column.containsByAttributes(newColumnList, (Column) oldItem) && !ListDiff.hasChangedAttributes(oldItem,result)){
-                    result.removed.add(oldItem);
-                }
-            }
-
-            for(T newItem : newList) {
-                if(!Column.containsByAttributes(oldColumnList, (Column) newItem) && !ListDiff.hasChangedAttributes(newItem,result)){
-                    result.added.add(newItem);
-                }
-            }
-        }
-
-        if(compareClass == Index.class){
-            List<Index> newIndexList = (List<Index>) newList;
-            List<Index> oldIndexList = (List<Index>) oldList;
-
-            for(T oldItem : oldList) {
-                if(!Index.containsByAttributes(newIndexList, (Index) oldItem)  && !hasChangedAttributes(oldItem,result)){
-                    result.removed.add(oldItem);
-                }
-            }
-
-            for(T newItem : newList) {
-                if(!Index.containsByAttributes(oldIndexList, (Index) newItem) && !hasChangedAttributes(newItem,result)){
-                    result.added.add(newItem);
-                }
-            }
-
-        }
-
-        if(compareClass == ForeignKey.class){
-            List<ForeignKey> newFKList = (List<ForeignKey>) newList;
-            List<ForeignKey> oldFkList = (List<ForeignKey>) oldList;
-
-            for(T oldItem : oldList) {
-                if(!ForeignKey.containsByAttributes(newFKList, (ForeignKey) oldItem) && !hasChangedAttributes(oldItem,result)){
-                    result.removed.add(oldItem);
-                }
-            }
-
-            for(T newItem : newList) {
-                if(!ForeignKey.containsByAttributes(oldFkList, (ForeignKey) newItem) && !hasChangedAttributes(newItem,result)){
-                    result.added.add(newItem);
-                }
-            }
-
-        }
-
+//        for(int i = 0, id = 0; i < attributePairs.size(); i++){
+//            T oldItem = attributePairs.get(id).getFirst();
+//            T newItem = attributePairs.get(id).getSecond();
+//
+//            if(compareClass == Column.class){
+//                Column oldColumnItem = (Column) oldItem;
+//                Column newColumnItem = (Column) newItem;
+//
+//                if(oldColumnItem != null && newColumnItem == null) result.removed.add()
+//
+//                if(!Column.matchesByAttributes(oldColumnItem,newColumnItem) && !ListDiff.hasChangedAttributes(oldItem,result)){
+//                    result.removed.add(oldItem);
+//                }
+//
+//            }
+//
+//        }
+//
+//        if(compareClass == Column.class){
+//            List<Column> newColumnList = (List<Column>) newList;
+//            List<Column> oldColumnList = (List<Column>) oldList;
+//
+//            for(T oldItem : oldList) {
+//                if(!Column.containsByAttributes(newColumnList, (Column) oldItem) && !ListDiff.hasChangedAttributes(oldItem,result)){
+//                    result.removed.add(oldItem);
+//                }
+//            }
+//
+//            for(T newItem : newList) {
+//                if(!Column.containsByAttributes(oldColumnList, (Column) newItem) && !ListDiff.hasChangedAttributes(newItem,result)){
+//                    result.added.add(newItem);
+//                }
+//            }
+//        }
+//
+//        if(compareClass == Index.class){
+//            List<Index> newIndexList = (List<Index>) newList;
+//            List<Index> oldIndexList = (List<Index>) oldList;
+//
+//
+//
+//            for(T oldItem : oldList) {
+//                if(!Index.containsByAttributes(newIndexList, (Index) oldItem)  && !hasChangedAttributes(oldItem,result)){
+//                    result.removed.add(oldItem);
+//                }
+//            }
+//
+//            for(T newItem : newList) {
+//                if(!Index.containsByAttributes(oldIndexList, (Index) newItem) && !hasChangedAttributes(newItem,result)){
+//                    result.added.add(newItem);
+//                }
+//            }
+//
+//        }
+//
+//        if(compareClass == ForeignKey.class){
+//            List<ForeignKey> newFKList = (List<ForeignKey>) newList;
+//            List<ForeignKey> oldFkList = (List<ForeignKey>) oldList;
+//
+//            for(T oldItem : oldList) {
+//                if(!ForeignKey.containsByAttributes(newFKList, (ForeignKey) oldItem) && !hasChangedAttributes(oldItem,result)){
+//                    result.removed.add(oldItem);
+//                }
+//            }
+//
+//            for(T newItem : newList) {
+//                if(!ForeignKey.containsByAttributes(oldFkList, (ForeignKey) newItem) && !hasChangedAttributes(newItem,result)){
+//                    result.added.add(newItem);
+//                }
+//            }
+//
+//        }
+//
 
         return result;
     }

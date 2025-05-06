@@ -5,7 +5,7 @@ import com.abelovagrupa.dbeeadmin.model.column.DataType;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexType;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
-import javafx.beans.binding.Bindings;
+import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,10 +19,7 @@ import javafx.scene.input.MouseButton;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class PanelColumnTab implements Initializable{
 
@@ -63,6 +60,12 @@ public class PanelColumnTab implements Initializable{
 
     ObservableList<Column> columnsData = FXCollections.observableArrayList(commitedColumnData);
 
+    HashMap<Integer, Pair<Column,Column>> columnPairs = new HashMap<>();
+
+    HashMap<Column,Integer> commitedColumnId = new HashMap<>();
+
+    HashMap<Column, Integer> columnId = new HashMap<>();
+
     // Controllers
     PanelIndexTab indexTabController;
 
@@ -86,6 +89,12 @@ public class PanelColumnTab implements Initializable{
         columnNameColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
             column.setName(event.getNewValue());
+            if(!columnId.containsKey(column)){
+                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
+                columnPairs.put(++lastId,Pair.of(null,column));
+                columnId.put(column,lastId);
+                System.out.println("Oke!");
+            }
         });
 
         // Setting data type column properties
@@ -95,6 +104,12 @@ public class PanelColumnTab implements Initializable{
         columnDataTypeColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
             column.setType(event.getNewValue());
+            if(!Column.containsByAttributes(columnId.keySet(),column)){
+                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
+                columnPairs.put(++lastId,Pair.of(null,column));
+                columnId.put(column,lastId);
+                System.out.println("Iznenadjenje!");
+            }
         });
         // Setting column size properties for certain types
         columnSizeColumn.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
@@ -102,6 +117,11 @@ public class PanelColumnTab implements Initializable{
         columnSizeColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
             column.setSize(event.getNewValue());
+            if(!Column.containsByAttributes(columnId.keySet(),column)){
+                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
+                columnPairs.put(++lastId,Pair.of(null,column));
+                columnId.put(column,lastId);
+            }
         });
         // Setting checkbox columns
         setCheckBoxes();
@@ -112,6 +132,11 @@ public class PanelColumnTab implements Initializable{
         columnDefaultColumn.setOnEditCommit(event -> {
             Column column = event.getRowValue();
             column.setDefaultValue(event.getNewValue());
+            if(!columnId.containsKey(column)){
+                Integer lastId = columnPairs.isEmpty() ? 0 : Collections.max(columnPairs.keySet());
+                columnPairs.put(++lastId,Pair.of(null,column));
+                columnId.put(column,lastId);
+            }
         });
 
         // Setting up listener for data change in column table
@@ -123,21 +148,32 @@ public class PanelColumnTab implements Initializable{
             newSelection.nameProperty().addListener((obs,oldVal,newVal) -> {
                 int lastIndex = columnTable.getItems().size() -1;
                 if(index != lastIndex) return;
+//                int lastPairId = Collections.max(columnPairs.keySet());
+//                Column newColumn = new Column();
                 columnTable.getItems().add(new Column());
+//                columnPairs.put(++lastPairId,Pair.of(null,newColumn));
+//                columnId.put(newColumn,lastPairId);
             });
             // Column type property listener
             newSelection.typeProperty().addListener((obs,oldVal,newVal) -> {
                 columnSizeColumn.setEditable(DataType.hasVariableLength(newVal));
-
                 int lastIndex = columnTable.getItems().size() -1;
                 if(index != lastIndex) return;
+//                int lastPairId = Collections.max(columnPairs.keySet());
+//                Column newColumn = new Column();
                 columnTable.getItems().add(new Column());
+//                columnPairs.put(++lastPairId,Pair.of(null,newColumn));
+//                columnId.put(newColumn,lastPairId);
             });
             // Column default value property listener
             newSelection.defaultValueProperty().addListener((obs,oldVal,newVal) -> {
                 int lastIndex = columnTable.getItems().size() -1;
                 if(index != lastIndex) return;
+//                int lastPairId = Collections.max(columnPairs.keySet());
+//                Column newColumn = new Column();
                 columnTable.getItems().add(new Column());
+//                columnPairs.put(++lastPairId,Pair.of(null,newColumn));
+//                columnId.put(newColumn,lastPairId);
             });
 
         });
@@ -168,6 +204,9 @@ public class PanelColumnTab implements Initializable{
 
     private void deleteSelectedColumn(Column item) {
         columnsData.remove(item);
+        Integer id =  columnId.get(item);
+        columnPairs.get(id).setSecond(null);
+        columnId.remove(item);
     }
 
     public void setColumnsWidth(){
@@ -230,7 +269,6 @@ public class PanelColumnTab implements Initializable{
                                 // Checking not null box
                                 column.setNotNull(newValue);
                                 columnTable.refresh();
-
                                 // Creating a PRIMARY Index in index tab
                                 if(indexTabController != null && !indexTabController.primaryExists()){
                                     Index primaryIndex = new Index();
@@ -286,7 +324,7 @@ public class PanelColumnTab implements Initializable{
                             Column column = columnTable.getItems().get(row);
                             boolean newValue = checkBox.isSelected();
                             column.setNotNull(newValue);
-                            if(row == tableSize -1){
+                            if(row == tableSize - 1){
                                 columnTable.getItems().add(new Column());
                             }
                         }

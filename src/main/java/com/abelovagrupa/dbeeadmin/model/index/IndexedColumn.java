@@ -4,9 +4,11 @@ import com.abelovagrupa.dbeeadmin.model.column.Column;
 import javafx.beans.property.*;
 
 import java.net.spi.InetAddressResolver;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
 public class IndexedColumn {
 
@@ -186,7 +188,25 @@ public class IndexedColumn {
         result = 31 * result + getOrderNumber();
         result = 31 * result + Objects.hashCode(getOrder());
         result = 31 * result + getLength();
-//        result = 31 * result + getIndex().hashCode();
         return result;
     }
+
+    public static BiFunction<IndexedColumn, IndexedColumn, HashMap<String, Object[]>> indexedColumnAttributeComparator = (ic1, ic2) -> {
+        HashMap<String, Object[]> diffs = new HashMap<>();
+
+        if (!Objects.equals(ic1.getColumn(), ic2.getColumn())) {
+            diffs.put("column", new Object[]{ic1.getColumn(), ic2.getColumn()});
+        }
+        if (ic1.getOrderNumber() != ic2.getOrderNumber()) {
+            diffs.put("orderNumber", new Object[]{ic1.getOrderNumber(), ic2.getOrderNumber()});
+        }
+        if (!Objects.equals(ic1.getOrder(), ic2.getOrder())) {
+            diffs.put("order", new Object[]{ic1.getOrder(), ic2.getOrder()});
+        }
+        if (ic1.getLength() != ic2.getLength()) {
+            diffs.put("length", new Object[]{ic1.getLength(), ic2.getLength()});
+        }
+        return diffs;
+    };
+
 }

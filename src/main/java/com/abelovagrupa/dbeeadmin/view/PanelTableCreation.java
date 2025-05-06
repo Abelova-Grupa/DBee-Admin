@@ -18,6 +18,7 @@ import com.abelovagrupa.dbeeadmin.services.QueryExecutor;
 import com.abelovagrupa.dbeeadmin.util.AlertManager;
 import com.abelovagrupa.dbeeadmin.util.DiffResult;
 import com.abelovagrupa.dbeeadmin.util.ListDiff;
+import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,7 +27,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -211,9 +211,12 @@ public class PanelTableCreation implements Initializable {
             applyQuery = "";
             List<Column> commitedColumnData = new LinkedList<>(columnTabController.commitedColumnData);
             // Removing last empty row from list copy
-            if(!commitedColumnData.isEmpty() && columnTabController.emptyProperties(commitedColumnData.getLast())) commitedColumnData.removeLast();
+            if(!commitedColumnData.isEmpty() && columnTabController.emptyProperties(commitedColumnData.getLast())){
+                columnTabController.columnPairs.remove(Collections.max(columnTabController.columnPairs.keySet()));
+                commitedColumnData.removeLast();
+            }
 
-            DiffResult<Column> listDifferences = ListDiff.compareLists(commitedColumnData, columnTabController.getTableColumns(),Column.columnAttributeComparator,Column.class);
+            DiffResult<Column> listDifferences = ListDiff.compareLists(columnTabController.columnPairs,Column.columnAttributeComparator,Column.class);
             if(ListDiff.noDiff(listDifferences)) return;
 
             // Creating the table if it doesn't exist
@@ -239,21 +242,18 @@ public class PanelTableCreation implements Initializable {
             commitedIndexData.removeIf(s -> s.getName().equals("PRIMARY") && s.getType().equals(IndexType.PRIMARY));
             if(!commitedIndexData.isEmpty() && indexTabController.emptyProperties(commitedIndexData.getLast())) commitedIndexData.removeLast();
 
-            DiffResult<Index> listDifferences = ListDiff.compareLists(commitedIndexData,indexTabController.getTableIndexes(),Index.indexAttributeComparator,Index.class);
+            List<Index> indexData = indexTabController.getTableIndexes();
+            // commitedIndexData and indexData are the same length
+            Integer lastPairId = Collections.max(indexTabController.indexPairs.keySet());
+            for(int i = 0; i < commitedIndexData.size(); i++){
+                indexTabController.indexPairs.put(++lastPairId, Pair.of(commitedIndexData.get(i),indexData.get(i)));
+            }
+
+            DiffResult<Index> listDifferences = ListDiff.compareLists(indexTabController.indexPairs,Index.indexAttributeComparator,Index.class);
             if(ListDiff.noDiff(listDifferences)) return;
 
             // Index deletion, addition, altering
-            applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
-            Optional<List<Index>> indexesToBeDeleted = Optional.ofNullable(dropTableIndexes(listDifferences));
-            Optional<List<Index>> indexesToBeCreated = Optional.ofNullable(addTableIndexes(listDifferences));
-            changeTableIndexAttributes(listDifferences);
-            QueryExecutor.executeQuery(applyQuery,true);
-
-            indexesToBeDeleted.ifPresent(this::renderIndexDeletion);
-            indexesToBeCreated.ifPresent(this::renderNewIndexes);
-
-            indexTabController.commitedIndexData = new LinkedList<>(indexTabController.indexData)
-                    .stream().map(Index::deepCopy).toList();
+            handleTableIndexChange(listDifferences);
 
         }else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(foreignKeyTab)){
             if(currentTable == null) return;
@@ -262,7 +262,7 @@ public class PanelTableCreation implements Initializable {
             List<ForeignKey> commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.commitedForeignKeyData);
             if(!commitedForeignKeyData.isEmpty() && foreignKeyTabController.emptyProperties(commitedForeignKeyData.getLast())) commitedForeignKeyData.removeLast();
 
-            DiffResult<ForeignKey> listDifferences = ListDiff.compareLists(commitedForeignKeyData,foreignKeyTabController.getTableForeignKeys(),ForeignKey.foreignKeyAttributeComparator,ForeignKey.class);
+            DiffResult<ForeignKey> listDifferences = ListDiff.compareLists(foreignKeyTabController.fkPairs,ForeignKey.foreignKeyAttributeComparator,ForeignKey.class);
             if(ListDiff.noDiff(listDifferences)) return;
 
             // Foreign key deletion, addition, altering
@@ -294,6 +294,20 @@ public class PanelTableCreation implements Initializable {
         columnsToBeAdded.ifPresent(this::renderNewColumns);
         columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
                 .stream().map(Column::deepCopy).toList();
+    }
+
+    private void handleTableIndexChange(DiffResult<Index> listDifferences) {
+        applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
+        Optional<List<Index>> indexesToBeDeleted = Optional.ofNullable(dropTableIndexes(listDifferences));
+        Optional<List<Index>> indexesToBeCreated = Optional.ofNullable(addTableIndexes(listDifferences));
+        changeTableIndexAttributes(listDifferences);
+        QueryExecutor.executeQuery(applyQuery,true);
+
+        indexesToBeDeleted.ifPresent(this::renderIndexDeletion);
+        indexesToBeCreated.ifPresent(this::renderNewIndexes);
+
+        indexTabController.commitedIndexData = new LinkedList<>(indexTabController.indexData)
+                .stream().map(Index::deepCopy).toList();
     }
 
     private void renderColumnDeletion(@NotNull List<Column> columns) {
@@ -596,19 +610,14 @@ public class PanelTableCreation implements Initializable {
         if(indexDiff.changedAttributes.isEmpty()) return;
         for(Index index : indexDiff.changedAttributes.keySet()){
             index.setTable(currentTable);
+            DiffResult<IndexedColumn> indexColumnDiff = ListDiff.compareLists(null,IndexedColumn.indexedColumnAttributeComparator,IndexedColumn.class);
             // Name is changed, create a rename query
-            if(indexDiff.changedAttributes.get(index).get("name").length != 0 && indexDiff.changedAttributes.get(index).size() == 1){
+            if(indexDiff.changedAttributes.get(index).get("name").length != 0 && indexDiff.changedAttributes.get(index).size() == 1 && ListDiff.noDiff(indexColumnDiff)){
                 String oldName = (String) indexDiff.changedAttributes.get(index).get("name")[0];
                 String newName = (String) indexDiff.changedAttributes.get(index).get("name")[1];
                 applyQuery += DDLGenerator.createIndexRenameQuery(index,oldName,newName);
                 applyQuery += "\n";
             }
-//            else if(indexDiff.changedAttributes.get(index).get("name").length != 0 && indexDiff.changedAttributes.get(index).size() > 1){
-//                String oldName = (String) indexDiff.changedAttributes.get(index).get("name")[0];
-//                String newName = (String) indexDiff.changedAttributes.get(index).get("name")[1];
-//                applyQuery += DDLGenerator.createColumnRenameAndAlterQuery(oldName,newName,index);
-//                applyQuery += "\n";
-//            }
             else{
                 applyQuery += DDLGenerator.createIndexAlterQuery(index);
             }
