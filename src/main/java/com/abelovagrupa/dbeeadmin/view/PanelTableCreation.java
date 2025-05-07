@@ -77,6 +77,10 @@ public class PanelTableCreation implements Initializable {
 
     ObservableList<IndexedColumn> indexedColumns = FXCollections.observableArrayList();
 
+    List<ForeignKey> committedForeignKeyData;
+
+    ObservableList<ForeignKey> foreignKeyData;
+
     boolean[] tabLoaded;
 
     public PanelBrowser getBrowserController() {
@@ -156,6 +160,12 @@ public class PanelTableCreation implements Initializable {
                             VBox foreignKeyTabContent = fkLoader.load();
                             foreignKeyTabController = fkLoader.getController();
                             foreignKeyTab.setContent(foreignKeyTabContent);
+                            if(committedForeignKeyData != null && foreignKeyData != null){
+                                foreignKeyTabController.commitedForeignKeyData = committedForeignKeyData;
+                                foreignKeyTabController.foreignKeyData = foreignKeyData;
+                                foreignKeyTabController.foreignKeyTable.setItems(foreignKeyTabController.foreignKeyData);
+                            }
+
                             tabLoaded[2] = true;
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -254,9 +264,7 @@ public class PanelTableCreation implements Initializable {
             List<Index> indexData = indexTabController.getTableIndexes();
             // commitedIndexData and indexData are the same length
             Integer lastPairId = indexTabController.indexPairs.isEmpty() ? 0 : Collections.max(indexTabController.indexPairs.keySet());
-//            for(int i = 0; i < Math.min(commitedIndexData.size(),indexData.size()); i++){
-//                indexTabController.indexPairs.put(++lastPairId, Pair.of(commitedIndexData.get(i),indexData.get(i)));
-//            }
+
             for(Index index : indexData){
                 if(!indexTabController.indexIds.containsKey(index)){
                     indexTabController.indexPairs.put(++lastPairId,Pair.of(null,index));

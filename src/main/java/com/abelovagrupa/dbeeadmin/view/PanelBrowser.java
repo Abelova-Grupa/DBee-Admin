@@ -4,6 +4,7 @@ import com.abelovagrupa.dbeeadmin.Main;
 import com.abelovagrupa.dbeeadmin.controller.DatabaseInspector;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 import com.abelovagrupa.dbeeadmin.model.schema.Schema;
@@ -15,6 +16,7 @@ import com.abelovagrupa.dbeeadmin.services.QueryProcessor;
 import com.abelovagrupa.dbeeadmin.util.Pair;
 import com.abelovagrupa.dbeeadmin.view.schemaview.PanelSchemaTree;
 import com.abelovagrupa.dbeeadmin.view.schemaview.PanelTableTree;
+import com.abelovagrupa.dbeeadmin.view.schemaview.tableView.PanelForeignKeyTree;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -572,7 +574,63 @@ public class PanelBrowser implements Initializable {
             }
 
             // Loading foreign key data
+            if(tableCreationController.tabLoaded[2]){
+                PanelFKTab foreignKeyController = tableCreationController.foreignKeyTabController;
+                foreignKeyController.commitedForeignKeyData = new LinkedList<>(selectedTable.getForeignKeys().stream().map(
+                        foreignKey -> {
+                            ForeignKey fkCopy = ForeignKey.deepCopy(foreignKey);
+                            fkCopy.getReferencingColumns().clear();
+                            fkCopy.getReferencedColumns().clear();
+                            List<ForeignKeyColumns> fkColumnCopies = fkCopy.getColumnPairs().stream().map(fkColumn ->{
+                                ForeignKeyColumns fkColumnCopy = ForeignKeyColumns.deepCopy(fkColumn);
+                                fkCopy.getReferencingColumns().add(fkColumnCopy.getFirst());
+                                fkCopy.getReferencedColumns().add(fkColumnCopy.getSecond());
+                                return fkColumnCopy;
+                            }).toList();
+                            fkCopy.setColumnPairs(fkColumnCopies);
+                            return fkCopy;
+                        }
+                ).toList());
 
+                List<ForeignKey> foreignKeyData = new LinkedList<>(selectedTable.getForeignKeys()
+                        .stream().map(foreignKey -> {
+                            for(ForeignKeyColumns fkColumns : foreignKey.getColumnPairs()){
+                                fkColumns.setCheckedColumnProperty(true);
+                            }
+                            return foreignKey;
+                        }).toList());
+                foreignKeyData.add(new ForeignKey());
+                foreignKeyController.foreignKeyData = FXCollections.observableArrayList(foreignKeyData);
+                foreignKeyController.foreignKeyTable.setItems(foreignKeyController.foreignKeyData);
+
+            }else{
+                tableCreationController.committedForeignKeyData = new LinkedList<>(selectedTable.getForeignKeys().stream().map(
+                        foreignKey -> {
+                            ForeignKey fkCopy = ForeignKey.deepCopy(foreignKey);
+                            fkCopy.getReferencingColumns().clear();
+                            fkCopy.getReferencedColumns().clear();
+                            List<ForeignKeyColumns> fkColumnCopies = fkCopy.getColumnPairs().stream().map(fkColumn ->{
+                                ForeignKeyColumns fkColumnCopy = ForeignKeyColumns.deepCopy(fkColumn);
+                                fkCopy.getReferencingColumns().add(fkColumnCopy.getFirst());
+                                fkCopy.getReferencedColumns().add(fkColumnCopy.getSecond());
+                                return fkColumnCopy;
+                            }).toList();
+                            fkCopy.setColumnPairs(fkColumnCopies);
+                            return fkCopy;
+                        }
+                ).toList());
+
+                List<ForeignKey> foreignKeyData = new LinkedList<>(selectedTable.getForeignKeys()
+                        .stream().map(foreignKey -> {
+                            for(ForeignKeyColumns fkColumns : foreignKey.getColumnPairs()){
+                                fkColumns.setCheckedColumnProperty(true);
+                            }
+                            return foreignKey;
+                        }).toList());
+                foreignKeyData.add(new ForeignKey());
+                tableCreationController.foreignKeyData = FXCollections.observableArrayList(foreignKeyData);
+
+            }
 
             // Creating tab
             Tab tableTab = new Tab("New Table");
