@@ -359,7 +359,7 @@ public class DDLGenerator {
         if (index.getType() != null && index.getType() != IndexType.INDEX) {
             queryBuilder.append(index.getType()).append(" "); // e.g., UNIQUE, FULLTEXT
         }
-        queryBuilder.append("INDEX `").append(index.getName()).append("` (");
+        queryBuilder.append("INDEX ").append(index.getName()).append(" (");
 
         Comparator<IndexedColumn> indexComparator = new Comparator<IndexedColumn>() {
             @Override
@@ -396,7 +396,7 @@ public class DDLGenerator {
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
       
-        return "RENAME INDEX `" + oldName + "` TO `" + newName + "`";
+        return "RENAME INDEX " + oldName + " TO " + newName;
     }
 
     public static String createIndexDropQuery(Index index) {
@@ -404,7 +404,7 @@ public class DDLGenerator {
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
 
-        return "DROP INDEX `" + index.getName() + "`";
+        return "DROP INDEX " + index.getName();
     }
 
     public static String createIndexAlterQuery(Index index) {

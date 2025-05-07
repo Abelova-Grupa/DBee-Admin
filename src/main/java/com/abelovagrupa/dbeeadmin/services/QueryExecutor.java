@@ -145,6 +145,7 @@ public class QueryExecutor {
         } catch (SQLException e) {
             try {
                 connection.rollback();
+                System.out.println(e.getMessage());
             } catch (SQLException rollbackEx) {
                 logger.error("Error during rollback {}", rollbackEx.getMessage());
             }
