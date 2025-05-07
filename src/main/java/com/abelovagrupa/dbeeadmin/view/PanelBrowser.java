@@ -503,9 +503,11 @@ public class PanelBrowser implements Initializable {
             tableTabContent = fxmlLoader.load();
             PanelTableCreation tableCreationController = fxmlLoader.getController();
             tableCreationController.setBrowserController(this);
+            PanelColumnTab columnController = tableCreationController.columnTabController;
 
+            // Loading column data
             tableCreationController.currentTable = selectedTable;
-            tableCreationController.columnTabController.commitedColumnData = new LinkedList<>(selectedTable.getColumns())
+            columnController.commitedColumnData = new LinkedList<>(selectedTable.getColumns())
                     .stream().map(column -> {
                         column = Column.deepCopy(column);
                         return column;
@@ -513,8 +515,19 @@ public class PanelBrowser implements Initializable {
 
             List<Column> columnData = new LinkedList<>(selectedTable.getColumns());
             columnData.add(new Column());
-            tableCreationController.columnTabController.columnsData = FXCollections.observableArrayList(columnData);
-            tableCreationController.columnTabController.columnTable.setItems(tableCreationController.columnTabController.columnsData);
+            columnController.columnsData = FXCollections.observableArrayList(columnData);
+            columnController.columnTable.setItems(tableCreationController.columnTabController.columnsData);
+
+            //Putting columns from both lists into a hashmap of pairs that we will later compare
+            for(int i = 0; i < columnController.commitedColumnData.size(); i++){
+                Column commitedColumn = columnController.commitedColumnData.get(i);
+                Column column = columnController.columnsData.get(i);
+                Integer lastId = columnController.columnPairs.isEmpty() ? 0 : Collections.max(columnController.columnPairs.keySet());
+
+                columnController.columnPairs.put(++lastId,Pair.of(commitedColumn,column));
+                columnController.commitedColumnId.put(column,lastId);
+                columnController.columnId.put(column,lastId);
+            }
 
             tableCreationController.txtTableName.setText(selectedTable.getName());
             tableCreationController.txtTableName.setEditable(false);
@@ -526,19 +539,40 @@ public class PanelBrowser implements Initializable {
             tableCreationController.cbSchema.setDisable(true);
 
             // Loading index data
-            tableCreationController.indexTabController.commitedIndexData = new LinkedList<>(selectedTable.getIndexes())
+            PanelIndexTab indexController = tableCreationController.indexTabController;
+            indexController.commitedIndexData = new LinkedList<>(selectedTable.getIndexes())
                     .stream().map(index -> {
-                        index = Index.deepCopy(index);
+                        Index indexCopy = Index.deepCopy(index);
+                        List<IndexedColumn> indexColCopies = indexCopy.getIndexedColumns().stream().map(IndexedColumn::deepCopy).toList();
+                        indexCopy.setIndexedColumns(indexColCopies);
+                        for (IndexedColumn ic : indexCopy.getIndexedColumns()){
+                            ic.checkedColumnProperty().set(true);
+                        }
+                        return indexCopy;
+                    }).toList();
+
+            List<Index> indexData = new LinkedList<>(selectedTable.getIndexes()
+                    .stream().map(index -> {
                         for (IndexedColumn ic : index.getIndexedColumns()){
                             ic.checkedColumnProperty().set(true);
                         }
                         return index;
-                    }).toList();
-
-            List<Index> indexData = new LinkedList<>(selectedTable.getIndexes());
+                    }).toList());
             indexData.add(new Index());
-            tableCreationController.indexTabController.indexData = FXCollections.observableArrayList(indexData);
-            tableCreationController.indexTabController.indexTable.setItems(tableCreationController.indexTabController.indexData);
+            indexController.indexData = FXCollections.observableArrayList(indexData);
+            indexController.indexTable.setItems(tableCreationController.indexTabController.indexData);
+
+            for(int i = 0; i < indexController.commitedIndexData.size(); i++){
+                Index commitedIndex = indexController.commitedIndexData.get(i);
+                Index index = indexController.indexData.get(i);
+                Integer lastId = indexController.indexPairs.isEmpty() ? 0 : Collections.max(indexController.indexPairs.keySet());
+                indexController.indexPairs.put(++lastId,Pair.of(commitedIndex,index));
+                indexController.commitedIndexIds.put(commitedIndex,lastId);
+                indexController.indexIds.put(index,lastId);
+            }
+
+            // Loading foreign key data
+
 
             // Creating tab
             Tab tableTab = new Tab("New Table");

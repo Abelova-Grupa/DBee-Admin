@@ -77,6 +77,12 @@ public class PanelFKTab implements Initializable {
 
     Optional<ForeignKeyColumns> selectedFKColumn;
 
+    HashMap<Integer,Pair<ForeignKey,ForeignKey>> fkPairs = new HashMap<>();
+
+    HashMap<ForeignKey,Integer> commitedFkIds = new HashMap<>();
+
+    HashMap<ForeignKey,Integer> fkIds = new HashMap<>();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Setting up foreign key table properties
@@ -221,13 +227,21 @@ public class PanelFKTab implements Initializable {
             newSelection.nameProperty().addListener((_,oldVal,newVal) -> {
                 int lastIndex = foreignKeyTable.getItems().size() - 1;
                 if(index != lastIndex) return;
-                foreignKeyTable.getItems().add(new ForeignKey());
+                int lastPairId = Collections.max(fkPairs.keySet());
+                ForeignKey newForeignKey = new ForeignKey();
+                foreignKeyTable.getItems().add(newForeignKey);
+                fkPairs.put(++lastPairId,Pair.of(null,newForeignKey));
+                fkIds.put(newForeignKey,lastPairId);
             });
 
             newSelection.referencedTableProperty().addListener((_,oldVal,newVal) -> {
                 int lastIndex = foreignKeyTable.getItems().size() - 1;
                 if(index != lastIndex) return;
+                int lastPairId = Collections.max(fkPairs.keySet());
+                ForeignKey newForeignkey = new ForeignKey();
                 foreignKeyTable.getItems().add(new ForeignKey());
+                fkPairs.put(++lastPairId,Pair.of(null,newForeignkey));
+                fkIds.put(newForeignkey,lastPairId);
             });
 
             for(ForeignKeyColumns fkColumn : foreignKeyColumnsData){

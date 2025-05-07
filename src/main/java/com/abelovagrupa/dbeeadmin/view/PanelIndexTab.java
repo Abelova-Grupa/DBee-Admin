@@ -1,6 +1,7 @@
 package com.abelovagrupa.dbeeadmin.view;
 
 import com.abelovagrupa.dbeeadmin.model.index.*;
+import com.abelovagrupa.dbeeadmin.util.Pair;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -67,6 +68,12 @@ public class PanelIndexTab implements Initializable {
     ObservableList<Index> indexData = FXCollections.observableArrayList(commitedIndexData);
 
     ObservableList<IndexedColumn> indexedColumnData = FXCollections.observableArrayList();
+
+    HashMap<Integer,Pair<Index,Index>> indexPairs = new HashMap<>();
+
+    IdentityHashMap<Index,Integer> commitedIndexIds = new IdentityHashMap<>();
+
+    IdentityHashMap<Index,Integer> indexIds = new IdentityHashMap<>();
 
     Index selectedIndex;
 
@@ -305,6 +312,8 @@ public class PanelIndexTab implements Initializable {
 
     private void deleteSelectedIndex(Index item) {
         indexData.remove(item);
+        Integer id = indexIds.get(item);
+        indexPairs.get(id).setSecond(null);
     }
 
     private void setColumnsEditable(boolean editable) {

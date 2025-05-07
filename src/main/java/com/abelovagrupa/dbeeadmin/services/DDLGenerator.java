@@ -353,10 +353,13 @@ public class DDLGenerator {
         if (index.getTable().getSchema() == null) throw new IllegalArgumentException("Schema is not set");
         if (index.getTable() == null) throw new IllegalArgumentException("Table is not set");
 
-        StringBuilder queryBuilder = new StringBuilder("ADD ")
-                .append(
-            !index.getType().equals(IndexType.INDEX) ? index.getType() + " " : " "
-        ).append("INDEX ").append(index.getName()).append(" (");
+        StringBuilder queryBuilder = new StringBuilder("ADD ");
+
+        // Handle index type.  Don't add "INDEX" if the type is already something else.
+        if (index.getType() != null && index.getType() != IndexType.INDEX) {
+            queryBuilder.append(index.getType()).append(" "); // e.g., UNIQUE, FULLTEXT
+        }
+        queryBuilder.append("INDEX ").append(index.getName()).append(" (");
 
         Comparator<IndexedColumn> indexComparator = new Comparator<IndexedColumn>() {
             @Override
@@ -376,7 +379,7 @@ public class DDLGenerator {
             if (i != sortedIndexedColumns.size() - 1) queryBuilder.append(", ");
         }
 
-        queryBuilder.append(") USING ").append(index.getStorageType()).append(index.isVisible() ? " VISIBLE " : " INVISIBLE ").append("\n ");
+        queryBuilder.append(") USING ").append(index.getStorageType()).append(index.isVisible() ? " VISIBLE" : " INVISIBLE").append("\n ");
         if (index.getKeyBlockSize() != 0)
             queryBuilder.append("KEY_BLOCK_SIZE = ").append(index.getKeyBlockSize()).append(" ");
         if (index.getParser() != null && !index.getParser().isEmpty())
@@ -405,7 +408,7 @@ public class DDLGenerator {
     }
 
     public static String createIndexAlterQuery(Index index) {
-        return createIndexDropQuery(index) + "\n" + createIndexCreationQuery(index);
+        return createIndexDropQuery(index) + ";\nALTER TABLE "+index.getTable().getSchema().getName() + "."+index.getTable().getName()+"\n" + createIndexCreationQuery(index);
     }
 
     public static String createTriggerCreationQuery(Trigger trigger) {

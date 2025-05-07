@@ -82,6 +82,85 @@ public class QueryExecutor {
         return Pair.of(resultSet, rowsAffected);
     }
 
+    public static void executeBatch(String sql, boolean preview){
+        DatabaseConnection.getInstance().setCurrentSchema(ProgramState.getInstance().getSelectedSchema());
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Integer rowsAffected = null;
+
+        try {
+            // Get the database connection
+            connection = DatabaseConnection.getInstance().getConnection();
+            statement = connection.createStatement();
+
+            // Disable auto-commit to ensure batch execution is handled in a transaction
+            connection.setAutoCommit(false);
+
+            // Previewing query
+
+
+            // Split the SQL string
+            String[] sqlStatements = sql.split(";");
+
+            // Add each SQL statement to the batch
+            for (String singleSql : sqlStatements) {
+                singleSql = singleSql.trim();
+                if (!singleSql.isEmpty()) {
+                    statement.addBatch(singleSql);
+                }
+            }
+
+
+
+            boolean shouldExecute = new DialogSQLPreview(sql).showAndWait().orElse(false);
+            int[] updateCounts = new int[0];
+
+            if (preview && shouldExecute) {
+                updateCounts = statement.executeBatch();
+            } else if (!preview) {
+                updateCounts = statement.executeBatch();
+            }
+
+            // Execute the batch
+
+
+            // Iterate through the update counts to process each result
+            for (int updateCount : updateCounts) {
+                boolean isResultSet = statement.getMoreResults();
+
+                // If it is a SELECT query, process the ResultSet
+                if (isResultSet) {
+                    resultSet = statement.getResultSet();
+                } else {
+                    if(rowsAffected == null) rowsAffected = 0;
+                    rowsAffected += updateCount;
+                }
+            }
+
+            // Commit the transaction if everything is successful
+            connection.commit();
+            connection.setAutoCommit(true);
+
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+                System.out.println(e.getMessage());
+            } catch (SQLException rollbackEx) {
+                logger.error("Error during rollback {}", rollbackEx.getMessage());
+            }
+            logger.error("Error executing SQL query: {}", e.getMessage());
+            AlertManager.showErrorDialog(null, "Error executing SQL query:", e.getMessage());
+        } finally {
+            DatabaseConnection.getInstance().setCurrentSchema(null);
+            try {
+                DatabaseConnection.getInstance().getConnection().setAutoCommit(true);
+            } catch (SQLException e) {
+                logger.fatal("Something extremely dire and profoundly fucked happened.");
+            }
+        }
+    }
+
     public static Pair<ResultSet, Integer> executeQuery(String sql) {
         DatabaseConnection.getInstance().setCurrentSchema(ProgramState.getInstance().getSelectedSchema());
         Connection connection = null;
