@@ -543,13 +543,21 @@ public class PanelBrowser implements Initializable {
             indexController.commitedIndexData = new LinkedList<>(selectedTable.getIndexes())
                     .stream().map(index -> {
                         Index indexCopy = Index.deepCopy(index);
+                        List<IndexedColumn> indexColCopies = indexCopy.getIndexedColumns().stream().map(IndexedColumn::deepCopy).toList();
+                        indexCopy.setIndexedColumns(indexColCopies);
                         for (IndexedColumn ic : indexCopy.getIndexedColumns()){
                             ic.checkedColumnProperty().set(true);
                         }
                         return indexCopy;
                     }).toList();
 
-            List<Index> indexData = new LinkedList<>(selectedTable.getIndexes());
+            List<Index> indexData = new LinkedList<>(selectedTable.getIndexes()
+                    .stream().map(index -> {
+                        for (IndexedColumn ic : index.getIndexedColumns()){
+                            ic.checkedColumnProperty().set(true);
+                        }
+                        return index;
+                    }).toList());
             indexData.add(new Index());
             indexController.indexData = FXCollections.observableArrayList(indexData);
             indexController.indexTable.setItems(tableCreationController.indexTabController.indexData);

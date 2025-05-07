@@ -191,6 +191,23 @@ public class IndexedColumn {
         return result;
     }
 
+    public static boolean containsByAttributes(List<IndexedColumn> indexedColumns, IndexedColumn indexedColumn) {
+        for (IndexedColumn indexedCol : indexedColumns) {
+            if (matchesByAttributes(indexedCol, indexedColumn)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean matchesByAttributes(IndexedColumn a, IndexedColumn b) {
+        return Objects.equals(a.getColumn(), b.getColumn()) &&
+                a.getOrderNumber() == b.getOrderNumber() &&
+                a.getOrder() == b.getOrder() &&
+                a.getLength() == b.getLength() &&
+                Objects.equals(a.getIndex(), b.getIndex());
+    }
+
     public static BiFunction<IndexedColumn, IndexedColumn, HashMap<String, Object[]>> indexedColumnAttributeComparator = (ic1, ic2) -> {
         HashMap<String, Object[]> diffs = new HashMap<>();
 

@@ -3,6 +3,7 @@ package com.abelovagrupa.dbeeadmin.util;
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
+import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,6 +86,23 @@ public class StructDiff {
                 }
             }
 
+        }
+
+        if(compareClass == IndexedColumn.class){
+            List<IndexedColumn> newIndexColumnList = (List<IndexedColumn>) newList;
+            List<IndexedColumn> oldIndexList = (List<IndexedColumn>) oldList;
+
+            for(T oldItem : oldList) {
+                if(!IndexedColumn.containsByAttributes(newIndexColumnList, (IndexedColumn) oldItem)  && !hasChangedAttributes(oldItem,result)){
+                    result.removed.add(oldItem);
+                }
+            }
+
+            for(T newItem : newList) {
+                if(!IndexedColumn.containsByAttributes(oldIndexList, (IndexedColumn) newItem) && !hasChangedAttributes(newItem,result)){
+                    result.added.add(newItem);
+                }
+            }
         }
 
         if(compareClass == ForeignKey.class){

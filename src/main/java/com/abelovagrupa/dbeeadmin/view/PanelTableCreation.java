@@ -234,7 +234,7 @@ public class PanelTableCreation implements Initializable {
                 List<Column> columns = columnTabController.getTableColumns();
                 currentTable = createTable(columns);
                 applyQuery += DDLGenerator.createTableCreationQuery(currentTable) +"\n";
-                QueryExecutor.executeQuery(applyQuery,true);
+                QueryExecutor.executeBatch(applyQuery,true);
                 renderNewTable(currentTable);
                 columnTabController.commitedColumnData = new LinkedList<>(columnTabController.columnsData)
                         .stream().map(Column::deepCopy).toList();
@@ -303,7 +303,7 @@ public class PanelTableCreation implements Initializable {
         changeTableColumnsAttributes(listDifferences);
 
         applyQuery += ";";
-        QueryExecutor.executeQuery(applyQuery,true);
+        QueryExecutor.executeBatch(applyQuery,true);
 
         columnsToBeDeleted.ifPresent(this::renderColumnDeletion);
         columnsToBeAdded.ifPresent(this::renderNewColumns);
@@ -316,7 +316,7 @@ public class PanelTableCreation implements Initializable {
         Optional<List<Index>> indexesToBeDeleted = Optional.ofNullable(dropTableIndexes(listDifferences));
         Optional<List<Index>> indexesToBeCreated = Optional.ofNullable(addTableIndexes(listDifferences));
         changeTableIndexAttributes(listDifferences);
-        QueryExecutor.executeQuery(applyQuery,true);
+        QueryExecutor.executeBatch(applyQuery,true);
 
         indexesToBeDeleted.ifPresent(this::renderIndexDeletion);
         indexesToBeCreated.ifPresent(this::renderNewIndexes);
@@ -623,10 +623,6 @@ public class PanelTableCreation implements Initializable {
     
     private void changeTableIndexAttributes(DiffResult<Index> indexDiff){
         if(indexDiff.changedAttributes.isEmpty()) return;
-
-        for(Index index : indexDiff.changedAttributes.keySet()){
-
-        }
 
         for(Index index : indexDiff.changedAttributes.keySet()){
             index.setTable(currentTable);
