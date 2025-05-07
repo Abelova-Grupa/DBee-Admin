@@ -46,7 +46,7 @@ This document contains a list of objectives that must be accomplished in order t
 #### Indexes
 
 - [x] Index creation
-- [ ] Index altering
+- [X] Index altering
 - [X] Index removal
   
   
