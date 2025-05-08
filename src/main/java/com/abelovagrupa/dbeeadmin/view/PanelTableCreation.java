@@ -166,6 +166,15 @@ public class PanelTableCreation implements Initializable {
                                 foreignKeyTabController.foreignKeyTable.setItems(foreignKeyTabController.foreignKeyData);
                             }
 
+                            for(int i = 0; i < foreignKeyTabController.commitedForeignKeyData.size(); i++){
+                                ForeignKey commitedFk = foreignKeyTabController.commitedForeignKeyData.get(i);
+                                ForeignKey foreignKey = foreignKeyTabController.foreignKeyData.get(i);
+                                Integer lastId = foreignKeyTabController.fkPairs.isEmpty() ? 0 : Collections.max(foreignKeyTabController.fkPairs.keySet());
+                                foreignKeyTabController.fkPairs.put(++lastId,Pair.of(commitedFk,foreignKey));
+                                foreignKeyTabController.commitedFkIds.put(commitedFk,lastId);
+                                foreignKeyTabController.fkIds.put(foreignKey,lastId);
+                            }
+
                             tabLoaded[2] = true;
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -278,28 +287,29 @@ public class PanelTableCreation implements Initializable {
             // Index deletion, addition, altering
             handleTableIndexChange(listDifferences);
 
-        }else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(foreignKeyTab)){
+        }
+        else if(tableAttributeTabPane.getSelectionModel().getSelectedItem().equals(foreignKeyTab)){
             if(currentTable == null) return;
 
             applyQuery = "";
             List<ForeignKey> commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.commitedForeignKeyData);
             if(!commitedForeignKeyData.isEmpty() && foreignKeyTabController.emptyProperties(commitedForeignKeyData.getLast())) commitedForeignKeyData.removeLast();
 
+            List<ForeignKey> foreignKeyData = foreignKeyTabController.getTableForeignKeys();
+            Integer lastPairId = indexTabController.indexPairs.isEmpty() ? 0 : Collections.max(indexTabController.indexPairs.keySet());
+
+            for(ForeignKey foreignKey : foreignKeyData){
+                if(!foreignKeyTabController.fkIds.containsKey(foreignKey)){
+                    foreignKeyTabController.fkPairs.put(++lastPairId,Pair.of(null,foreignKey));
+                    foreignKeyTabController.fkIds.put(foreignKey,lastPairId);
+                }
+            }
+
             DiffResult<ForeignKey> listDifferences = StructDiff.comparePairs(foreignKeyTabController.fkPairs,ForeignKey.foreignKeyAttributeComparator,ForeignKey.class);
             if(StructDiff.noDiff(listDifferences)) return;
 
             // Foreign key deletion, addition, altering
-            applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
-            Optional<List<ForeignKey>> foreignKeysToBeDeleted = Optional.ofNullable(dropTableForeignKeys(listDifferences));
-            Optional<List<ForeignKey>> foreignKeysToBeAdded = Optional.ofNullable(addTableForeignKeys(listDifferences));
-            QueryExecutor.executeQuery(applyQuery,true);
-
-            foreignKeysToBeDeleted.ifPresent(this::renderForeignKeyDeletion);
-            foreignKeysToBeAdded.ifPresent(this::renderNewForeignKeys);
-
-            foreignKeyTabController.commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.foreignKeyData)
-                    .stream().map(ForeignKey::deepCopy).toList();
-
+            handleTableFkChange(listDifferences);
         }
     }
 
@@ -332,6 +342,22 @@ public class PanelTableCreation implements Initializable {
         indexTabController.commitedIndexData = new LinkedList<>(indexTabController.indexData)
                 .stream().map(Index::deepCopy).toList();
     }
+
+    private void handleTableFkChange(DiffResult<ForeignKey> listDifferences){
+        applyQuery += DDLGenerator.createTableAlterQuery(currentTable) + "\n";
+        Optional<List<ForeignKey>> foreignKeysToBeDeleted = Optional.ofNullable(dropTableForeignKeys(listDifferences));
+        Optional<List<ForeignKey>> foreignKeysToBeAdded = Optional.ofNullable(addTableForeignKeys(listDifferences));
+        changeTableFkAttributes(listDifferences);
+        QueryExecutor.executeBatch(applyQuery,true);
+
+        foreignKeysToBeDeleted.ifPresent(this::renderForeignKeyDeletion);
+        foreignKeysToBeAdded.ifPresent(this::renderNewForeignKeys);
+
+        foreignKeyTabController.commitedForeignKeyData = new LinkedList<>(foreignKeyTabController.foreignKeyData)
+                .stream().map(ForeignKey::deepCopy).toList();
+    }
+
+
 
     private void renderColumnDeletion(@NotNull List<Column> columns) {
         TreeItem<String> tableTreeItemToChange =
@@ -636,6 +662,7 @@ public class PanelTableCreation implements Initializable {
             index.setTable(currentTable);
             Integer id = indexTabController.indexIds.get(index);
             Index committedIndex = indexTabController.indexPairs.get(id).getFirst();
+            Index newindex = indexTabController.indexPairs.get(id).getSecond();
 
             DiffResult<IndexedColumn> indexColumnDiff = StructDiff.compareLists(committedIndex.getIndexedColumns(),index.getIndexedColumns(),IndexedColumn.indexedColumnAttributeComparator,IndexedColumn.class);
             // Name is changed, create a rename query
@@ -646,9 +673,25 @@ public class PanelTableCreation implements Initializable {
                 applyQuery += "\n";
             }
             else{
-                applyQuery += DDLGenerator.createIndexAlterQuery(index);
+                applyQuery += DDLGenerator.createIndexAlterQuery(committedIndex,newindex);
             }
         }
     }
-    
+
+    private void changeTableFkAttributes(DiffResult<ForeignKey> fkDiff) {
+        if(fkDiff.changedAttributes.isEmpty()) return;
+
+        for(ForeignKey foreignKey : fkDiff.changedAttributes.keySet()){
+            foreignKey.setReferencingTable(currentTable);
+            Integer id = foreignKeyTabController.fkIds.get(foreignKey);
+            ForeignKey commitedFk = foreignKeyTabController.fkPairs.get(id).getFirst();
+            ForeignKey newFk = foreignKeyTabController.fkPairs.get(id).getSecond();
+
+            DiffResult<ForeignKeyColumns> fkColumnDiff = StructDiff.compareLists(commitedFk.getColumnPairs(),foreignKey.getColumnPairs(),ForeignKeyColumns.foreignKeyColumnComparator,ForeignKeyColumns.class);
+            applyQuery += DDLGenerator.createForeignKeyAlterQuery(commitedFk,newFk);
+
+        }
+
+     }
+
 }

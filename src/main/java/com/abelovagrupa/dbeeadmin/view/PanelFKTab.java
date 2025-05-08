@@ -79,9 +79,9 @@ public class PanelFKTab implements Initializable {
 
     HashMap<Integer,Pair<ForeignKey,ForeignKey>> fkPairs = new HashMap<>();
 
-    HashMap<ForeignKey,Integer> commitedFkIds = new HashMap<>();
+    IdentityHashMap<ForeignKey,Integer> commitedFkIds = new IdentityHashMap<>();
 
-    HashMap<ForeignKey,Integer> fkIds = new HashMap<>();
+    IdentityHashMap<ForeignKey,Integer> fkIds = new IdentityHashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -227,21 +227,13 @@ public class PanelFKTab implements Initializable {
             newSelection.nameProperty().addListener((_,oldVal,newVal) -> {
                 int lastIndex = foreignKeyTable.getItems().size() - 1;
                 if(index != lastIndex) return;
-                int lastPairId = Collections.max(fkPairs.keySet());
-                ForeignKey newForeignKey = new ForeignKey();
-                foreignKeyTable.getItems().add(newForeignKey);
-                fkPairs.put(++lastPairId,Pair.of(null,newForeignKey));
-                fkIds.put(newForeignKey,lastPairId);
+                foreignKeyTable.getItems().add(new ForeignKey());
             });
 
             newSelection.referencedTableProperty().addListener((_,oldVal,newVal) -> {
                 int lastIndex = foreignKeyTable.getItems().size() - 1;
                 if(index != lastIndex) return;
-                int lastPairId = Collections.max(fkPairs.keySet());
-                ForeignKey newForeignkey = new ForeignKey();
                 foreignKeyTable.getItems().add(new ForeignKey());
-                fkPairs.put(++lastPairId,Pair.of(null,newForeignkey));
-                fkIds.put(newForeignkey,lastPairId);
             });
 
             for(ForeignKeyColumns fkColumn : foreignKeyColumnsData){
@@ -314,6 +306,8 @@ public class PanelFKTab implements Initializable {
 
     private void deleteSelectedForeignKey(ForeignKey item) {
         foreignKeyData.remove(item);
+        Integer id = fkIds.get(item);
+        fkPairs.get(id).setSecond(null);
     }
 
     public void setColumnsWidth(){

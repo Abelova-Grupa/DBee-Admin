@@ -344,8 +344,8 @@ public class DDLGenerator {
         return dropQueryBuilder + newQueryBuilder + " ;";
     }
 
-    public static String createForeignKeyAlterQuery(ForeignKey oldForeignKey, ForeignKey newForeignKey) {
-        return createForeignKeyDropQuery(oldForeignKey) + "\n" + createForeignKeyCreationQuery(newForeignKey);
+    public static String createForeignKeyAlterQuery(ForeignKey oldFk, ForeignKey newFk) {
+        return createForeignKeyDropQuery(oldFk) + ";\nALTER TABLE " +newFk.getReferencingTable().getSchema().getName() + "."+newFk.getReferencingTable().getName()+"\n" + createForeignKeyCreationQuery(newFk);
     }
 
     public static String createIndexCreationQuery(Index index) {
@@ -407,8 +407,8 @@ public class DDLGenerator {
         return "DROP INDEX " + index.getName();
     }
 
-    public static String createIndexAlterQuery(Index index) {
-        return createIndexDropQuery(index) + ";\nALTER TABLE "+index.getTable().getSchema().getName() + "."+index.getTable().getName()+"\n" + createIndexCreationQuery(index);
+    public static String createIndexAlterQuery(Index oldIndex,Index newIndex) {
+        return createIndexDropQuery(oldIndex) + ";\nALTER TABLE "+newIndex.getTable().getSchema().getName() + "."+newIndex.getTable().getName()+"\n" + createIndexCreationQuery(newIndex);
     }
 
     public static String createTriggerCreationQuery(Trigger trigger) {

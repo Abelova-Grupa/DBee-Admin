@@ -594,6 +594,7 @@ public class PanelBrowser implements Initializable {
 
                 List<ForeignKey> foreignKeyData = new LinkedList<>(selectedTable.getForeignKeys()
                         .stream().map(foreignKey -> {
+                            foreignKey.setReferencedTableProperty(foreignKey.getReferencedSchema().getName()+"."+foreignKey.getReferencedTable().getName());
                             for(ForeignKeyColumns fkColumns : foreignKey.getColumnPairs()){
                                 fkColumns.setCheckedColumnProperty(true);
                             }
@@ -622,6 +623,8 @@ public class PanelBrowser implements Initializable {
 
                 List<ForeignKey> foreignKeyData = new LinkedList<>(selectedTable.getForeignKeys()
                         .stream().map(foreignKey -> {
+                            foreignKey.setReferencedTableProperty(foreignKey.getReferencedSchema().getName()+"."+foreignKey.getReferencedTable().getName());
+
                             for(ForeignKeyColumns fkColumns : foreignKey.getColumnPairs()){
                                 fkColumns.setCheckedColumnProperty(true);
                             }

@@ -79,8 +79,8 @@ public class QueryProcessor {
         QueryExecutor.executeQuery(query,preview);
     }
 
-    public static void alterForeignKey(ForeignKey oldForeignKey, ForeignKey newForeignKey, boolean preview){
-        String query = DDLGenerator.createForeignKeyAlterQuery(oldForeignKey,newForeignKey);
+    public static void alterForeignKey(ForeignKey oldFk, ForeignKey newFk, boolean preview){
+        String query = DDLGenerator.createForeignKeyAlterQuery(oldFk,newFk);
         QueryExecutor.executeQuery(query,preview);
     }
 
