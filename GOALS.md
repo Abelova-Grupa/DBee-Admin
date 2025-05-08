@@ -17,8 +17,8 @@ This document contains a list of objectives that must be accomplished in order t
 
 #### Views
 - [x] View creation
-- [ ] View altering
-- [ ] View removal
+- [X] View altering
+- [X] View removal
 
 #### Tables
 - [x] Table creation
