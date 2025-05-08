@@ -2,6 +2,7 @@ package com.abelovagrupa.dbeeadmin.util;
 
 import com.abelovagrupa.dbeeadmin.model.column.Column;
 import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKey;
+import com.abelovagrupa.dbeeadmin.model.foreignkey.ForeignKeyColumns;
 import com.abelovagrupa.dbeeadmin.model.index.Index;
 import com.abelovagrupa.dbeeadmin.model.index.IndexedColumn;
 
@@ -117,6 +118,24 @@ public class StructDiff {
 
             for(T newItem : newList) {
                 if(!ForeignKey.containsByAttributes(oldFkList, (ForeignKey) newItem) && !hasChangedAttributes(newItem,result)){
+                    result.added.add(newItem);
+                }
+            }
+
+        }
+
+        if(compareClass == ForeignKeyColumns.class){
+            List<ForeignKeyColumns> newFkColumnList = (List<ForeignKeyColumns>) newList;
+            List<ForeignKeyColumns> oldFkColumnList = (List<ForeignKeyColumns>) oldList;
+
+            for(T oldItem : oldList){
+                if(!ForeignKeyColumns.containsByAttributes(newFkColumnList,(ForeignKeyColumns) oldItem) && !hasChangedAttributes(oldItem,result)){
+                    result.removed.add(oldItem);
+                }
+            }
+
+            for(T newItem : newList){
+                if(!ForeignKeyColumns.containsByAttributes(oldFkColumnList,(ForeignKeyColumns) newItem) && !hasChangedAttributes(newItem,result)){
                     result.added.add(newItem);
                 }
             }
