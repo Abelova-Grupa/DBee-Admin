@@ -8,7 +8,7 @@ This document contains a list of objectives that must be accomplished in order t
 - [x] Result table
 - [x] History panel
 - [X] Tree browser
-- [ ] Database connector
+- [X] Database connector
 
 ### Visual schema operations
 - [x] Schema creation
