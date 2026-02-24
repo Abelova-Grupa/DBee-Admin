@@ -3,6 +3,8 @@
 
 Cross-platform visual database design and administration tool
 
+https://github.com/user-attachments/assets/ea993481-b059-4bb6-9624-7e3847c07278
+
 ## Requirements 📝
 + [Java Runtime Environment](https://www.java.com/en/download/manual.jsp) (*That you have already installed for Minecraft*)
 + [MySQL](https://www.mysql.com/) or [MariaDB](https://mariadb.org/)
